@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planning · Agent Skills</title>
+<meta name="description" content="What should we build, before any code exists?">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Planning · Agent Skills">
+<meta property="og:description" content="What should we build, before any code exists?">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%BA%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#E7E9E4; --surface:#F3F4F0; --surface-2:#DDE0DA;
+  --ink:#141C22; --muted:#5C6A70; --faint:#8A959A;
+  --line:rgba(20,28,34,.16); --line-soft:rgba(20,28,34,.08);
+  --gate:#1F5C8B; --gate-bg:rgba(31,92,139,.10);
+  --engine:#8C6714; --engine-bg:rgba(140,103,20,.10);
+  --shadow:0 1px 0 rgba(20,28,34,.06);
+  --f-display:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-body:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#101519; --surface:#171E23; --surface-2:#1F272D;
+    --ink:#DBE2E2; --muted:#8D9B9D; --faint:#6C787B;
+    --line:rgba(219,226,226,.17); --line-soft:rgba(219,226,226,.08);
+    --gate:#6FB2E0; --gate-bg:rgba(111,178,224,.13);
+    --engine:#D2A63F; --engine-bg:rgba(210,166,63,.13);
+    --shadow:0 1px 0 rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#101519; --surface:#171E23; --surface-2:#1F272D;
+  --ink:#DBE2E2; --muted:#8D9B9D; --faint:#6C787B;
+  --line:rgba(219,226,226,.17); --line-soft:rgba(219,226,226,.08);
+  --gate:#6FB2E0; --gate-bg:rgba(111,178,224,.13);
+  --engine:#D2A63F; --engine-bg:rgba(210,166,63,.13);
+  --shadow:0 1px 0 rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);
+  font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px 96px}
+
+.mast{padding:56px 0 30px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gate);margin:0 0 14px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(38px,6.4vw,72px);
+  line-height:.98;letter-spacing:-.025em;margin:0;text-wrap:balance}
+h1 .sub{display:block;font-size:clamp(15px,2vw,20px);font-weight:600;letter-spacing:.01em;
+  color:var(--muted);margin-top:16px;line-height:1.5}
+.lede{max-width:66ch;color:var(--muted);margin:24px 0 0;font-size:15.5px}
+.facts{display:flex;flex-wrap:wrap;gap:0;margin:30px 0 0;border-top:1px solid var(--line-soft)}
+.fact{flex:1 1 130px;padding:16px 20px 14px;border-right:1px solid var(--line-soft)}
+.fact:last-child{border-right:0}
+.fact b{display:block;font-family:var(--f-display);font-weight:700;font-size:26px;
+  letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.fact span{font-size:11.5px;color:var(--faint);font-family:var(--f-mono);letter-spacing:.06em;
+  text-transform:uppercase}
+
+nav.jump{position:sticky;top:0;z-index:20;background:var(--ground);border-bottom:1px solid var(--line);
+  margin-bottom:8px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+nav.jump a{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;padding:13px 12px;white-space:nowrap;
+  border-bottom:2px solid transparent}
+nav.jump a:hover{color:var(--ink);border-bottom-color:var(--gate)}
+nav.jump a:focus-visible{outline:2px solid var(--gate);outline-offset:-3px}
+
+section{padding:52px 0 8px;border-top:1px solid var(--line-soft);scroll-margin-top:56px}
+section:first-of-type{border-top:0}
+h2{font-family:var(--f-display);font-weight:700;font-size:26px;letter-spacing:-.015em;
+  margin:0 0 6px;display:flex;align-items:baseline;gap:12px;text-wrap:balance}
+h2 .num{font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--gate);letter-spacing:.1em}
+.sec-note{color:var(--muted);max-width:74ch;margin:0 0 26px;font-size:14.5px}
+h3{font-family:var(--f-display);font-weight:700;font-size:16px;letter-spacing:.01em;margin:30px 0 10px}
+.sub-lab{margin:22px 0 8px;font-size:12px;font-family:var(--f-mono);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);font-weight:600}
+
+figure{margin:0 0 8px;padding:0}
+.scroll{overflow-x:auto;padding-bottom:6px}
+figure svg{display:block;min-width:760px;max-width:100%;height:auto;color:var(--ink)}
+figcaption{color:var(--faint);font-size:12.5px;margin-top:12px;max-width:78ch;line-height:1.65}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+@media(max-width:760px){.cols{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:2px;
+  padding:20px 22px 22px;box-shadow:var(--shadow)}
+.panel h3{margin-top:0}
+.panel ul{margin:0;padding-left:18px}
+.panel li{margin:6px 0;font-size:14px}
+.panel.yes{border-left:3px solid var(--gate)}
+.panel.no{border-left:3px solid var(--line)}
+
+.sk{display:grid;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:2px;
+  display:grid;grid-template-columns:210px 1fr;box-shadow:var(--shadow)}
+@media(max-width:900px){.card{grid-template-columns:1fr}}
+.card-id{padding:18px 18px;border-right:1px solid var(--line-soft);display:flex;
+  flex-direction:column;gap:8px;align-items:flex-start}
+@media(max-width:900px){.card-id{border-right:0;border-bottom:1px solid var(--line-soft);
+  flex-direction:row;align-items:center;flex-wrap:wrap}}
+.card-id .k{font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--gate);
+  letter-spacing:.02em;word-break:break-all}
+.card-body{padding:18px 22px;min-width:0}
+.card-body p{margin:0 0 12px;color:var(--muted);font-size:13.5px;line-height:1.7}
+.rows{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.rows li{font-family:var(--f-mono);font-size:11.5px;padding:3px 8px;border:1px solid var(--line);
+  border-radius:2px;color:var(--ink);background:var(--ground)}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:2px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:13.5px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+thead th{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;background:var(--surface-2);border-bottom:1px solid var(--line)}
+tbody tr:last-child td{border-bottom:0}
+code{font-family:var(--f-mono);font-size:12.5px;background:var(--surface-2);padding:1px 5px;border-radius:2px}
+.tw code{background:transparent;padding:0;color:var(--engine);font-size:12px}
+.num-c{font-variant-numeric:tabular-nums;white-space:nowrap}
+.chain{font-family:var(--f-mono);font-size:12px;color:var(--ink);line-height:1.9}
+.chain b{color:var(--gate);font-weight:600}
+
+.tag{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.05em;padding:2px 7px;
+  border-radius:2px;white-space:nowrap;display:inline-block}
+.tag.a{color:var(--gate);background:var(--gate-bg)}
+.tag.b{color:var(--engine);background:var(--engine-bg)}
+.tag.c{color:var(--muted);background:var(--surface-2)}
+
+pre{font-family:var(--f-mono);font-size:12.5px;line-height:1.7;background:var(--surface);
+  border:1px solid var(--line);border-left:3px solid var(--engine);border-radius:2px;
+  padding:16px 18px;overflow-x:auto;margin:0}
+.callout{border-left:3px solid var(--gate);background:var(--gate-bg);padding:14px 18px;
+  margin:22px 0 0;font-size:14px;line-height:1.7;border-radius:0 2px 2px 0}
+.callout b{font-weight:700}
+.rule-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.rule-list li{padding-left:30px;position:relative;font-size:14px;line-height:1.7;color:var(--muted)}
+.rule-list li::before{content:attr(data-n);position:absolute;left:0;top:2px;
+  font-family:var(--f-mono);font-size:10.5px;color:var(--gate);font-weight:600}
+.rule-list li b{color:var(--ink);font-weight:700}
+
+footer{border-top:1px solid var(--line);margin-top:56px;padding-top:22px;color:var(--faint);
+  font-size:12.5px;line-height:1.8}
+footer code{background:transparent;padding:0}
+a{color:var(--gate)}
+a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow"><a href="../agent-toolkit/" style="color:inherit">Agent Skills</a> / planning set</p>
+  <h1>Planning<span class="sub">What should we build, before any code exists?</span></h1>
+  <p class="lede">Nine skills over the planning loop — framing the problem, establishing what is true, generating and choosing options, slicing the work, sizing it, finding what could go wrong, judging whether the plan is ready, and deciding what it becomes when reality diverges.</p>
+  <div class="facts">
+    <div class="fact"><b>9</b><span>skills</span></div>
+    <div class="fact"><b>8</b><span>routes</span></div>
+    <div class="fact"><b>19</b><span>playbooks</span></div>
+    <div class="fact"><b>9</b><span>reference</span></div>
+    <div class="fact"><b>35</b><span>static rules</span></div>
+    <div class="fact"><b>1,591</b><span>listing chars</span></div>
+  </div>
+</header>
+
+<nav class="jump">
+  <a href="#load">Load model</a><a href="#skills">Skills</a><a href="#bounds">Boundaries</a>
+  <a href="#routes">Routes</a><a href="#mech">Mechanism</a><a href="#evidence">Evidence</a>
+  <a href="#tools">Permissions</a><a href="#budgets">Budgets</a><a href="#install">Install</a>
+</nav>
+
+<section id="load">
+  <h2><span class="num">01</span>What is loaded, and when it is paid for</h2>
+  <p class="sec-note">A skill arrives in three stages and each costs something different. Almost
+    every design rule in this repository follows from that asymmetry rather than from taste.</p>
+  
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1180 220" role="img" aria-label="Three loading stages. The listing carries 9 names and descriptions on every turn; a chosen SKILL.md is read in full; playbooks and reference files load only when the situation calls for them.">
+      <text x="30" y="34" font-family="'JetBrains Mono',monospace" font-size="10"
+            fill="currentColor" opacity=".55" letter-spacing=".04em">what the engine is holding, and when</text>
+      
+      <rect x="30" y="60" width="330" height="132" rx="1" fill="none"
+            stroke="currentColor" stroke-width="1.6"
+            />
+      <text x="48" y="88" font-family="Archivo,sans-serif" font-weight="700"
+            font-size="13" fill="currentColor">1 · LISTING</text>
+      <text x="48" y="108" font-family="'JetBrains Mono',monospace" font-size="10"
+            fill="currentColor" opacity=".6">every skill, every turn</text>
+      <text x="48" y="136" font-family="Archivo,sans-serif" font-weight="700"
+            font-size="17" fill="currentColor">9 names + descriptions</text>
+      <text x="48" y="156" font-family="'JetBrains Mono',monospace" font-size="10.5"
+            fill="currentColor" opacity=".6">1,591 characters</text>
+      <text x="48" y="180" font-family="Archivo,sans-serif" font-size="11.5"
+            fill="currentColor" opacity=".72">selection happens here, and on nothing else</text>
+      <rect x="420" y="60" width="330" height="132" rx="1" fill="none"
+            stroke="currentColor" stroke-width="1.2"
+            stroke-dasharray="5 4" opacity=".75"/>
+      <text x="438" y="88" font-family="Archivo,sans-serif" font-weight="700"
+            font-size="13" fill="currentColor">2 · SKILL.MD</text>
+      <text x="438" y="108" font-family="'JetBrains Mono',monospace" font-size="10"
+            fill="currentColor" opacity=".6">one skill, once chosen</text>
+      <text x="438" y="136" font-family="Archivo,sans-serif" font-weight="700"
+            font-size="17" fill="currentColor">≤ 128 lines each</text>
+      <text x="438" y="156" font-family="'JetBrains Mono',monospace" font-size="10.5"
+            fill="currentColor" opacity=".6">6 fixed sections</text>
+      <text x="438" y="180" font-family="Archivo,sans-serif" font-size="11.5"
+            fill="currentColor" opacity=".72">contracts are copied in, not referenced</text>
+      <rect x="810" y="60" width="330" height="132" rx="1" fill="none"
+            stroke="currentColor" stroke-width="1.2"
+            stroke-dasharray="5 4" opacity=".75"/>
+      <text x="828" y="88" font-family="Archivo,sans-serif" font-weight="700"
+            font-size="13" fill="currentColor">3 · DEFERRED</text>
+      <text x="828" y="108" font-family="'JetBrains Mono',monospace" font-size="10"
+            fill="currentColor" opacity=".6">only when the situation calls</text>
+      <text x="828" y="136" font-family="Archivo,sans-serif" font-weight="700"
+            font-size="17" fill="currentColor">19 playbooks · 9 reference</text>
+      <text x="828" y="156" font-family="'JetBrains Mono',monospace" font-size="10.5"
+            fill="currentColor" opacity=".6">budgeted / unbudgeted</text>
+      <text x="828" y="180" font-family="Archivo,sans-serif" font-size="11.5"
+            fill="currentColor" opacity=".72">judgement stays; what rots is dated</text>
+      <g stroke="currentColor" stroke-width="1.3" fill="none" opacity=".7"
+         marker-end="url(#a)"><line x1="365" y1="126" x2="412" y2="126"/><line x1="755" y1="126" x2="802" y2="126"/></g>
+      <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+        orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="currentColor"/></marker></defs>
+    </svg>
+    </div>
+    <figcaption>Cost is not uniform across the three. Stage&nbsp;1 is paid on every turn for every
+      installed skill, which is why a description is budgeted to
+      200 characters and why boundaries are kept out of it.
+      Stage&nbsp;3 is paid only by the run that needs it, which is where anything long or
+      perishable belongs.</figcaption>
+  </figure>
+</section>
+
+<section id="skills">
+  <h2><span class="num">02</span>The 9 skills</h2>
+  <p class="sec-note">Each owns one kind of work and states it in its own <em>Owns</em> section.
+    The tags under it are the facets recorded in
+    <code>planning-registry/capabilities.yaml</code>, which is also what the fixtures route
+    against.</p>
+  <div class="sk">
+  <article class="card">
+    <div class="card-id">
+      <span class="k">planning-router</span>
+      <span class="tag b">route</span>
+    </div>
+    <div class="card-body">
+      <p>Deciding which planning phases a request actually needs and in what order. It dispatches and <strong>produces no artifact of its own</strong>. The canonical order is frame → discover → options → decompose → estimate → risk → review; the job is to take the shortest path through it that the request needs.</p>
+      <ul class="rows"><li>classify</li><li>chain-selection</li><li>sequencing</li><li>fallback</li></ul>
+    </div>
+  </article>
+  <article class="card">
+    <div class="card-id">
+      <span class="k">planning-frame</span>
+      <span class="tag b">doc-write</span>
+    </div>
+    <div class="card-body">
+      <p>The problem, stated so it can be argued with — one sentence, with the goals it serves, the goals it explicitly does not, and criteria somebody could measure. It never proposes a solution.</p>
+      <ul class="rows"><li>goals</li><li>non-goals</li><li>success-criteria</li><li>constraints</li><li>definition-of-done</li></ul>
+    </div>
+  </article>
+  <article class="card">
+    <div class="card-id">
+      <span class="k">planning-discover</span>
+      <span class="tag b">full</span>
+    </div>
+    <div class="card-body">
+      <p>The gap between what the brief assumed and what is there. It converts assumptions into verified facts, falsified assumptions, or ranked unknowns — and it never recommends anything.</p>
+      <ul class="rows"><li>current-state</li><li>verification</li><li>assumption-testing</li><li>constraint-discovery</li><li>unknowns</li></ul>
+    </div>
+  </article>
+  <article class="card">
+    <div class="card-id">
+      <span class="k">planning-options</span>
+      <span class="tag b">doc-write</span>
+    </div>
+    <div class="card-body">
+      <p>Which approach, and why that one. It generates real alternatives, scores them against the brief&#x27;s own criteria, and <strong>recommends</strong> — a scored table with no recommendation is abdication.</p>
+      <ul class="rows"><li>candidate-generation</li><li>criteria</li><li>trade-offs</li><li>elimination</li><li>decision-record</li></ul>
+    </div>
+  </article>
+  <article class="card">
+    <div class="card-id">
+      <span class="k">planning-decompose</span>
+      <span class="tag b">doc-write</span>
+    </div>
+    <div class="card-body">
+      <p>The shape of the work once the approach is settled — what the tasks are, what each depends on, what order retires the most uncertainty, and where the system stays deployable. <strong>It never estimates durations.</strong></p>
+      <ul class="rows"><li>slicing</li><li>task-shape</li><li>dependencies</li><li>critical-path</li><li>milestones</li><li>sequence</li></ul>
+    </div>
+  </article>
+  <article class="card">
+    <div class="card-id">
+      <span class="k">planning-estimate</span>
+      <span class="tag b">doc-write</span>
+    </div>
+    <div class="card-body">
+      <p>How long, expressed as a range with the reasons it is that wide. <strong>The drivers of the range are the deliverable; the number is a summary of them.</strong></p>
+      <ul class="rows"><li>sizing</li><li>ranges</li><li>buffer</li><li>schedule</li><li>range-drivers</li><li>breaking-conditions</li></ul>
+    </div>
+  </article>
+  <article class="card">
+    <div class="card-id">
+      <span class="k">planning-risk</span>
+      <span class="tag b">doc-write</span>
+    </div>
+    <div class="card-body">
+      <p>The failure modes of the plan, each with a way to see it coming and something to do about it. <strong>The plan is this deliverable&#x27;s subject, not its client</strong> — a risk softened to preserve a plan has been deleted.</p>
+      <ul class="rows"><li>pre-mortem</li><li>register</li><li>likelihood</li><li>impact</li><li>mitigation</li><li>rollback</li><li>abort</li></ul>
+    </div>
+  </article>
+  <article class="card">
+    <div class="card-id">
+      <span class="k">planning-review</span>
+      <span class="tag b">doc-write</span>
+    </div>
+    <div class="card-body">
+      <p>Whether the plan is ready, as one verdict with the findings behind it. <strong>It never rewrites the plan</strong> — findings go back to the phase that owns them, and a reviewer who fixes the plan can no longer review it.</p>
+      <ul class="rows"><li>readiness-checks</li><li>silence-audit</li><li>blocking-findings</li><li>verdict</li><li>shortest-path</li></ul>
+    </div>
+  </article>
+  <article class="card">
+    <div class="card-id">
+      <span class="k">planning-replan</span>
+      <span class="tag b">doc-write</span>
+    </div>
+    <div class="card-body">
+      <p>What the plan becomes after reality arrives — measured, classified, and corrected at the smallest surface that fixes it. <strong>Stopping stays on the table and is priced like any other option.</strong></p>
+      <ul class="rows"><li>divergence-classification</li><li>measurement</li><li>stop-test</li><li>changelog</li></ul>
+    </div>
+  </article></div>
+</section>
+
+<section id="bounds">
+  <h2><span class="num">03</span>Where a skill stops</h2>
+  <p class="sec-note">Boundaries live in one file and never in a description. A description that
+    named its neighbours would spend listing budget advertising them, and adding a skill would
+    mean editing every other one &mdash; so the cost of an addition would stop being O(1).</p>
+  <div class="tw"><table>
+    <thead><tr><th>Skill</th><th>Does not do</th><th>Goes to</th></tr></thead>
+    <tbody>
+      <tr><td><code>planning-router</code></td><td>a request whose phase is already obvious</td>
+      <td>that phase directly</td></tr>
+      <tr><td><code>planning-router</code></td><td>carrying out the plan once it exists</td>
+      <td>a build skill outside this set</td></tr>
+      <tr><td><code>planning-frame</code></td><td>surveying what the codebase currently does</td>
+      <td><code>planning-discover</code></td></tr>
+      <tr><td><code>planning-frame</code></td><td>choosing between ways of getting there</td>
+      <td><code>planning-options</code></td></tr>
+      <tr><td><code>planning-discover</code></td><td>deciding what the problem is</td>
+      <td><code>planning-frame</code></td></tr>
+      <tr><td><code>planning-discover</code></td><td>weighing one approach against another</td>
+      <td><code>planning-options</code></td></tr>
+      <tr><td><code>planning-options</code></td><td>slicing the approach once it is chosen</td>
+      <td><code>planning-decompose</code></td></tr>
+      <tr><td><code>planning-options</code></td><td>what could go wrong with the chosen one</td>
+      <td><code>planning-risk</code></td></tr>
+      <tr><td><code>planning-decompose</code></td><td>how long each slice takes</td>
+      <td><code>planning-estimate</code></td></tr>
+      <tr><td><code>planning-decompose</code></td><td>which approach is being sliced</td>
+      <td><code>planning-options</code></td></tr>
+      <tr><td><code>planning-estimate</code></td><td>what the tasks are in the first place</td>
+      <td><code>planning-decompose</code></td></tr>
+      <tr><td><code>planning-estimate</code></td><td>the chance that the estimate is wrong for a nameable reason</td>
+      <td><code>planning-risk</code></td></tr>
+      <tr><td><code>planning-risk</code></td><td>whether the plan as a whole is finished</td>
+      <td><code>planning-review</code></td></tr>
+      <tr><td><code>planning-risk</code></td><td>reacting to something that already went wrong</td>
+      <td><code>planning-replan</code></td></tr>
+      <tr><td><code>planning-review</code></td><td>enumerating what could go wrong</td>
+      <td><code>planning-risk</code></td></tr>
+      <tr><td><code>planning-review</code></td><td>revising the plan after work has started</td>
+      <td><code>planning-replan</code></td></tr>
+      <tr><td><code>planning-replan</code></td><td>judging a plan before any work started</td>
+      <td><code>planning-review</code></td></tr>
+      <tr><td><code>planning-replan</code></td><td>a change in the problem rather than the path</td>
+      <td><code>planning-frame</code></td></tr></tbody>
+  </table></div>
+</section>
+
+<section id="routes">
+  <h2><span class="num">04</span>Chains that recur</h2>
+  <p class="sec-note">A chain of names expresses linear work only. Where a stage repeats until a
+    condition holds, the entry carries the condition, the judge, and a hard cycle limit &mdash;
+    without all three, &ldquo;until it looks right&rdquo; has no stopping rule and the loop ends
+    when somebody gets tired.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Route</th><th>Pattern</th><th>When</th><th>Chain</th><th>Condition</th></tr></thead>
+    <tbody>
+      <tr><td><code>full-plan</code></td><td><span class="tag c">linear</span></td>
+      <td>multi-week or hard to reverse, nothing decided yet</td><td class="chain">planning-frame <b>&rarr;</b> planning-discover <b>&rarr;</b> planning-options <b>&rarr;</b> planning-decompose <b>&rarr;</b> planning-estimate <b>&rarr;</b> planning-risk <b>&rarr;</b> planning-review</td>
+      <td><b>gate</b> &middot; the goal fits in one sentence without &#x27;and&#x27; before anything else runs</td></tr>
+      <tr><td><code>approach</code></td><td><span class="tag c">linear</span></td>
+      <td>the problem is clear, the way to solve it is not</td><td class="chain">planning-discover <b>&rarr;</b> planning-options</td>
+      <td><b>gate</b> &middot; a load-bearing assumption is verified before an approach is chosen</td></tr>
+      <tr><td><code>breakdown</code></td><td><span class="tag c">linear</span></td>
+      <td>the approach is decided and the work needs shape</td><td class="chain">planning-decompose <b>&rarr;</b> planning-estimate</td>
+      <td>&mdash;</td></tr>
+      <tr><td><code>state-the-problem</code></td><td><span class="tag c">report-only</span></td>
+      <td>nobody can say in one sentence what this is for</td><td class="chain">planning-frame</td>
+      <td><b>stops at</b> &middot; goals, non-goals, measurable criteria, and the open questions. No approach is chosen</td></tr>
+      <tr><td><code>find-out</code></td><td><span class="tag c">report-only</span></td>
+      <td>what is actually true here</td><td class="chain">planning-discover</td>
+      <td><b>stops at</b> &middot; verified facts with pointers, falsified assumptions, and unknowns ranked by decision impact</td></tr>
+      <tr><td><code>what-could-go-wrong</code></td><td><span class="tag c">linear</span></td>
+      <td>the plan exists and nobody has stress-tested it</td><td class="chain">planning-risk <b>&rarr;</b> planning-review</td>
+      <td>&mdash;</td></tr>
+      <tr><td><code>course-correct</code></td><td><span class="tag c">linear</span></td>
+      <td>work started and reality diverged</td><td class="chain">planning-replan <b>&rarr;</b> planning-decompose</td>
+      <td><b>gate</b> &middot; the divergence is classified and measured before the plan is rewritten</td></tr>
+      <tr><td><code>review-to-ready</code></td><td><span class="tag c">loop</span></td>
+      <td>close every blocking finding before work starts</td><td class="chain">planning-review <b>&rarr;</b> planning-replan</td>
+      <td><b>oracle</b> &middot; no blocking finding remains, and one full pass adds none</td></tr></tbody>
+  </table></div>
+</section>
+
+<section id="mech">
+  <h2><span class="num">05</span>The mechanism this set has and its siblings do not</h2>
+  <p class="sec-note">Six sets share one validator and one contract shape. Each declares exactly
+    one signature mechanism, and that declaration is the whole difference &mdash; which is what
+    keeps six copies of the same rules from becoming six dialects.</p>
+  <div class="cols">
+    <div class="panel yes">
+      <h3>calibration &middot; <code>_planning/CALIBRATION.md</code></h3>
+      <p style="margin:0 0 12px;color:var(--muted);font-size:14px">An estimate that is never compared to the outcome is a number, not a forecast. Every estimate records what actually happened — <code>within</code>, <code>under</code>, <code>over</code>, <code>open</code>, <code>abandoned</code> — so the next range is drawn from this team's history rather than from optimism.</p>
+      <ul class="rows"><li>within</li><li>under</li><li>over</li><li>open</li><li>abandoned</li></ul>
+    </div>
+    <div class="panel no">
+      <h3>Owed by 3 of 9</h3>
+      <ul class="rows"><li>planning-estimate</li><li>planning-replan</li><li>planning-review</li></ul>
+      <p style="margin:14px 0 0;color:var(--muted);font-size:13.5px">A rule states the mechanism
+        inside every skill through a delivered block. A skill that <em>owes</em> it must also name
+        its own half in its own words &mdash; a rule stated everywhere and owned nowhere is a
+        ritual.</p>
+    </div>
+  </div>
+</section>
+
+<section id="evidence">
+  <h2><span class="num">06</span>What counts as done</h2>
+  <p class="sec-note">Reporting completion without meeting this is reporting a wish. The
+    vocabulary is fixed in <code>planning-registry/harness.yaml</code> and defined in
+    <code>_planning/CONTRACT.md</code>; the validator checks the contract actually
+    defines every word it declares.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Axis</th><th>Vocabulary</th></tr></thead>
+    <tbody>
+      <tr><td>Evidence grades</td><td><code>verified</code> <code>assumed</code> <code>unknown</code></td></tr>
+      <tr><td>Residual classes</td><td><code>BLOCKED</code> <code>OUT-OF-SCOPE</code> <code>DEFERRED</code> <code>UNVERIFIED</code></td></tr>
+      <tr><td>Statuses</td><td><code>DONE</code> <code>PARTIAL</code> <code>BLOCKED</code></td></tr>
+      <tr><td>Sizing tiers</td><td><code>S</code> <code>M</code> <code>L</code></td></tr>
+      <tr><td>Route patterns</td><td><code>linear</code> <code>loop</code> <code>report-only</code></td></tr>
+      <tr><td>Calibration</td><td><code>within</code> <code>under</code> <code>over</code> <code>open</code> <code>abandoned</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><b>The completion sweep is never omitted.</b> Before reporting, both halves
+    run and both results are stated: every marker this run introduced appears in the handoff with a
+    class, and every claim made is a claim at its floor. While either pair disagrees, the status is
+    not <code>DONE</code>.</div>
+</section>
+
+<section id="tools">
+  <h2><span class="num">07</span>Permission classes</h2>
+  <p class="sec-note">A class is declared once in the registry and the validator checks each
+    <code>SKILL.md</code> front matter matches it exactly. Where a CLI does not enforce tool
+    grants, the <em>Never</em> lines are discipline and nothing more &mdash; that limit is stated
+    rather than papered over.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Class</th><th>Tools</th><th>Writes</th><th>Skills</th></tr></thead>
+    <tbody>
+      <tr><td><code>route</code></td><td><code>Read, Grep, Glob, Skill</code></td>
+      <td>no</td>
+      <td class="num-c">1</td></tr>
+      <tr><td><code>doc-write</code></td><td><code>Read, Grep, Glob, Write, Edit</code></td>
+      <td>yes</td>
+      <td class="num-c">7</td></tr>
+      <tr><td><code>full</code></td><td><code>Read, Grep, Glob, Bash, Write, Edit</code></td>
+      <td>yes</td>
+      <td class="num-c">1</td></tr></tbody>
+  </table></div>
+</section>
+
+<section id="budgets">
+  <h2><span class="num">08</span>Budgets, and the rules that decide them</h2>
+  <p class="sec-note">Every threshold is declared in one place and read from there by
+    <code>planning-tools/validate.py</code>. A number written twice is a number that drifts.
+    Raising a limit is the last resort &mdash; merging, deleting, compressing and relocating come
+    first.</p>
+  <div class="cols">
+    <div class="panel">
+      <h3>Declared limits</h3>
+      <div class="tw" style="border:0;background:transparent"><table style="min-width:0">
+        <tbody>
+      <tr><td><code>skill_md_lines</code></td><td class="num-c">128</td></tr>
+      <tr><td><code>description_chars</code></td><td class="num-c">200</td></tr>
+      <tr><td><code>playbook_lines</code></td><td class="num-c">300</td></tr>
+      <tr><td><code>playbooks_per_skill</code></td><td class="num-c">8</td></tr>
+      <tr><td><code>shared_file_lines</code></td><td class="num-c">100</td></tr>
+      <tr><td><code>shared_lines_total</code></td><td class="num-c">500</td></tr>
+      <tr><td><code>skills_max</code></td><td class="num-c">11</td></tr>
+      <tr><td><code>routes_max</code></td><td class="num-c">12</td></tr>
+      <tr><td><code>route_stages_max</code></td><td class="num-c">8</td></tr>
+      <tr><td><code>repo_md_lines_total</code></td><td class="num-c">4200</td></tr></tbody>
+      </table></div>
+    </div>
+    <div class="panel">
+      <h3>Measured now</h3>
+      <div class="tw" style="border:0;background:transparent"><table style="min-width:0"><tbody>
+        <tr><td>skills</td><td class="num-c">9 / 11</td></tr>
+        <tr><td>routes</td><td class="num-c">8 / 12</td></tr>
+        <tr><td>shared contract lines</td><td class="num-c">479 / 500</td></tr>
+        <tr><td>repository markdown</td><td class="num-c">2,608 / 4,200</td></tr>
+        <tr><td>static rules</td><td class="num-c">35</td></tr>
+      </tbody></table></div>
+      <p style="margin:14px 0 0;color:var(--muted);font-size:13.5px">Adding a rule means adding a
+        deliberate violation and watching it fail. A check only ever seen passing may be checking
+        nothing.</p>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <h2><span class="num">09</span>Installing it</h2>
+  <p class="sec-note">Each <code>planning-*</code> directory is symlinked individually, so a
+    skills directory keeps whatever else it already carries and a name already taken by a real
+    directory is skipped rather than overwritten.</p>
+<pre>make link                       # into ~/.claude/skills
+make link CLAUDE_DIR=.claude/skills
+
+make check                      # the rules, then proof the rules still fire
+make render                     # after editing a delivered block
+make hooks                      # run the rules on every commit</pre>
+  <ul class="rule-list" style="margin-top:26px">
+    <li data-n="01"><b>Selection happens on the description alone.</b> Every word that selects a
+      skill appears literally in its description, and a rule checks the registry and the
+      description still agree.</li>
+    <li data-n="02"><b>Contracts are delivered, not referenced.</b> A rule kept only in
+      <code>_planning/</code> is read on a minority of launches, so the operative part
+      is copied verbatim into every skill and a rule fails if any copy has drifted.</li>
+    <li data-n="03"><b>Knowledge is split by whether it rots.</b> Playbooks hold judgement and are
+      budgeted; reference holds what goes stale, carries no line budget, and states what re-checks
+      it instead of a bare date.</li>
+    <li data-n="04"><b>The fixtures do not model how a model chooses.</b> They catch a missing or
+      duplicated signal. Passing them is not evidence that nothing will be misrouted.</li>
+  </ul>
+</section>
+
+<footer>
+  <p>planning-skills &middot; 9 skills &middot; 35 static rules
+     &middot; 2,608 lines of markdown.<br>
+     Every figure on this page is read off the repository by <code>tools/pages.py</code> in
+     <code>agent-toolkit</code>. None of them are typed by hand, and a stale page fails a
+     check rather than sitting there looking current.</p>
+</footer>
+</div>
+</body>
+</html>

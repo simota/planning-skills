@@ -1,0 +1,99 @@
+# What each skill owns, what it does not, and the words that select it.
+#
+# `not:` is the only place a boundary is written. Putting boundaries in
+# descriptions means every skill added rewrites its neighbours, and the
+# marginal cost of an addition stops being O(1).
+#
+# `signals` are the words a request actually uses. Each must appear literally
+# in that skill's description: the listing carries name and description only,
+# so a signal that lives here and nowhere else never reaches the engine.
+
+planning-router:
+  class: route
+  does: [classify, chain-selection, sequencing, fallback]
+  not:
+    - what: "a request whose phase is already obvious"
+      go: "that phase directly"
+    - what: "carrying out the plan once it exists"
+      go: "a build skill outside this set"
+  signals: [planning request, the phase is unclear, plan end to end, sequences them]
+
+planning-frame:
+  class: doc-write
+  does: [goals, non-goals, success-criteria, constraints, definition-of-done]
+  not:
+    - what: "surveying what the codebase currently does"
+      go: planning-discover
+    - what: "choosing between ways of getting there"
+      go: planning-options
+  signals: [goals, non-goals, success criteria, constraints, definition of done, stated problem]
+
+planning-discover:
+  class: full
+  does: [current-state, verification, assumption-testing, constraint-discovery, unknowns]
+  not:
+    - what: "deciding what the problem is"
+      go: planning-frame
+    - what: "weighing one approach against another"
+      go: planning-options
+  signals: [current state, verified facts, assumptions worth checking, unknowns, decision impact]
+
+planning-options:
+  class: doc-write
+  does: [candidate-generation, criteria, trade-offs, elimination, decision-record]
+  not:
+    - what: "slicing the approach once it is chosen"
+      go: planning-decompose
+    - what: "what could go wrong with the chosen one"
+      go: planning-risk
+  signals: [approaches, criteria and weights, trade-offs, decision record, change our mind]
+
+planning-decompose:
+  class: doc-write
+  does: [slicing, task-shape, dependencies, critical-path, milestones, sequence]
+  not:
+    - what: "how long each slice takes"
+      go: planning-estimate
+    - what: "which approach is being sliced"
+      go: planning-options
+  signals: [task shape, dependency graph, critical path, milestones, sequencing them, parallel]
+
+planning-estimate:
+  class: doc-write
+  does: [sizing, ranges, buffer, schedule, range-drivers, breaking-conditions]
+  not:
+    - what: "what the tasks are in the first place"
+      go: planning-decompose
+    - what: "the chance that the estimate is wrong for a nameable reason"
+      go: planning-risk
+  signals: [per-task estimates, critical path total, buffer, schedule, range drivers]
+
+planning-risk:
+  class: doc-write
+  does: [pre-mortem, register, likelihood, impact, mitigation, rollback, abort]
+  not:
+    - what: "whether the plan as a whole is finished"
+      go: planning-review
+    - what: "reacting to something that already went wrong"
+      go: planning-replan
+  signals: [pre-mortem, register with likelihood, impact, mitigations, abort conditions]
+
+planning-review:
+  class: doc-write
+  does: [readiness-checks, silence-audit, blocking-findings, verdict, shortest-path]
+  not:
+    - what: "enumerating what could go wrong"
+      go: planning-risk
+    - what: "revising the plan after work has started"
+      go: planning-replan
+  signals: [ready to act on, readiness checks, silence audit, blocking findings, shortest path to ready]
+
+planning-replan:
+  class: doc-write
+  does: [divergence-classification, measurement, stop-test, changelog]
+  not:
+    - what: "judging a plan before any work started"
+      go: planning-review
+    - what: "a change in the problem rather than the path"
+      go: planning-frame
+  signals: [reality diverges, divergence, stop test, dated changelog, what changed and why]

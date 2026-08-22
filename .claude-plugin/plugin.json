@@ -1,0 +1,6 @@
+{
+  "name": "planning-skills",
+  "description": "A planning-only skill suite: frame, discover, options, decompose, estimate, risk, review, replan.",
+  "version": "0.1.0",
+  "author": { "name": "simota" }
+}

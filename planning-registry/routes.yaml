@@ -1,0 +1,53 @@
+# Chains that recur, as control structure rather than prose.
+#
+# The canonical order is frame → discover → options → decompose → estimate →
+# risk → review. A chain takes the shortest path through it that the request
+# needs, and a skipped phase is recorded rather than silent.
+
+full-plan:
+  pattern: linear
+  when: "multi-week or hard to reverse, nothing decided yet"
+  chain: [planning-frame, planning-discover, planning-options, planning-decompose, planning-estimate, planning-risk, planning-review]
+  gate: "the goal fits in one sentence without 'and' before anything else runs"
+
+approach:
+  pattern: linear
+  when: "the problem is clear, the way to solve it is not"
+  chain: [planning-discover, planning-options]
+  gate: "a load-bearing assumption is verified before an approach is chosen"
+
+breakdown:
+  pattern: linear
+  when: "the approach is decided and the work needs shape"
+  chain: [planning-decompose, planning-estimate]
+
+state-the-problem:
+  pattern: report-only
+  when: "nobody can say in one sentence what this is for"
+  chain: [planning-frame]
+  stops_at: "goals, non-goals, measurable criteria, and the open questions. No approach is chosen"
+
+find-out:
+  pattern: report-only
+  when: "what is actually true here"
+  chain: [planning-discover]
+  stops_at: "verified facts with pointers, falsified assumptions, and unknowns ranked by decision impact"
+
+what-could-go-wrong:
+  pattern: linear
+  when: "the plan exists and nobody has stress-tested it"
+  chain: [planning-risk, planning-review]
+
+course-correct:
+  pattern: linear
+  when: "work started and reality diverged"
+  chain: [planning-replan, planning-decompose]
+  gate: "the divergence is classified and measured before the plan is rewritten"
+
+review-to-ready:
+  pattern: loop
+  when: "close every blocking finding before work starts"
+  chain: [planning-review, planning-replan]
+  oracle: "no blocking finding remains, and one full pass adds none"
+  checker: other-engine          # resolved at run time to one that is not running this
+  max_cycles: 3

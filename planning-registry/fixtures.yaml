@@ -1,0 +1,42 @@
+# A record of misroutes.
+#
+# This does not reproduce how a model chooses. It is a proxy for finding
+# missing and duplicated signals, and "fixtures pass" does not mean "nothing
+# will be misrouted".
+
+- ask: "I have a planning request and I do not know which phase it needs"
+  expect: planning-router
+- ask: "write me a plan end to end for this migration"
+  expect: planning-router
+- ask: "we need goals, non-goals and success criteria written down"
+  expect: planning-frame
+- ask: "what is the definition of done here"
+  expect: planning-frame
+- ask: "find out the current state before we decide anything"
+  expect: planning-discover
+- ask: "list the unknowns ranked by decision impact"
+  expect: planning-discover
+- ask: "compare the approaches with criteria and weights"
+  expect: planning-options
+- ask: "write the decision record and what would change our mind"
+  expect: planning-options
+- ask: "break this into tasks with a dependency graph"
+  expect: planning-decompose
+- ask: "what is the critical path and which milestones fall out of it"
+  expect: planning-decompose
+- ask: "how long, with a buffer and a schedule"
+  expect: planning-estimate
+- ask: "give me per-task estimates and the range drivers"
+  expect: planning-estimate
+- ask: "run a pre-mortem and give me mitigations and rollback"
+  expect: planning-risk
+- ask: "what are the abort conditions"
+  expect: planning-risk
+- ask: "is this plan ready to act on"
+  expect: planning-review
+- ask: "run the readiness checks and a silence audit"
+  expect: planning-review
+- ask: "reality diverges from the plan, what now"
+  expect: planning-replan
+- ask: "apply the stop test and write the dated changelog"
+  expect: planning-replan

@@ -1,0 +1,176 @@
+# Budgets and vocabulary. The validator reads thresholds from here and nowhere
+# else: a number copied into prose becomes a second definition that drifts.
+
+# One declaration. Every namespaced name derives from it, and a rule checks
+# that they still agree.
+set: planning
+prefix: planning-           # <set>-
+shared_dir: _planning       # _<set>
+
+# Every directory this set owns carries the set name — `<set>-*` or `_<set>` —
+# so that copying any of them into a shared skills directory cannot collide.
+# `skills/` is named by the plugin format, not by this set: a plugin's skills
+# are discovered there. The set's own directories still carry the set name.
+skills_dir: skills
+platform_dirs: [.git, .github, .claude, .claude-plugin, skills, docs]
+
+limits:
+  skill_md_lines: 128         # measured at adoption: 92-129. Raised from 120 when the
+                              # scoring block was delivered into every skill: the closing
+                              # half of an estimate is the half that gets skipped, and it
+                              # is skipped hardest when it lives in a file nobody opens
+  description_chars: 200      # the listing truncates past this
+  playbook_lines: 300
+  playbooks_per_skill: 8
+  shared_file_lines: 100
+  shared_lines_total: 500     # measured: 402 before CALIBRATION.md, 479 after. This set
+                              # is the only one that emits a claim about the future, so it
+                              # is the only one that owes a record of how those turned out
+  skills_max: 11              # 9 in use, 2 spare for demand found in use
+  routes_max: 12
+  route_stages_max: 8         # the canonical order is seven phases plus a router
+  repo_md_lines_total: 4200
+
+# Nine skills is the closest this family comes to the point where selection
+# degrades. Crossing the line below is the trigger to split the set into named
+# subsets, not a reason to delete a phase.
+listing:
+  packs_needed_above: 20
+
+# `doc-write` here carries Edit and withholds Bash, which is the reverse of the
+# coding and design sets. Both are `doc-write` by the same definition — the
+# artifact is documents, stated in the Never list — and the tools differ because
+# the domains do: every file under plans/ opens with `> Status:` and `> Updated:`
+# that a later phase rewrites in place (ARTIFACTS.md), and a set whose rule is
+# "never write code" does not hand out a shell to keep it.
+permission_classes:
+  route:
+    tools: "Read, Grep, Glob, Skill"          # dispatches; writes nothing itself
+    writes: false
+  doc-write:
+    tools: "Read, Grep, Glob, Write, Edit"    # plans/ documents only, never code
+    writes: true
+  full:
+    tools: "Read, Grep, Glob, Bash, Write, Edit"   # verifying a claim may mean running something.
+    writes: true                                   # was `probe`; the grant is unrestricted
+
+forbidden_description_terms:
+  - "Not for"
+  - "not for"
+  - "instead of"
+  - "rather than"
+  - "use planning-"
+
+# All three CLIs read the same SKILL.md, so any of them may be the one running
+# — the producing engine is a property of the run, not of this file. An earlier
+# version pinned `produced_by: claude` here, which quietly approved `checker:
+# codex` on a run that was itself codex.
+#
+# Detection was tried and does not work: codex launched from inside Claude Code
+# inherits `CLAUDECODE` and `CLAUDE_CODE_*`, so a nested run reads as its parent.
+# The caller states which engine is running; when it does not, the runner stops.
+engines:
+  runs_on: [claude, codex, agy]     # two or more, or no run can check itself out
+
+# What a refuting engine attacks in this domain, and what counts as having broken
+# the claim. The tool is the same in every set (`planning-tools/refute.py`); the lens is
+# not, and a refuter with no domain framing is a second opinion rather than an
+# adversary.
+refutation:
+  lens: |
+    A claimed risk, estimate, or readiness verdict about work that does not exist yet.
+    There is no code to check, so attack the assumption: name the thing this claim
+    needs to be true and ask whether anyone verified it. Check that a stated dependency
+    exists, that an estimate's range driver is what is named rather than the first thing
+    thought of, and that a risk has a trigger observable before the damage.
+  refuted_when: >-
+    it rests on an assumption nobody verified, a named dependency does not exist,
+    or a risk has no trigger anyone could observe in time
+
+vocabulary:
+  patterns: [linear, loop, report-only]
+  checkers: [other-engine]
+  evidence_levels: [verified, assumed, unknown]
+  residual_classes: [BLOCKED, OUT-OF-SCOPE, DEFERRED, UNVERIFIED]
+  statuses: [DONE, PARTIAL, BLOCKED]
+  tiers: [S, M, L]
+  estimate_outcomes: [within, under, over, open, abandoned]
+
+
+document_labels: [contract, guidance, deferred]
+# Patterns match the path from the repository root, so they carry `skills/`.
+label_by_path:
+  "skills/_planning/ROUTING.md": guidance
+  "skills/_planning/*.md": contract
+  "skills/*/SKILL.md": contract
+  "skills/*/playbooks/*.md": guidance
+  "skills/*/reference/*.md": deferred
+
+rot_patterns:
+  - '\b(19|20)\d{2}-\d{2}\b'
+  - '\bv\d+\.\d+(\.\d+)?\b'
+
+reference_headers: ["Purpose:", "Read when:", "Verified:"]
+# A `Verified:` date records that someone looked once, and a date has no failure
+# mode. V31 requires the line to name what re-checks it — or to say plainly that
+# nothing does. An unchecked page is fine; an unchecked page that reads like a
+# checked one is not.
+verified_markers:
+  - "no automated check"      # the honest admission, and the common case
+  - "by running"
+  - "produced by running"
+  - "confirmed by running"
+  - "performing the operation"
+  - "quoted from"
+  - "recomputed"
+  - "re-run by"
+  - "re-runs"
+  - "re-derives"
+  - "re-checked"
+  - "re-verified"
+  - "make figures"
+  - "holds every"
+  - "holds the two"
+  - "holds them to"
+
+
+# Paths that belong to the host project, not to this set.
+external_paths:
+  - .agents/
+  - plans/
+  - CLAUDE.md
+  - AGENTS.md
+  - GEMINI.md
+  - settings.json
+  # The artifacts this set produces, under plans/<slug>/ in the host project.
+  # They are written by name in the contracts, which is not a reference into
+  # this tree — the layout that owns them is _planning/ARTIFACTS.md.
+  - 00-brief.md
+  - 10-context.md
+  - 20-options.md
+  - 30-plan.md
+  - 35-estimate.md
+  - 40-risks.md
+  - 50-review.md
+  - changelog.md
+
+# The one mechanism this set has that its siblings do not. The rule that checks
+# it is identical in all six sets; this block is the whole difference, which is
+# what keeps six copies of the validator from becoming six dialects.
+#
+# `required_of` names the skills that owe the mechanism: the one that produces a
+# range, the one that revises it, and the one that fails a plan for not having
+# closed the loop. `own_word` is the substring each must carry outside the
+# delivered block — the rule is stated for all, and owned in each skill's own words.
+signature:
+  name: calibration
+  contract: CALIBRATION.md
+  vocabulary: estimate_outcomes
+  required_of: [planning-estimate, planning-replan, planning-review]
+  own_word: calibrat
+
+delivered:
+  sizing:  { section: "Before starting" }
+  score:   { section: "Verify with" }
+  values:  { section: "Decide first" }
+  report:  { section: "Verify with" }

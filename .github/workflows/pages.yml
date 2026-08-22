@@ -1,0 +1,47 @@
+# Publish docs/ to GitHub Pages.
+#
+# The page is generated, not written: `tools/pages.py` in the `agent-toolkit`
+# repository reads this repository's registry and writes `docs/index.html`. This
+# workflow only publishes what is committed, so a figure on the site is a figure
+# that was in the corpus at that commit.
+#
+# Enable once under Settings → Pages → Source: GitHub Actions.
+name: pages
+
+# Any push to main, deliberately unfiltered. A `paths:` filter on `docs/**` looks
+# tidier and leaves the first deploy un-triggered: turning Pages on under
+# Settings pushes nothing, so the site would not exist until something happened
+# to touch that directory. A static page is cheap to rebuild; a site that is
+# silently absent is not cheap to notice.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time, and never cancel one that is mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: The page has to exist before it is published
+        run: test -f docs/index.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - id: deployment
+        uses: actions/deploy-pages@v4

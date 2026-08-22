@@ -1,0 +1,6 @@
+#!/bin/sh
+# Budgets enforced by a mechanism rather than by remembering.
+# Install with: make hooks
+set -e
+python3 "$(git rev-parse --show-toplevel)/planning-tools/validate.py"
+python3 "$(git rev-parse --show-toplevel)/planning-tools/figures_check.py"
