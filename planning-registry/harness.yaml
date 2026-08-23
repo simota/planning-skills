@@ -15,15 +15,20 @@ skills_dir: skills
 platform_dirs: [.git, .github, .claude, .claude-plugin, skills, docs]
 
 limits:
-  skill_md_lines: 128         # measured at adoption: 92-129. Raised from 120 when the
-                              # scoring block was delivered into every skill: the closing
-                              # half of an estimate is the half that gets skipped, and it
-                              # is skipped hardest when it lives in a file nobody opens
+  skill_md_lines: 140         # derived, not chosen: 90 for the skill's own words plus
+                              # the 50 lines of delivered contract every file in this
+                              # set now carries. The last raise (120 -> 128) was the
+                              # same move for a smaller block; the blocks have
+                              # grown since, and the cap had come to govern about
+                              # 78 lines of actual skill. Measured own-content max
+                              # in this set: 72 lines, in planning-review
   description_chars: 200      # the listing truncates past this
   playbook_lines: 300
   playbooks_per_skill: 8
   shared_file_lines: 100
-  shared_lines_total: 500     # measured: 402 before CALIBRATION.md, 479 after. This set
+  shared_lines_total: 550   # every set sat at 95-98% of the old figure at once,
+                              # which is a budget that has stopped leaving room to
+                              # think rather than seven sets each being careless
                               # is the only one that emits a claim about the future, so it
                               # is the only one that owes a record of how those turned out
   skills_max: 11              # 9 in use, 2 spare for demand found in use
