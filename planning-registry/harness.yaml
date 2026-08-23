@@ -87,6 +87,14 @@ refutation:
     it rests on an assumption nobody verified, a named dependency does not exist,
     or a risk has no trigger anyone could observe in time
 
+# Tools a skill may run. Each is linked individually into the skills that can run
+# it; the tools directory is never linked whole, because a skill holding `Bash`
+# and all of it could edit the harness it is part of. A rule checks each link is
+# present exactly where the skill's class grants a shell, so a missing one is a
+# failure rather than an oversight.
+linked_tools:
+  refute.py: all
+
 vocabulary:
   patterns: [linear, loop, report-only]
   checkers: [other-engine]

@@ -566,31 +566,55 @@ def v33_refutation_lens():
                         f"{SET}-tools/refute.py has nothing domain-specific to ask with")
 
 
-def v34_refute_reachable():
-    """The refuter is reachable from a skill exactly where it is runnable.
+def v34_tools_reachable():
+    """Every declared tool is reachable from a skill exactly where it is runnable.
 
-    Linked into a skill whose class withholds `Bash`, it is decoration that reads
-    like a capability. Missing from one that holds `Bash`, the skill has to shell
-    out to a path outside its own directory, which §1.3 says does not resolve.
-    Tying the link to the grant makes the absence checked rather than accidental —
-    a set where no skill can run it says so out loud (T11).
+    Linked into a skill whose class withholds `Bash`, a tool is decoration that
+    reads like a capability. Missing from one that holds `Bash`, the skill has to
+    shell out to a path outside its own directory, which does not resolve. Tying
+    the link to the grant makes the absence checked rather than accidental — a set
+    where no skill can run one says so out loud.
 
-    Only this one tool is linked. `render.py` rewrites SKILL.md files, and a skill
-    holding `Bash` and the whole tools directory could edit the harness it is part of.
+    The list is `linked_tools` in harness.yaml, so adding a tool costs one line
+    and is checked the same way as the ones already there. The tools directory is
+    never linked whole: a skill holding `Bash` and all of it could edit the
+    harness it is part of, `render.py` included.
     """
+    declared_tools = H.get("linked_tools") or {}
+    if not declared_tools:
+        fail("V34", "harness.yaml declares no linked_tools; this rule is "
+                    "checking nothing")
+        return
+    for tool, who in declared_tools.items():
+        source = ROOT / f"{SET}-tools" / tool
+        if not source.exists():
+            fail("V34", f"linked_tools names {tool}, which is not in {SET}-tools/")
+            continue
+        wanted = set(SKILLS) if who == "all" else set(who)
+        unknown = wanted - set(SKILLS)
+        if unknown:
+            fail("V34", f"linked_tools[{tool}] names {sorted(unknown)}, "
+                        "which are not skills")
+        for d in SKILL_DIRS:
+            cls = CAP.get(d.name, {}).get("class")
+            has_shell = "Bash" in H["permission_classes"].get(cls, {}).get("tools", "")
+            link = d / tool
+            should = d.name in wanted and has_shell
+            if should and not link.is_symlink():
+                fail("V34", f"{d.name} may run {SET}-tools/{tool} but cannot reach "
+                            f"it; link it as {tool}")
+            if not should and link.is_symlink():
+                why = ("its class grants no Bash" if d.name in wanted
+                       else f"linked_tools[{tool}] does not name it")
+                fail("V34", f"{d.name} links {tool} and {why}")
+            if link.is_symlink() and link.resolve() != source.resolve():
+                fail("V34", f"{d.name}/{tool} points at {link.resolve()}, not "
+                            "the set's own")
     for d in SKILL_DIRS:
-        declared = CAP.get(d.name, {}).get("class")
-        tools = H["permission_classes"].get(declared, {}).get("tools", "")
-        link = d / "refute.py"
-        runnable = "Bash" in tools
-        if runnable and not link.is_symlink():
-            fail("V34", f"{d.name} may run {SET}-tools/refute.py but cannot reach it; "
-                        f"link it as refute.py")
-        if not runnable and link.is_symlink():
-            fail("V34", f"{d.name} links refute.py but class {declared!r} grants no "
-                        "Bash, so it cannot run it")
-        if link.is_symlink() and link.resolve() != (ROOT / f"{SET}-tools/refute.py").resolve():
-            fail("V34", f"{d.name}/refute.py points at {link.resolve()}, not the set's own")
+        for entry in sorted(d.iterdir()):
+            if entry.suffix == ".py" and entry.name not in declared_tools:
+                fail("V34", f"{d.name}/{entry.name} is a tool link nothing "
+                            "declares; add it to linked_tools or remove it")
 
 
 def v35_signature():
@@ -636,7 +660,7 @@ RULES = [v1_sizes, v2_description_terms, v3_roster, v4_playbook_orphans,
          v29_reference_headers, v30_reference_orphans, v31_verified_names_a_check,
          v32_checker_engine,
          v33_refutation_lens,
-         v34_refute_reachable,
+         v34_tools_reachable,
          v35_signature]
 
 
