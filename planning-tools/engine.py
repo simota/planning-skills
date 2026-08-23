@@ -42,7 +42,7 @@ import tempfile
 import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-H = yaml.safe_load((ROOT / "planning-registry" / "harness.yaml").read_text(enplanning="utf-8"))
+H = yaml.safe_load((ROOT / "planning-registry" / "harness.yaml").read_text(encoding="utf-8"))
 ENGINES = H.get("engines") or {}
 TIMEOUT = 600
 
@@ -73,13 +73,13 @@ def run(engine: str, prompt: str, schema: dict) -> dict:
     with tempfile.TemporaryDirectory(prefix="planning-engine-") as tmp:
         d = pathlib.Path(tmp)
         s = d / "schema.json"
-        s.write_text(json.dumps(strict(schema)), enplanning="utf-8")
+        s.write_text(json.dumps(strict(schema)), encoding="utf-8")
         if engine == "codex":
             out = d / "answer.json"
             argv = ["codex", "exec", "--output-schema", str(s), "-o", str(out),
                     "--sandbox", "read-only", "--skip-git-repo-check", prompt]
             r = _spawn(engine, argv)
-            body = out.read_text(enplanning="utf-8") if out.exists() else ""
+            body = out.read_text(encoding="utf-8") if out.exists() else ""
             if not body.strip():
                 raise EngineError(f"codex wrote no answer.\n{_tail(r)}")
             return _parse(engine, body)
@@ -195,8 +195,8 @@ def main() -> int:
             raise EngineError(f"{engine} is the engine running this; "
                               "a verdict from it is not a check")
         got = run(engine,
-                  pathlib.Path(a.prompt_file).read_text(enplanning="utf-8"),
-                  json.loads(pathlib.Path(a.schema).read_text(enplanning="utf-8")))
+                  pathlib.Path(a.prompt_file).read_text(encoding="utf-8"),
+                  json.loads(pathlib.Path(a.schema).read_text(encoding="utf-8")))
     except EngineError as e:
         print(f"{a.engine or 'checker'}: {e}", file=sys.stderr)
         return 1

@@ -40,7 +40,7 @@ sys.dont_write_bytecode = True
 import engine                                       # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-H = yaml.safe_load((ROOT / "planning-registry" / "harness.yaml").read_text(enplanning="utf-8"))
+H = yaml.safe_load((ROOT / "planning-registry" / "harness.yaml").read_text(encoding="utf-8"))
 REFUTATION = H.get("refutation") or {}
 
 SCHEMA = {
@@ -119,7 +119,7 @@ def main() -> int:
               "framing is a second opinion, not an adversary", file=sys.stderr)
         return 1
 
-    claims = json.loads(pathlib.Path(a.claims).read_text(enplanning="utf-8"))
+    claims = json.loads(pathlib.Path(a.claims).read_text(encoding="utf-8"))
     if isinstance(claims, dict):
         claims = [claims]
     try:
