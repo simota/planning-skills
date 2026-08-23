@@ -95,6 +95,31 @@ refutation:
 linked_tools:
   refute.py: all
 
+# A finding a reader has to reassemble in their head is a finding that gets
+# skimmed, and a skimmed report did not happen. This is the one place the
+# trigger and the floor are written; the review skill states them in its own
+# words, its playbook decides the form, and a rule checks the two agree.
+#
+# The same block, with the same keys, is in every set that has a review skill.
+# A set with none says so here rather than leaving the absence to be inferred.
+finding_visuals:
+  playbook: visualise.md          # under the review skill's playbooks/
+  contract: diagram-forms.md      # under its reference/
+  required_of: [planning-review]
+
+  # ASCII first: it survives a terminal, a plain-text report, a commit message
+  # and a diff. Mermaid when the shape is genuinely a graph and ASCII would
+  # misalign it. Never both for one finding.
+  forms: [ascii, mermaid]
+
+  # When a diagram is owed. Any one of these is enough, and none of them is
+  # "it would look nice" — a diagram that restates a sentence costs the reader
+  # twice.
+  triggers: [hops, ordering, disagreement, location]
+
+  # What keeps a diagram a finding rather than an illustration.
+  floor: [labelled, derived, bounded]
+
 vocabulary:
   patterns: [linear, loop, report-only]
   checkers: [other-engine]

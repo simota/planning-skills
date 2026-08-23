@@ -47,6 +47,7 @@ Phases: `TRACE → AUDIT → ATTACK → VERDICT`.
 | Running the audit | [checks](playbooks/checks.md) — the checks, the silence audit, and how the verdict follows from them |
 | Writing the deliverable | [template](reference/template.md) |
 | About to issue a verdict | [traps](playbooks/traps.md) |
+| A finding spans places, an order, a disagreement, or a region | [visualise](playbooks/visualise.md) — a reader who has to reassemble it will skim it. ASCII by default, and the drawing carries the finding's rung, never a better one |
 | A finding has no concrete failure scenario | It is not a finding. "Estimates seem optimistic" is a mood; name the task, the number, and what breaks |
 | Everything looks blocking | Re-grade. **A gate that blocks on everything is ignored on the next plan**, which costs more than the plan it blocked |
 | The plan never mentions something | That is the silence audit, and it is where the authors' blind spots are. Absence is the finding |

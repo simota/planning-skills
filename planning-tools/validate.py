@@ -649,6 +649,65 @@ def v35_signature():
                         f"it in its own words; the delivered block does not count")
 
 
+def v36_finding_visuals():
+    """A finding a reader has to reassemble gets a picture, and the picture is
+    held to the same standard as the words.
+
+    `finding_visuals` in harness.yaml names the triggers, the forms and the
+    floor; this checks the review skill actually defines each of them, and that
+    its `Decide first` table reaches the playbook — a rule stated in a file
+    nothing links to is read on no launches at all.
+
+    A set with no review skill declares `required_of: []` and says why. The
+    absence is then a decision on the record rather than something a later
+    reader has to notice.
+    """
+    fv = H.get("finding_visuals")
+    if not fv:
+        fail("V36", "harness.yaml declares no finding_visuals; this rule is "
+                    "checking nothing")
+        return
+    required = fv.get("required_of")
+    if required is None:
+        fail("V36", "finding_visuals declares no required_of")
+        return
+    if not required:
+        if not (fv.get("why") or "").strip():
+            fail("V36", "finding_visuals.required_of is empty and says nothing "
+                        "about why no skill in this set owes a diagram")
+        return
+    words = list(fv.get("triggers") or []) + list(fv.get("floor") or [])
+    if not words or not fv.get("forms"):
+        fail("V36", "finding_visuals declares no triggers, floor or forms; "
+                    "the rule would check that a file exists and nothing else")
+        return
+    for name in required:
+        if name not in SKILLS:
+            fail("V36", f"finding_visuals.required_of names {name!r}, "
+                        "which is not a skill")
+            continue
+        pb = SKILLS_ROOT / name / "playbooks" / fv["playbook"]
+        ref = SKILLS_ROOT / name / "reference" / fv["contract"]
+        for f in (pb, ref):
+            if not f.exists():
+                fail("V36", f"{name} owes {f.relative_to(SKILLS_ROOT)}, "
+                            "which does not exist")
+        if not (pb.exists() and ref.exists()):
+            continue
+        text = read(pb) + read(ref)
+        for word in words:
+            if f"`{word}`" not in text:
+                fail("V36", f"{name} never defines {word!r}, which "
+                            "finding_visuals declares")
+        for form in fv["forms"]:
+            if form not in _norm(text):
+                fail("V36", f"{name} never names the {form!r} form")
+        body = sections(read(SKILLS_ROOT / name / "SKILL.md")).get("Decide first", "")
+        if fv["playbook"] not in body:
+            fail("V36", f"{name}/SKILL.md does not reach {fv['playbook']} from "
+                        "Decide first; a rule nothing links to is read on no launches")
+
+
 RULES = [v1_sizes, v2_description_terms, v3_roster, v4_playbook_orphans,
          v5_playbook_budget, v6_budgets, v7_routes_real, v8_links, v9_signals,
          v10_fixtures, v11_count, v12_prefix, v13_route_budget, v14_patterns,
@@ -661,7 +720,8 @@ RULES = [v1_sizes, v2_description_terms, v3_roster, v4_playbook_orphans,
          v32_checker_engine,
          v33_refutation_lens,
          v34_tools_reachable,
-         v35_signature]
+         v35_signature,
+         v36_finding_visuals]
 
 
 def main() -> int:

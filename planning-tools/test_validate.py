@@ -292,6 +292,28 @@ def _(r): sub(r / f"{S}planning-review/SKILL.md", "Check the calibration loop is
               "Check the scoring loop is closable")
 
 
+@case("V36")
+def _(r): (r / f"{S}planning-review/playbooks/visualise.md").unlink()
+
+
+@case("V36-undefined")
+def _(r):
+    """A trigger the registry declares and the pages never define."""
+    for g in (r / f"{S}planning-review/playbooks/visualise.md",
+              r / f"{S}planning-review/reference/diagram-forms.md"):
+        g.write_text(g.read_text(encoding="utf-8").replace("`ordering`", "sequencing"),
+                     encoding="utf-8")
+
+
+@case("V36-unreachable")
+def _(r): sub(r / f"{S}planning-review/SKILL.md",
+              "[visualise](playbooks/visualise.md)", "the visualise guidance")
+
+
+@case("V36-none-declared")
+def _(r): sub(r / "planning-registry/harness.yaml", "finding_visuals:", "unused_visuals:")
+
+
 def main() -> int:
     baseline = run(ROOT)
     if "green" not in baseline:
