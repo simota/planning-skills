@@ -126,6 +126,7 @@ before.
 | [`skills/_planning/HANDOFF.md`](skills/_planning/HANDOFF.md) | What passes between phases, and the seven checks the receiver runs |
 | [`skills/_planning/VALUES.md`](skills/_planning/VALUES.md) | The order when two goods conflict, and the escape hatch |
 | [`skills/_planning/ROUTING.md`](skills/_planning/ROUTING.md) | Guidance. Which phase owns the call when two could take it |
+| [`skills/_planning/REPORT.md`](skills/_planning/REPORT.md) | What a person reads: the order, the ceiling per tier, and why the artifacts are the record |
 
 ## Layout
 

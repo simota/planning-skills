@@ -2,8 +2,9 @@
 # HANDOFF — passing work between planning skills
 
 Every `M` and `L` run returns one, whether the next reader is another skill, a
-person, or a later session. It is the single place the facts live; the report a
-person reads is this object in prose, not a second set of claims.
+person, or a later session. It is the single place the facts live, and it is the
+**record, not the report**: what a person reads is a bounded view over it
+(`_planning/REPORT.md`), never this object rendered field by field.
 
 **`S` is the exception** (`_planning/SIZING.md`): one brief in the response, no
 files, no handoff. It still tags its claims — `S` drops the paperwork, never the
