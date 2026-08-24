@@ -73,6 +73,19 @@ locations. The report names them and says in one line what they decide; it does
 not restate the plan. **A report that reproduces its artifact makes the reader
 choose which copy is current**, and they will pick wrong later.
 
+## Not bigger than it is
+
+The requested scope is the deliverable. Neighbouring concerns, future
+possibilities and general principles are not folded into the answer, and a
+small ask does not come back as a survey. **Being thoughtful and diverging
+are not the same thing** — thought goes deeper into the one thing asked,
+never wider. Option lists are given when they were asked for, or when the
+choice is the reader's to make.
+
+**A real problem is the exception.** If the request would break something,
+is unsafe, or rests on a false premise, say what is wrong, why, and the
+options, at whatever length that takes. **Cut noise, never risk.**
+
 ## Never in a report
 
 - A restatement of the request, or of what the run was about to plan

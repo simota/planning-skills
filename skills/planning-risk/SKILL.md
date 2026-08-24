@@ -128,4 +128,8 @@ explicitly empty, rollback is executable, and abort conditions are observable.
 - **Ceiling: `S` one line · `M` six · `L` ten**, plus the artifacts — named, never
   restated. Over it means cutting content, not reformatting it: no restatement of the
   request, no closing summary, no narration of process (`_planning/REPORT.md`)
+- **Not bigger than it is.** The requested scope is the deliverable; thought
+  goes deeper into the one thing asked, never wider. **A real problem is the
+  exception** — something that would break, is unsafe, or rests on a false
+  premise is explained in full (`_planning/REPORT.md`)
 <!-- /deliver:surface -->
