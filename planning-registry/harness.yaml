@@ -156,7 +156,22 @@ rot_patterns:
   - '\b(19|20)\d{2}-\d{2}\b'
   - '\bv\d+\.\d+(\.\d+)?\b'
 
-reference_headers: ["Purpose:", "Read when:", "Verified:"]
+reference_headers: ["Purpose:", "Read when:", "Source:", "Verified:"]
+# `Verified:` is when someone looked. `Source:` is what they looked at, and the
+# two are different times: the date is when it was observed, the version is what
+# was in force. Without the second, a page records only that somebody glanced at
+# it, never where the rot would come from. Declared empty is a real answer — a
+# layer of templates and catalogues depends on nothing and cannot go stale — but
+# it has to be declared, or V37 is checking nothing.
+#
+# A version here is a pin, and V37 requires it to appear in the page as well as
+# in the header. That is what makes a page edited to a newer version fail rather
+# than quietly disagree with its own header. `null` means the authority carries
+# no version worth pinning — a tool re-run against whatever is installed has no
+# version to pin, and writing one would be a fiction.
+source_authorities: {}     # declared and empty: this layer is templates
+                           # and forms, and depends on nothing outside itself
+source_none_marker: "none"    # what a page with no outside dependency writes
 # A `Verified:` date records that someone looked once, and a date has no failure
 # mode. V31 requires the line to name what re-checks it — or to say plainly that
 # nothing does. An unchecked page is fine; an unchecked page that reads like a

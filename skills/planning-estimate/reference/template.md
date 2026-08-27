@@ -3,6 +3,7 @@
 
 Purpose: the required sections of `35-estimate.md`, in order, with what each must carry.
 Read when: writing or completing the deliverable.
+Source: none — nothing outside this page can move what it states.
 Verified: 2026-08-21 — no automated check.
 
 ```markdown

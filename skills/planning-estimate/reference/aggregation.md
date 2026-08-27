@@ -3,6 +3,7 @@
 
 Purpose: How per-task ranges combine into the total the deliverable asks for, why adding the endpoints is wrong, and when the method itself stops holding.
 Read when: filling in "Critical path total", combining any set of task ranges, or setting the confidence label on a schedule.
+Source: none — nothing outside this page can move what it states.
 Verified: 2026-08-21 — the tables through "Where the method stops holding" came from a 200,000-run
 Monte Carlo over the Beta-PERT distribution `sizing.md`'s formulas assume. `make figures` holds every one of them against a generated fixture on every commit; `make
 figures-full` re-derives that fixture from the seed. The fast tier catches a number edited

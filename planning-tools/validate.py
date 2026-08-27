@@ -708,6 +708,79 @@ def v36_finding_visuals():
                         "Decide first; a rule nothing links to is read on no launches")
 
 
+def v37_source_pins_the_rot():
+    """`Verified:` is when someone looked. `Source:` is what they looked at.
+
+    V31 makes the line name what re-checks it, and across the family 94 of 114
+    reference pages answer `no automated check`. That one admission covers two
+    populations: pages bound to something outside themselves, and the templates
+    and catalogues that depend on nothing and cannot go stale. Only the first
+    can rot, and nothing in the header said which page was which.
+
+    So the header names it and the check is an equality — every authority the
+    registry declares and the body leans on is named in `Source:`, and nothing
+    is named there the body does not use. Where the registry pins a version,
+    that version has to appear in the page too: a page edited to a newer one
+    then fails instead of quietly disagreeing with its own header.
+
+    Nothing here reads a date or leaves the machine. Freshness is time- and
+    environment-dependent and does not belong in CI; agreement between a header
+    and its own body is neither.
+
+    Matching is on word boundaries, not substrings. Plain `in` reported that a
+    page on test oracles depended on git, having found it inside "legitimate".
+    """
+    def names(text: str, name: str) -> bool:
+        return re.search(rf"(?<![\w-]){re.escape(name)}(?![\w-])", text) is not None
+
+    declared = H.get("source_authorities")
+    none_marker = H.get("source_none_marker")
+    if declared is None or not none_marker:
+        fail("V37", "harness.yaml declares no source_authorities/source_none_marker; "
+                    "this rule is checking nothing. A set whose reference layer "
+                    "depends on nothing outside itself declares the map empty — "
+                    "silence and emptiness have to look different")
+        return
+    for d in SKILL_DIRS:
+        for f in sorted((d / "reference").glob("*.md")) if (d / "reference").exists() else []:
+            lines = read(f).splitlines()
+            start = next((i for i, l in enumerate(lines) if l.startswith("Source:")), None)
+            if start is None:
+                continue                      # V29 already reports the missing header
+            # The block ends at the next header, not at the next blank line.
+            # `Source:` and `Verified:` sit on adjacent lines, and a run-to-blank
+            # reading swallowed the evidence line into the header — where it named
+            # the very tool the mutation had just removed, and the rule stayed
+            # quiet about a page that no longer declared what it runs on.
+            end = start
+            while (end + 1 < len(lines) and lines[end + 1].strip()
+                   and not any(lines[end + 1].startswith(h) for h in H["reference_headers"])):
+                end += 1
+            head = " ".join(lines[start:end + 1])
+            body = "\n".join(lines[:start] + lines[end + 1:])
+            named = [a for a in declared if names(head, a)]
+            if not named and none_marker not in head:
+                fail("V37", f"{f.relative_to(ROOT)} names no source and does not say "
+                            f"{none_marker!r}; a page that depends on nothing says so, "
+                            "because silence reads the same from a page that rots")
+            for name, version in declared.items():
+                if names(body, name) and not names(head, name):
+                    fail("V37", f"{f.relative_to(ROOT)} leans on {name} and its `Source:` "
+                                "does not name it; the header is where the rot is declared")
+                if names(head, name) and not names(body, name):
+                    fail("V37", f"{f.relative_to(ROOT)} names {name} in `Source:` and never "
+                                "uses it; a source the page does not depend on pins nothing")
+                if version and names(head, name):
+                    pin = f"{name} {version}"
+                    if pin not in head:
+                        fail("V37", f"{f.relative_to(ROOT)} names {name} in `Source:` without "
+                                    f"the pinned version; the registry pins {version}, and a "
+                                    "source without one cannot be compared with anything later")
+                    elif pin not in body:
+                        fail("V37", f"{f.relative_to(ROOT)} pins {pin} and the page never says "
+                                    f"{pin}; one of the two moved without the other")
+
+
 RULES = [v1_sizes, v2_description_terms, v3_roster, v4_playbook_orphans,
          v5_playbook_budget, v6_budgets, v7_routes_real, v8_links, v9_signals,
          v10_fixtures, v11_count, v12_prefix, v13_route_budget, v14_patterns,
@@ -721,7 +794,8 @@ RULES = [v1_sizes, v2_description_terms, v3_roster, v4_playbook_orphans,
          v33_refutation_lens,
          v34_tools_reachable,
          v35_signature,
-         v36_finding_visuals]
+         v36_finding_visuals,
+         v37_source_pins_the_rot]
 
 
 def main() -> int:
