@@ -48,7 +48,7 @@ checking them against each other.
 
 ## The floor
 
-A diagram carries the same rung as the finding it belongs to. It never raises
+A diagram carries the same evidence tag as the finding it belongs to. It never raises
 one, and three things keep it a finding rather than an illustration:
 
 - **`labelled`** — every mark names something that was opened. A region, a file,

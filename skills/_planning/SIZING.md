@@ -18,8 +18,6 @@ Match depth to stakes. Declare the tier at the top of the deliverable.
 
 These are minimum sets, not exact ones: a chain that runs `planning-estimate` produces `35-estimate.md` at any tier. `L` is the exception — `40-risks.md` and a `planning-review` verdict are mandatory, never optional.
 
-Over-planning an `S` task is a failure of the same weight as under-planning an `L` one.
-
 ## The planning gate
 
 No `planning-*` skill proceeds past its own phase while its own gate conditions hold. Stop and report instead.

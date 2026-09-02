@@ -24,5 +24,5 @@ Use when the option set is really one idea in three costumes.
 - Forecloses: <what becomes hard or impossible afterward>
 - Fails by: <the realistic failure mode, not the worst case>
 - Reversal: <what undoing it takes> — hours | days | weeks | practically never
-- Evidence: <tags per CONVENTIONS §3>
+- Evidence: <one tag per claim — [verified: pointer] | [assumed] | [unknown]>
 ```

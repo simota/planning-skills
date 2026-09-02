@@ -27,14 +27,8 @@ noise at the next.**
 |---|---|---|
 | **Start** | What will be done and what is excluded, with the tier if it is not obvious | one line |
 | **A question** | The one decision that is blocked, and the default taken if nobody answers | one question, one line |
-| **Mid-run** | Nothing — unless the reader must act now: a divergence from what was agreed, a path found blocked, work that would grow the scope, a discovered constraint that invalidates the plan being written | one line each, or silence |
+| **Mid-run** | A line when the reader must act now: a divergence from what was agreed, a path found blocked, work that would grow the scope, a discovered constraint that invalidates the plan being written | one line each |
 | **End** | The report below | the ceiling below |
-
-**Progress is not information.** "reading the tickets", "now sizing the
-tasks", "this is coming together" tell the reader nothing they can act on,
-and they cost the same attention as the line that matters. A tool call is
-already visible; narrating it a second time is the commonest way a run fills
-a screen while saying nothing.
 
 **A question is not a status update.** Ask when guessing wrong would be
 expensive to undo, ask one thing, and say what happens if the answer never
@@ -56,15 +50,14 @@ A run with nothing unresolved reports lines 1 and 2 and stops.
 
 ## Ceiling
 
-| Tier (`_planning/SIZING.md`) | The whole report |
-|---|---|
-| `S` | one line — the brief is the deliverable and it is already short |
-| `M` | six lines, plus the artifacts |
-| `L` | ten lines, plus the artifacts |
+An `S` report is the brief, and the brief is already short. An `M` or `L`
+report is the four lines above plus the artifacts by name: long enough to be
+read to the end, and no longer. A reader who stops after the first line has
+the result.
 
-**Over the ceiling means cutting content, not reformatting it.** A table, a
-nested list, and a heading per task are the three ways a report grows while
-appearing to have been tightened.
+**Too long means cutting content, not reformatting it.** A table or a list
+earns its place when it is the thing the reader has to compare, never as a way
+to fit more in.
 
 ## The deliverable is not the report
 
@@ -91,7 +84,6 @@ options, at whatever length that takes. **Cut noise, never risk.**
 - A restatement of the request, or of what the run was about to plan
 - A closing summary of what was just said
 - Tasks the plan already lists, or options the options file already weighed
-- Narration of process: what was read, what was considered first, which tool
 - Confidence about a `verified` claim nobody doubted, or hedging on an
   `assumed` one that changes no decision
 

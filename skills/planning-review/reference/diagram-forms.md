@@ -72,12 +72,12 @@ It needs a renderer, so it is a trade.
 ````
 ```mermaid
 flowchart LR
-  B[brief axis 3] --> P[prompt v2]
-  P --> R1[run 1]
-  P --> R2[run 2]
-  R1 --> C1[cand 1 · ok]
-  R2 --> C3[cand 3 · shipped]
-  C3 -.->|exclusion never re-checked| B
+  T1[T-1 schema] --> T2[T-2 migration]
+  T1 --> T3[T-3 api]
+  T2 --> T5[T-5 cutover]
+  T3 --> T5
+  T5 --> T6[T-6 client]
+  T2 -.->|point of no return · no rehearsal task before it| T5
 ```
 ````
 
@@ -95,5 +95,5 @@ untraced edges as a sentence is, and harder to argue with, which is the danger.
 ## What none of these do
 
 They do not carry evidence. A map shows where a finding is, not that anyone
-looked — the grade beside the finding says that, and a beautifully drawn
-`asserted` is still `asserted`.
+looked — the tag beside the finding says that, and a beautifully drawn
+`[assumed]` is still `[assumed]`.
