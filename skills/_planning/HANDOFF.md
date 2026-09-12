@@ -19,6 +19,7 @@ brief:                        # every field of the brief in _planning/SIZING.md
   tier: S | M | L
   excludes: [...]             # may not be empty
   open_questions: []          # must be empty; a non-empty one never travels
+  terms: {}                   # the names this run used, as the glossary spells them
 status: DONE                  # DONE | PARTIAL | BLOCKED  (_planning/CONTRACT.md)
 produced: ["plans/<slug>/30-plan.md"]        # the files, not a description of them
 decided: "<what this phase settled, 1-3 lines>"

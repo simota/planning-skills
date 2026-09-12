@@ -33,9 +33,11 @@ Ask what the plan never mentions. In order of how often each turns out to matter
 
 | Verdict | Condition |
 |---------|-----------|
-| `READY` | All nine checks pass; no blocking findings; open `Q-n` are non-blocking |
-| `READY WITH CONDITIONS` | Findings exist but each has a named owner and a resolution that fits before the task it gates |
-| `NOT READY` | Any check-1/2/3 failure, an unresolved `Q-n` on the critical path, or an irreversible step with no rollback |
+| All nine checks pass; no blocking findings; open `Q-n` are non-blocking | `READY` |
+| Findings exist but each has a named owner and a resolution that fits before the task it gates | `READY-WITH-CONDITIONS` |
+| Any check-1/2/3 failure, an unresolved `Q-n` on the critical path, or an irreversible step with no rollback | `NOT-READY` |
+
+The three words are defined once, in `_planning/CONTRACT.md` § Readiness; this table says which the checks produce.
 
 **The rehearsal rule.** This review runs *before* execution, so a rollback path that does not exist yet cannot have been tested — demanding a completed rehearsal would make `READY` unreachable for every plan that builds new rollback capability, and the only way to satisfy it would be for a planning skill to execute, which the suite forbids.
 
@@ -45,4 +47,4 @@ Ask what the plan never mentions. In order of how often each turns out to matter
 | Built by this plan | A rehearsal task exists with an owner, a done condition, and a scheduled position **before the point of no return** |
 | Not needed (nothing persisted, no public contract, no live traffic) | The plan says so explicitly and the claim survives spot-check |
 
-`NOT READY` names the shortest path to `READY`, not a list of everything wrong.
+`NOT-READY` names the shortest path to `READY`, not a list of everything wrong.

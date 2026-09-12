@@ -38,6 +38,10 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
 - **`excludes` may not be empty** and execution waits on an empty
   `open_questions`. In planning, an exclusion becomes a non-goal, and a non-goal
   written down is the cheapest scope control there is (`_planning/SIZING.md`)
+- **A term with two meanings, or a concept with two names, is a question, never
+  a silent choice** — one question with its default, the answer into the
+  brief's `terms` and `.agents/glossary.md`, and the glossary's names only from
+  then on (`_planning/SIZING.md` § Terms)
 <!-- /deliver:sizing -->
 
 ## Decide first

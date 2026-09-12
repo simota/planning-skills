@@ -43,6 +43,17 @@ Falling short is reported as falling short. **A plan that reaches `DONE` by
 dropping a question is the failure mode of this whole set**: the question does
 not go away, it just arrives during execution instead.
 
+## Readiness
+
+`planning-review` closes with exactly one of these; the checks that produce each
+are in its `checks` playbook.
+
+| Verdict | Means |
+|---|---|
+| `READY` | Nothing blocks execution; what is open is non-blocking |
+| `READY-WITH-CONDITIONS` | Execution may start once each named condition is met by its named owner, before the task it gates |
+| `NOT-READY` | Execution must not start; the shortest path to `READY` is named |
+
 ## Residuals
 
 Anything left behind is classified and appears in the handoff's `open` list.

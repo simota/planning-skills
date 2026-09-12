@@ -145,8 +145,8 @@ def _(r): sub(r / f"{S}_planning/ROUTING.md", "(`_planning/SIZING.md`)", "(`SIZI
 
 @case("V20")
 def _(r):
-    f = r / f"{S}_planning/CONTRACT.md"
-    f.write_text(f.read_text(encoding="utf-8").replace("UNVERIFIED", "OPEN"), encoding="utf-8")
+    """The definition row becomes a mention; the word is still on the page."""
+    sub(r / f"{S}_planning/CONTRACT.md", "| `[assumed]` |", "| [assumed] |")
 
 
 @case("V21")
@@ -312,6 +312,11 @@ def _(r): sub(r / f"{S}planning-review/SKILL.md",
 
 @case("V36-none-declared")
 def _(r): sub(r / "planning-registry/harness.yaml", "finding_visuals:", "unused_visuals:")
+
+
+@case("V38")
+def _(r): sub(r / f"{S}planning-review/playbooks/checks.md", "## The Silence Audit",
+              "verdict: KEEP | DROP\n\n## The Silence Audit")
 
 
 @case("V37")

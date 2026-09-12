@@ -333,12 +333,30 @@ def _check_paths(f: Path, base: Path, label: str) -> None:
                         "skill directory")
 
 
+# A definition, as against a mention: a table row or a heading that opens with
+# the word. `patterns` and `checkers` are route vocabulary and live in
+# routes.yaml, so no page is asked to define them.
+DEFINITION_FORMS = ("| `{w}` |", "| `[{w}]` |", "## `{w}`")
+ROUTE_VOCAB = {"patterns", "checkers"}
+
+
 def v20_contract_vocabulary():
-    text = read(SKILLS_ROOT / CONTRACT_FILE)
-    for key in ("evidence_levels", "residual_classes", "statuses"):
-        for word in VOCAB[key]:
-            if word not in text:
-                fail("V20", f"{CONTRACT_FILE} never defines {word!r}")
+    """Every declared word is defined on a shared page, not merely named there.
+
+    The earlier form asked whether the word appeared anywhere in CONTRACT.md,
+    and a word used in a sentence passed as defined — the check §5.7 names,
+    that one replaced definition does not trip. A definition is a row or a
+    heading, and every vocabulary key is held to it, not three.
+    """
+    pages = {p.name: read(p) for p in (SKILLS_ROOT / SHARED).glob("*.md")}
+    for key, words in VOCAB.items():
+        if key in ROUTE_VOCAB:
+            continue
+        for word in words:
+            forms = [f.format(w=word) for f in DEFINITION_FORMS]
+            if not any(f in t for t in pages.values() for f in forms):
+                fail("V20", f"no page under {SHARED}/ defines {word!r} ({key}) — "
+                            "a table row or a heading, not a mention")
 
 
 def strip_delivered(text: str) -> str:
@@ -781,6 +799,36 @@ def v37_source_pins_the_rot():
                                     f"{pin}; one of the two moved without the other")
 
 
+# `KEY: A | B | C` in a schema, or a bare `A | B | C` on a line of its own —
+# upper-case words joined by pipes. Underscored and parenthesised forms are not
+# matched, so this is a floor.
+ENUM_RE = re.compile(r"(?:^|:\s*)((?:[A-Z][A-Z-]*(?: [A-Z][A-Z-]*)*)"
+                     r"(?:\s*\|\s*(?:[A-Z][A-Z-]*(?: [A-Z][A-Z-]*)*))+)\s*(?:#.*)?$")
+
+
+def v38_enumerations_declared():
+    """A value set a page switches on is declared vocabulary, or nothing checks it.
+
+    `SEVERITY: CRITICAL | HIGH | MEDIUM | LOW | NIT` in a handoff schema is a
+    vocabulary — the receiver branches on it — and a set that writes it only
+    on the page has no rule reaching it, so `low` in a playbook fails nowhere.
+    Declared words are what V20 and V22 reach; the rest is what drifts.
+    """
+    declared = {w for words in VOCAB.values() for w in words}
+    for f in sorted(SKILLS_ROOT.rglob("*.md")):
+        if ".git" in f.parts:
+            continue
+        for i, line in enumerate(read(f).splitlines(), 1):
+            m = ENUM_RE.search(line)
+            if not m:
+                continue
+            words = [w.strip() for w in m.group(1).split("|")]
+            missing = [w for w in words if w not in declared]
+            if missing:
+                fail("V38", f"{f.relative_to(ROOT)}:{i} switches on {', '.join(missing)}, "
+                            "which harness.yaml vocabulary does not declare")
+
+
 RULES = [v1_sizes, v2_description_terms, v3_roster, v4_playbook_orphans,
          v5_playbook_budget, v6_budgets, v7_routes_real, v8_links, v9_signals,
          v10_fixtures, v11_count, v12_prefix, v13_route_budget, v14_patterns,
@@ -795,7 +843,8 @@ RULES = [v1_sizes, v2_description_terms, v3_roster, v4_playbook_orphans,
          v34_tools_reachable,
          v35_signature,
          v36_finding_visuals,
-         v37_source_pins_the_rot]
+         v37_source_pins_the_rot,
+         v38_enumerations_declared]
 
 
 def main() -> int:

@@ -10,7 +10,7 @@ Verified: 2026-08-21 — no automated check.
 # <initiative> — Review
 > Status: draft
 > Updated: YYYY-MM-DD
-> Verdict: READY | READY WITH CONDITIONS | NOT READY
+> Verdict: READY | READY-WITH-CONDITIONS | NOT-READY
 > Reviewer: <name or role>
 > Self-review: yes | no
 

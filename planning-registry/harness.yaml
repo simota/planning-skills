@@ -141,6 +141,7 @@ vocabulary:
   statuses: [DONE, PARTIAL, BLOCKED]
   tiers: [S, M, L]
   estimate_outcomes: [within, under, over, open, abandoned]
+  readiness: [READY, READY-WITH-CONDITIONS, NOT-READY]   # the review verdict, one of three
 
 
 document_labels: [contract, guidance, deferred]
