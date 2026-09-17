@@ -7,8 +7,7 @@ allowed-tools: Read, Grep, Glob, Write, Edit
 
 ## Owns
 
-What the plan becomes after reality arrives — measured, classified, and
-corrected at the smallest surface that fixes it. **Stopping stays on the table
+Post-start divergence, classified and corrected at its owning phase. Pre-start edits return there directly. **Stopping stays on the table
 and is priced like any other option.**
 
 Phases: `MEASURE → CLASSIFY → PRICE → CORRECT → RECORD`.
@@ -55,7 +54,8 @@ Phases: `MEASURE → CLASSIFY → PRICE → CORRECT → RECORD`.
 | An estimate slipped | That does not justify re-framing the problem. Correct the minimum surface |
 | A goal's assumption turned out false | That does justify it. Hand back to framing rather than patching downstream |
 | Remaining value is below remaining cost | Recommend stopping, and say what is salvageable. This is a normal outcome, not a failure of the plan |
-| Artifacts need updating | Route them through their owning phase, preserving IDs |
+| Artifacts need updating | Select the correction owner using `course-correct` in `registry/routes.yaml`, preserving IDs and rechecking only affected decisions |
+| One task took longer but no future decision changes | Score its original forecast and record the actual; do not re-decompose, re-estimate, or price a new continuation decision |
 | The divergence is being measured | Score the ranges the divergence closed, on their originals. This is the only skill that normally sees an actual, so a calibration record that is empty here is empty forever |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
@@ -87,8 +87,8 @@ artifacts themselves, with pointers. **A divergence measured from memory is the
 one that gets classified wrong**, because memory reconstructs the cause it
 already believes.
 
-- **Price both branches**, continuing and stopping, and show both numbers. A
-  recommendation to continue that never priced stopping has not considered it
+- **When continuation is in question, price continuing and stopping.** A
+  record-only variance needs neither branch priced; never invent costs to fill a table
 <!-- deliver:report -->
 - **Tag every factual claim in a decision-bearing section**, exactly one:
   `[verified: <pointer>]` — read, run, or cited, with the pointer ·
@@ -119,7 +119,7 @@ already believes.
 ## Done when
 
 Planned versus actual is tabulated, the divergence carries exactly one class,
-both continuing and stopping are priced, the correction touches the minimum
+continuing and stopping are priced when continuation is in question, the correction touches the minimum
 surface, IDs are preserved, and the changelog entry is dated with its trigger.
 <!-- deliver:surface -->
 - **Say what the moment needs.** Start: one line naming what will be planned and what
