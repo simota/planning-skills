@@ -12,6 +12,7 @@ from pathlib import Path
 import yaml
 
 PHASES = {f'planning-{x}' for x in ('frame','discover','options','decompose','estimate','risk','review')}
+MUTATIONS = ('pre-to-replan', 'fixed-decompose', 'wrong-evidence-owner')
 
 def validate(routes: dict, cases: list[dict]) -> list[str]:
     errors=[]
@@ -41,23 +42,39 @@ def validate(routes: dict, cases: list[dict]) -> list[str]:
             errors.append(f'{c["id"]}: {actual!r} != {c["expect"]!r}')
     return errors
 
+def mutate(routes: dict, name: str) -> dict:
+    changed=copy.deepcopy(routes)
+    if name=='pre-to-replan':
+        changed['review-to-ready']['chain']=['planning-review','planning-replan']
+    elif name=='fixed-decompose':
+        changed['course-correct']['chain']=['planning-replan','planning-decompose']
+    elif name=='wrong-evidence-owner':
+        changed['review-to-ready']['repair']['evidence']='planning-decompose'
+    return changed
+
 def main() -> int:
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root',type=Path,default=Path(__file__).resolve().parent.parent)
-    parser.add_argument('--mutate',choices=['pre-to-replan','fixed-decompose','wrong-evidence-owner'])
+    parser.add_argument('--mutate',choices=MUTATIONS)
     args=parser.parse_args()
     routes=yaml.safe_load((args.root/'planning-registry/routes.yaml').read_text())
     cases=yaml.safe_load((args.root/'planning-registry/phase-regressions.yaml').read_text())['cases']
-    if args.mutate:
-        routes=copy.deepcopy(routes)
-        if args.mutate=='pre-to-replan': routes['review-to-ready']['chain']=['planning-review','planning-replan']
-        elif args.mutate=='fixed-decompose': routes['course-correct']['chain']=['planning-replan','planning-decompose']
-        else: routes['review-to-ready']['repair']['evidence']='planning-decompose'
-    errors=validate(routes,cases)
+    tested=mutate(routes,args.mutate) if args.mutate else routes
+    errors=validate(tested,cases)
     for error in errors: print('FAIL:',error)
+    if args.mutate:
+        if errors:
+            print(f'PASS: mutation {args.mutate} was rejected with {len(errors)} structural failure(s)')
+            return 0
+        print(f'FAIL: mutation {args.mutate} escaped the regression checks')
+        return 1
     if errors:
         print(f'{len(errors)} structural failures'); return 1
-    print(f'PASS: {len(cases)} diagnosed return-owner cases; natural-language selection was not tested')
+    for name in MUTATIONS:
+        if not validate(mutate(routes,name),cases):
+            print(f'FAIL: mutation {name} escaped the regression checks')
+            return 1
+    print(f'PASS: {len(cases)} diagnosed return-owner cases; {len(MUTATIONS)} mutations rejected; natural-language selection was not tested')
     return 0
 
 if __name__=='__main__': sys.exit(main())
