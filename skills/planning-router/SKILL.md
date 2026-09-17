@@ -8,9 +8,9 @@ allowed-tools: Read, Grep, Glob, Skill
 ## Owns
 
 Deciding which planning phases a request actually needs and in what order. It
-dispatches and **produces no artifact of its own**. The canonical order is
-frame → discover → options → decompose → estimate → risk → review; the job is
-to take the shortest path through it that the request needs.
+dispatches and **produces no artifact of its own**. The usual order is a default,
+not a requirement: select only phases that supply a missing input or decision.
+An obvious phase is invoked directly; this router is a fallback, not a mandatory stage.
 
 ## Before starting
 
@@ -54,7 +54,7 @@ to take the shortest path through it that the request needs.
 | The user has already chosen the approach | Skip the options phase and say so. Manufacturing alternatives to look thorough costs a phase and buys nothing |
 | The goal needs "and" to state | Stop. Two goals are two briefs, and splitting them is the work rather than a preliminary to it |
 | The request is actually asking for execution | Stop and say so. A plan written for a decided question is pure cost |
-| Something forces the chain backward | Name the observable trigger, and **re-run every phase downstream of the one re-entered**. A scope change after estimating invalidates the plan and the estimate; both are regenerated, not patched |
+| A finding invalidates an earlier decision | Return to its owning phase. Before execution this is a phase revisit, not replan; after work starts use the divergence classification. Recheck decisions that used the changed input, preserving unaffected work and IDs |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
   completeness · mechanism over intent · **deciding over deferring** ·
@@ -68,8 +68,8 @@ to take the shortest path through it that the request needs.
 
 - Always: state the tier, the chain, and the phases deliberately skipped, before
   running anything
-- Always: run phases in canonical order. Skipping forward is free; going
-  backward is a replan and is recorded as one
+- Always: distinguish lifecycle from phase order. A pre-start revisit does not
+  invoke replan; a post-start divergence selects its owner, not a fixed next phase
 - Always: pass the brief whole to every stage. It does not change mid-chain
 - Never: write an artifact. This skill dispatches; the phases produce
 - Never: run a phase to make the chain look complete
