@@ -30,17 +30,17 @@ swept: "1 marker / 1 in open; 22 claims / 22 tagged"
 next: "<the skill that should receive this, or none>"
 ```
 
-- **`brief` travels whole and is not modifiable.** Rewriting it downstream is
-  how a plan ends up solving a problem nobody agreed to, and it is invisible:
-  the artifact still has the right headings
+- **`brief` travels whole; downstream phases may not edit it.** A finding that
+  changes the goal or constraints returns to framing for explicit human re-agreement.
+  The new brief supersedes the old one; affected decisions are rechecked, not silently reused
 - **`ids_added` is what makes the ID scheme work across phases.** A receiver
   that renumbers has broken every cross-reference already written
 - **`produced` names files, and a file named must exist.** A plan that describes
   an artifact it did not write is the commonest form of this set's own failure
-- **`open` carries a class and the class decides what happens.** `BLOCKED` and
-  `UNVERIFIED` stop the chain and go back to the human; `DEFERRED` and
-  `OUT-OF-SCOPE` travel as record, so the receiver learns what was already
-  decided against rather than rediscovering it
+- **`open` carries a class and stops dependent work.** Route a repairable
+  `BLOCKED` or `UNVERIFIED` to its owning phase; ask the human when authority,
+  access, scope or risk acceptance is needed. `DEFERRED` and `OUT-OF-SCOPE`
+  travel as record, not as permission to proceed through a blocked decision
 - Pass the decisions and their grounds. The exploration belongs in the artifact
   if it is load-bearing, and nowhere if it is not
 
@@ -49,7 +49,8 @@ next: "<the skill that should receive this, or none>"
 1. Is a whole `brief` attached, with every field present? A subset is a brief
    that lost a constraint in transit
 2. Does the declared `tier` match the artifact set actually produced?
-3. Does `open` hold a `BLOCKED` or `UNVERIFIED`? Hand back to the human
+3. Does `open` hold a `BLOCKED` or `UNVERIFIED`? Stop dependent work; send the
+   named failed check to its repair owner, or to the human for a required decision
 4. Does every file in `produced` exist, and does every decision-bearing claim in
    it carry a tag?
 5. Does `ids_added` cover every ID the artifacts introduced? Continue from there,

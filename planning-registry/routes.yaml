@@ -1,8 +1,8 @@
 # Chains that recur, as control structure rather than prose.
 #
-# The canonical order is frame → discover → options → decompose → estimate →
-# risk → review. A chain takes the shortest path through it that the request
-# needs, and a skipped phase is recorded rather than silent.
+# These are route templates, not a universal workflow. Enter the phase whose
+# input is missing; repeat only phases whose decisions a new finding invalidates.
+# A pre-execution repair is not post-start replanning.
 
 full-plan:
   pattern: linear
@@ -41,13 +41,30 @@ what-could-go-wrong:
 course-correct:
   pattern: linear
   when: "work started and reality diverged"
-  chain: [planning-replan, planning-decompose]
-  gate: "the divergence is classified and measured before the plan is rewritten"
+  chain: [planning-replan]
+  gate: "work has started; classify the divergence before choosing its correction surface"
+  reenter:
+    estimate: planning-estimate
+    dependency: planning-decompose
+    approach: planning-options
+    evidence: planning-discover
+    goal: planning-frame
+    constraint: planning-frame  # agreed brief changes; a capacity-only delta is estimate
+    materialized-risk: planning-risk
+    record-only: none
+    stop: none
 
 review-to-ready:
   pattern: loop
   when: "close every blocking finding before work starts"
-  chain: [planning-review, planning-replan]
-  oracle: "no blocking finding remains, and one full pass adds none"
+  chain: [planning-review]
+  repair:
+    goal: planning-frame
+    evidence: planning-discover
+    decision: planning-options
+    dependency: planning-decompose
+    estimate: planning-estimate
+    risk: planning-risk
+  oracle: "repair each blocking finding at its owner, check affected decisions, then review again; no blocking finding remains and one pass adds none"
   checker: other-engine          # resolved at run time to one that is not running this
   max_cycles: 3

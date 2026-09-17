@@ -48,9 +48,10 @@ goes. These rows say *how to tell which case you are in*.
 ## Chains
 
 The chains that recur are in `registry/routes.yaml`, with their control
-structure. The canonical order is frame → discover → options → decompose →
-estimate → risk → review; a chain takes the shortest path through it that the
-request actually needs, and **skipping a phase is recorded, not silent**.
+structure. The familiar order is a default, not a dependency graph. Start where an input
+or decision is missing; name necessary skips without manufacturing a full chain.
+Before execution, return findings to their owning phase, then check only decisions
+that used the changed input. `review-to-ready` repairs at that owner and reviews again.
 
 Where a stage repeats until a condition holds — `review-to-ready` is the one
 that does — the entry carries the stopping condition, the judge, and a hard
@@ -66,4 +67,9 @@ cycle limit. **The judge is never the skill that produced the plan.**
   cross-reference already written (`_planning/ARTIFACTS.md`)
 - **Never run a writing skill on a request the gate stopped.** A gate that fired
   is reported, not worked around
-- **A chain wanting a phase twice is a replan**, not a longer chain. Say so
+- **Phase revisits do not imply execution started.** Pre-start findings return
+  to their owner directly. Use replan when an executing plan's divergence needs
+  diagnosis or a stop/continue decision; an already identified, requested repair
+  can go directly to its owner, retaining the changelog and original forecasts
+- A frame change needs explicit human re-agreement of the brief. Recheck decisions
+  using changed inputs; preserve unaffected work and IDs. Record-only variance needs no next phase

@@ -1,0 +1,58 @@
+# Regression cases are failures found in the frozen adversarial set, not natural
+# language accuracy tests. The human diagnosis is an INPUT, not model output.
+cases:
+  - id: R42
+    request: 'まだ着手前。レビューで「何を達成するかが曖昧」と言われた。そこを直して再確認してほしい。'
+    lifecycle: pre
+    finding_class: goal
+    expect: planning-frame
+  - id: R43
+    request: '実装前のレビューで、重要な制約の裏付けがないと分かった。そこを確認してから再判定して。'
+    lifecycle: pre
+    finding_class: evidence
+    expect: planning-discover
+  - id: R44
+    request: 'まだ手を付けていない。レビューで作業AがB待ち、BがA待ちになっていると言われた。順序を直して。'
+    lifecycle: pre
+    finding_class: dependency
+    expect: planning-decompose
+  - id: F05
+    request: '実装前に、採用案の点数が承認済みの優先順位と違う重みで計算されていると分かった。合意した条件で選び直して。'
+    lifecycle: pre
+    finding_class: decision
+    expect: planning-options
+  - id: F09
+    request: '着手前の点検で、レビュー待ちの日数が完了予想から抜けていると分かった。'
+    lifecycle: pre
+    finding_class: estimate
+    expect: planning-estimate
+  - id: F10
+    request: '始める前に確認したら、突然停止する調達先への備えがないと分かった。'
+    lifecycle: pre
+    finding_class: risk
+    expect: planning-risk
+  - id: R51
+    request: '実装してみたら選んだライブラリでは必須の通信方式に対応できないと確定した。どう立て直す？'
+    lifecycle: started
+    divergence_class: approach
+    expect: planning-options
+  - id: R55
+    request: '移行を始めたら外部承認が必須と判明し、その完了までデータ投入できない。タスクの順序を変えて。'
+    lifecycle: started
+    divergence_class: dependency
+    expect: planning-decompose
+  - id: R57
+    request: '実装中に、参照している顧客IDが部署ごとに違うかもしれないと気付いた。順番を変える前に確かめたい。'
+    lifecycle: started
+    divergence_class: evidence
+    expect: planning-discover
+  - id: R56
+    request: '一つの作業だけ半日余計にかかったが、全体の余裕で吸収できて後続も変わらない。記録だけして続けたい。'
+    lifecycle: started
+    divergence_class: record-only
+    expect: none
+  - id: R49
+    request: '残りの開発費より得られる価値が小さいと判明した。これ以上続けるべきか、今決めたい。'
+    lifecycle: started
+    divergence_class: stop
+    expect: none

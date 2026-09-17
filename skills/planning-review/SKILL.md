@@ -8,8 +8,8 @@ allowed-tools: Read, Grep, Glob, Write, Edit
 ## Owns
 
 Whether the plan is ready, as one verdict with the findings behind it. **It
-never rewrites the plan** — findings go back to the phase that owns them, and a
-reviewer who fixes the plan can no longer review it.
+never rewrites the plan** — follow the repair owners in `registry/routes.yaml`.
+Review the repair and affected decisions again; a pre-start repair is not replan.
 
 Phases: `TRACE → AUDIT → ATTACK → VERDICT`.
 

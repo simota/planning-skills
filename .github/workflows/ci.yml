@@ -27,7 +27,7 @@ jobs:
       - name: Static rules
         run: python3 planning-tools/validate.py
       - name: Every rule still fires
-        run: python3 planning-tools/test_validate.py
+        run: make test
       - name: Delivered blocks are current
         run: |
           python3 planning-tools/render.py

@@ -1,9 +1,13 @@
 <!-- planning:guidance -->
 # The canonical order, and choosing the shortest chain that works
 
-## Canonical Order
+## Default Order, Not Required Stages
 
 `FRAME → DISCOVER → OPTIONS → DECOMPOSE → ESTIMATE → RISK → REVIEW → (execute) → REPLAN`
+
+These are examples, not entry prerequisites: skip settled phases. Before execution,
+new evidence returns to the owning phase without replan. After execution starts,
+replan selects the minimum correction surface; only affected decisions are revisited.
 
 ## Chain Selection
 
