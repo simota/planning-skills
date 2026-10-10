@@ -20,7 +20,8 @@ Verified: 2026-08-21 — no automated check.
 |---|---|---|---|---|---|---|---|---|
 
 ## Critical path total
-Effort p50 <mean> … p90 <mean + 1.28σ> person-days · Elapsed p50 … p90 <calendar days>
+Effort p10 <mean − 1.28σ> … p90 <mean + 1.28σ> person-days, p50 <mean> · Elapsed p10 … p90 <calendar days>
+<!-- the p10 … p90 pair is the 80% range calibration scores -->
 Confidence: High | Medium | Low (<reason>)
 
 ## Buffer

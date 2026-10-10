@@ -51,7 +51,7 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
 | Picking the chain | [chains](playbooks/chains.md) — the canonical order, and the shortest path through it |
 | About to dispatch | [traps](playbooks/traps.md) |
 | A phase's output would not change any decision | Skip it, and **name the skipped phases and why**. A silent skip and a considered one read identically in the output |
-| The user has already chosen the approach | Run options in decided mode — record the `D-n`, attack it once — and say so. Manufacturing alternatives to look thorough costs a phase and buys nothing |
+| The user has already chosen the approach | Skip the options phase and say so, or run it in decided mode when the choice needs a `D-n` on record. Manufacturing alternatives to look thorough costs a phase and buys nothing |
 | The goal needs "and" to state | Stop. Two goals are two briefs, and splitting them is the work rather than a preliminary to it |
 | The request is actually asking for execution | Stop and say so. A plan written for a decided question is pure cost |
 | A finding invalidates an earlier decision | Return to its owning phase. Before execution this is a phase revisit, not replan; after work starts use the divergence classification. Recheck decisions that used the changed input, preserving unaffected work and IDs |
@@ -117,8 +117,8 @@ The tier is declared with its reason, the chain is named with every skip
 explained, each phase run at `M` or `L` returned a handoff (at `S`, the inline
 brief came back), and the artifacts on disk match the set the tier requires.
 <!-- deliver:surface -->
-- **Say what the moment needs.** Start: one line naming what will be planned and what
-  is excluded. Mid-run: a line when the reader must act now — a discovered constraint
+- **Say what the moment needs.** Start: one line naming what will be planned, what is
+  excluded, and the tier. Mid-run: a line when the reader must act now — a discovered constraint
   that invalidates the plan, a blocked path, work that would grow the scope. Asking counts
   as speaking: one question, the decision it unblocks, the default taken if nobody answers
 - **End with the answer in one line** — status, tier and what was decided; then the sweep

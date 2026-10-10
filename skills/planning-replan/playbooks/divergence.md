@@ -31,7 +31,7 @@ Planned, Actual, and Delta use **one unit throughout** — the same effort or el
 | T-7 | 1.5–2.5     | 2.0      | —          | —     | —    | blocked (Q-3) |
 ```
 
-When the plan was sized in T-shirts only, convert first and state the mapping used. Take it from the team's observed cycle times per size where `35-estimate.md` or flow data records them. Where neither exists — the usual case at tier `M`, which has no estimate file — state the mapping as `[assumed]` with an `A-n`, inside the half-a-day-to-two-days slice `planning-decompose` cuts to: `S = 0.5–1d, M = 1–1.5d, L = 1.5–2d`. An unconverted table cannot feed the stop test.
+When the plan was sized in T-shirts only, convert first and state the mapping used. Take it from the team's observed cycle times per size where `35-estimate.md` or flow data records them. Where neither exists — the case wherever the plan has no estimate file — state the mapping as `[assumed]` with an `A-n`, inside the half-a-day-to-two-days slice `planning-decompose` cuts to: `S = 0.5–1d, M = 1–1.5d, L = 1.5–2d`. An unconverted table cannot feed the stop test.
 
 Then project: at the observed rate, the remaining critical path finishes in `[range]`. Compare against the committed date and state the gap as a number before discussing it.
 

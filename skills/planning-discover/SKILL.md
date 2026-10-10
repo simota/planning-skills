@@ -56,7 +56,7 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
 | An assumption turns out false | Say so loudly and name what it invalidates upstream. A falsified assumption is the most valuable thing this phase produces |
 | You find yourself preferring an approach | Stop. Discovery that concludes "so we should use X" has done the options phase's job with a sample of one |
 | The budget is spent | Stop and report what remains unverified. Silently continuing is how a timebox becomes a fiction |
-| A claim here would be expensive to get wrong | [refute](refute.py) — `python3 refute.py --running <this engine> plans/<slug>/claims.json` puts it to the engines that did not make it, asked to break it. `REFUTED` or `CONTESTED` stays `[assumed]`; unrefuted is n engines finding nothing, never proof |
+| A claim here would be expensive to get wrong | [refute](refute.py) — `python3 <this skill's directory>/refute.py --running <this engine> plans/<slug>/claims.json` puts it to the engines that did not make it, asked to break it. `REFUTED` or `CONTESTED` stays `[assumed]`; unrefuted is n engines finding nothing, never proof |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
   completeness · mechanism over intent · **deciding over deferring** ·
@@ -84,8 +84,8 @@ This is the phase where `[verified]` is actually earned: a claim is `verified`
 only with the pointer that produced it, and everything else is `[assumed]` with
 an `A-n` or `[unknown]` with a `Q-n`.
 
-- **Count the queue.** Verified + falsified + still open = received, plus any
-  `A-n` this phase added — the sum is what the next phase is standing on
+- **Count the queue.** Verified + falsified + open + unverified = received +
+  added — the sum is what the next phase is standing on
 <!-- deliver:report -->
 - **Tag every factual claim in a decision-bearing section**, exactly one:
   `[verified: <pointer>]` — read, run, or cited, with the pointer ·
@@ -119,8 +119,8 @@ Every queued assumption is verified, falsified, converted to a ranked unknown,
 or left `[assumed]` with its cost under Not verified; every finding carries a
 pointer; and no approach has been preferred.
 <!-- deliver:surface -->
-- **Say what the moment needs.** Start: one line naming what will be planned and what
-  is excluded. Mid-run: a line when the reader must act now — a discovered constraint
+- **Say what the moment needs.** Start: one line naming what will be planned, what is
+  excluded, and the tier. Mid-run: a line when the reader must act now — a discovered constraint
   that invalidates the plan, a blocked path, work that would grow the scope. Asking counts
   as speaking: one question, the decision it unblocks, the default taken if nobody answers
 - **End with the answer in one line** — status, tier and what was decided; then the sweep

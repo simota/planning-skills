@@ -41,7 +41,7 @@ limits:
                               # is the only one that owes a record of how those turned out
   skills_max: 11              # 9 in use, 2 spare for demand found in use
   routes_max: 12
-  route_stages_max: 8         # the canonical order is eight phases (replan included) plus a router
+  route_stages_max: 8         # the canonical order is eight phases; the router is not a stage
   repo_md_lines_total: 4200
 
 # Nine skills is the closest this family comes to the point where selection

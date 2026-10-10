@@ -103,7 +103,7 @@ critical path's *relative to its own spread*. Against a critical path of mean
 So: **a parallel chain within about one of its own σ of the critical path is not
 non-critical**, however comfortable the gap looks in days. Past roughly 2σ it
 can be dropped. Between 1σ and 2σ it stays in the total by default; dropping it
-is a stated choice that names what it costs — about 1% of p90 at 1.5σ above. A chain that is short but wild belongs in the total; a chain
+is a stated choice that names what it costs — about 1% of p90 at a 1.5σ gap (table above). A chain that is short but wild belongs in the total; a chain
 that is long but tight often does not move it at all.
 
 ## Where the method stops holding

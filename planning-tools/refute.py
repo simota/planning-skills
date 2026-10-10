@@ -131,9 +131,17 @@ def main() -> int:
               "framing is a second opinion, not an adversary", file=sys.stderr)
         return 1
 
-    claims = json.loads(pathlib.Path(a.claims).read_text(encoding="utf-8"))
+    try:
+        claims = json.loads(pathlib.Path(a.claims).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        print(f"cannot read claims from {a.claims}: {e}", file=sys.stderr)
+        return 2
     if isinstance(claims, dict):
         claims = [claims]
+    # An empty list checks nothing, and exit 0 would read as everything standing.
+    if not isinstance(claims, list) or not claims:
+        print(f"{a.claims} holds no claims", file=sys.stderr)
+        return 2
     try:
         pool = refuters(a.running)
     except engine.EngineError as e:

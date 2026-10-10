@@ -122,8 +122,8 @@ Planned versus actual is tabulated, the divergence carries exactly one class,
 continuing and stopping are priced when continuation is in question, the correction touches the minimum
 surface, IDs are preserved, and the changelog entry is dated with its trigger.
 <!-- deliver:surface -->
-- **Say what the moment needs.** Start: one line naming what will be planned and what
-  is excluded. Mid-run: a line when the reader must act now — a discovered constraint
+- **Say what the moment needs.** Start: one line naming what will be planned, what is
+  excluded, and the tier. Mid-run: a line when the reader must act now — a discovered constraint
   that invalidates the plan, a blocked path, work that would grow the scope. Asking counts
   as speaking: one question, the decision it unblocks, the default taken if nobody answers
 - **End with the answer in one line** — status, tier and what was decided; then the sweep

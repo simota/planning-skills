@@ -11,7 +11,7 @@ Verified: 2026-08-21 — no automated check.
 > Status: draft
 > Updated: YYYY-MM-DD
 > Tier: S | M | L
-> Implements: D-n | none (approach given in 00-brief.md)
+> Implements: D-n | none (approach decided before planning — by whom)
 
 ## Tasks
 ### T-1: <imperative>

@@ -26,7 +26,7 @@ hurry, is the failure this tag scheme exists to catch.
 ## Confidence and ranges
 
 - **Never emit a single-point estimate.** Use `[optimistic / likely /
-  pessimistic]` or an explicit range; the ends are p10 and p90 unless stated
+  pessimistic]` or an explicit range; a percentile range names its percentiles
 - Attach `High | Medium | Low` confidence to every estimate, option score, and
   risk likelihood, with a one-line reason
 - **`Low` confidence on a load-bearing item is a blocking finding**, not a footnote
