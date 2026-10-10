@@ -19,7 +19,7 @@ here raises. Nothing returns a default verdict, nothing degrades to "assume
 fine": an engine missing from PATH, an engine that starts and produces no
 parseable object, a response that does not match the schema — each is an error
 with the engine's own words attached, because the alternative is a green run
-that verified nothing (DESIGN §5.4b).
+that verified nothing.
 
 Engine quirks, re-checked by `make engines` rather than dated:
 
@@ -28,6 +28,12 @@ Engine quirks, re-checked by `make engines` rather than dated:
 * `agy --print` returns an envelope; the validated object is `structured_output`.
 * `claude -p --json-schema` returns the same kind of envelope as agy; the
   validated object is `structured_output`, and `result` is only its text form.
+  `is_error` in that envelope is a failed run even when the exit code is 0.
+
+**The prompt is untrusted.** It carries claim text written by whoever made the
+work, so every engine runs in a fresh empty directory, the prompt goes in on
+stdin where the CLI reads it there (an argv entry is capped near 128 KiB and can
+be read as a flag), and each engine is held to the narrowest mode it offers.
 """
 from __future__ import annotations
 
@@ -60,7 +66,64 @@ def strict(schema: dict) -> dict:
         out["properties"] = {k: strict(v) for k, v in (out.get("properties") or {}).items()}
     if isinstance(out.get("items"), dict):
         out["items"] = strict(out["items"])
+    # An object reached only through a combinator is still an object codex rejects.
+    for key in ("anyOf", "oneOf", "allOf", "prefixItems"):
+        if isinstance(out.get(key), list):
+            out[key] = [strict(s) for s in out[key]]
     return out
+
+
+_TYPES = {"object": dict, "array": list, "string": str, "boolean": bool,
+          "null": type(None), "number": (int, float), "integer": int}
+
+
+def conforms(schema: dict, value, at: str = "$") -> str | None:
+    """The first way `value` breaks `schema`, or None. Types, required keys,
+    enums and combinators — enough to refuse a malformed verdict, no dependency.
+
+    The engines claim to enforce the schema themselves; this is not trusting
+    that, because a wrong-shaped answer read as a verdict is a verdict nobody gave.
+    """
+    if not isinstance(schema, dict):
+        return None
+    want = schema.get("type")
+    if want:
+        types = want if isinstance(want, list) else [want]
+        # bool is an int in Python; a JSON true is not a number.
+        if not any(isinstance(value, _TYPES.get(t, object))
+                   and not (t in ("number", "integer") and isinstance(value, bool))
+                   for t in types):
+            return f"{at} is {type(value).__name__}, schema wants {want}"
+    if "enum" in schema and value not in schema["enum"]:
+        return f"{at} is {value!r}, not one of {schema['enum']}"
+    if isinstance(value, dict):
+        for k in schema.get("required") or []:
+            if k not in value:
+                return f"{at} has no {k!r}"
+        props = schema.get("properties") or {}
+        for k, v in value.items():
+            if k in props:
+                why = conforms(props[k], v, f"{at}.{k}")
+                if why:
+                    return why
+            elif schema.get("additionalProperties") is False:
+                return f"{at} carries {k!r}, which the schema does not allow"
+    if isinstance(value, list) and isinstance(schema.get("items"), dict):
+        for i, v in enumerate(value):
+            why = conforms(schema["items"], v, f"{at}[{i}]")
+            if why:
+                return why
+    for s in schema.get("allOf") or []:
+        why = conforms(s, value, at)
+        if why:
+            return why
+    for key in ("anyOf", "oneOf"):
+        alts = schema.get(key)
+        if alts:
+            ok = sum(conforms(s, value, at) is None for s in alts)
+            if ok == 0 or (key == "oneOf" and ok > 1):
+                return f"{at} matches {ok} of its {key} alternatives"
+    return None
 
 
 def run(engine: str, prompt: str, schema: dict) -> dict:
@@ -68,48 +131,76 @@ def run(engine: str, prompt: str, schema: dict) -> dict:
     known = ENGINES.get("runs_on") or []
     if engine not in known:
         raise EngineError(f"{engine} is not one of {known}")
+    got = _ask(engine, prompt, strict(schema))
+    why = conforms(strict(schema), got)
+    if why:
+        raise EngineError(f"{engine} answered off-schema: {why}\n{json.dumps(got)[:400]}")
+    return got
 
+
+def _ask(engine: str, prompt: str, schema: dict):
     with tempfile.TemporaryDirectory(prefix="planning-engine-") as tmp:
         d = pathlib.Path(tmp)
         s = d / "schema.json"
-        s.write_text(json.dumps(strict(schema)), encoding="utf-8")
+        s.write_text(json.dumps(schema), encoding="utf-8")
+        # Nothing to read or write where the engine starts: not this repo, not
+        # the caller's project, not the schema beside it.
+        cwd = d / "empty"
+        cwd.mkdir()
         if engine == "codex":
             out = d / "answer.json"
+            # `-` reads the prompt from stdin.
             argv = ["codex", "exec", "--output-schema", str(s), "-o", str(out),
-                    "--sandbox", "read-only", "--skip-git-repo-check", prompt]
-            r = _spawn(engine, argv)
+                    "--sandbox", "read-only", "--skip-git-repo-check", "-"]
+            r = _spawn(engine, argv, cwd, prompt)
             body = out.read_text(encoding="utf-8") if out.exists() else ""
             if not body.strip():
                 raise EngineError(f"codex wrote no answer.\n{_tail(r)}")
             return _parse(engine, body)
         if engine == "claude":
-            argv = ["claude", "-p", prompt, "--output-format", "json",
-                    "--json-schema", json.dumps(strict(schema))]
-            r = _spawn(engine, argv)
-            envelope = _parse(engine, r.stdout)
-            if "structured_output" not in envelope:
-                raise EngineError(f"claude returned no structured_output "
-                                  f"(subtype {envelope.get('subtype')!r}).\n{_tail(r)}")
-            return envelope["structured_output"]
+            # No prompt argument: `-p` reads it from stdin. Without a shell or a
+            # file tool, a claim that says "run this" has nothing to run it with.
+            argv = ["claude", "-p", "--output-format", "json",
+                    "--json-schema", json.dumps(schema),
+                    "--disallowedTools", "Bash,Edit,Write,MultiEdit,NotebookEdit,WebFetch"]
+            r = _spawn(engine, argv, cwd, prompt)
+            return _structured(engine, _parse(engine, r.stdout), r, "subtype")
         if engine == "agy":
+            # No sandbox flag is known for agy, and none is guessed at here; it
+            # gets the empty directory only. `--print=` keeps the prompt one
+            # token, so a prompt opening with `-` is not read as a flag.
             argv = ["agy", f"--print={prompt}", "--output-format", "json",
                     "--json-schema", str(s)]
-            r = _spawn(engine, argv)
-            envelope = _parse(engine, r.stdout)
-            if "structured_output" not in envelope:
-                raise EngineError(f"agy returned no structured_output "
-                                  f"(status {envelope.get('status')!r}).\n{_tail(r)}")
-            return envelope["structured_output"]
+            r = _spawn(engine, argv, cwd)
+            return _structured(engine, _parse(engine, r.stdout), r, "status")
     raise EngineError(f"no invocation is known for {engine}")
 
 
-def _spawn(engine: str, argv: list[str]) -> subprocess.CompletedProcess:
+def _structured(engine: str, envelope: dict, r: subprocess.CompletedProcess, state: str):
+    if envelope.get("is_error"):
+        raise EngineError(f"{engine} reported an error ({state} "
+                          f"{envelope.get(state)!r}).\n{_tail(r)}")
+    if "structured_output" not in envelope:
+        raise EngineError(f"{engine} returned no structured_output "
+                          f"({state} {envelope.get(state)!r}).\n{_tail(r)}")
+    return envelope["structured_output"]
+
+
+def _spawn(engine: str, argv: list[str], cwd: pathlib.Path,
+           stdin: str | None = None) -> subprocess.CompletedProcess:
     try:
-        return subprocess.run(argv, capture_output=True, text=True, timeout=TIMEOUT)
+        r = subprocess.run(argv, capture_output=True, text=True, timeout=TIMEOUT,
+                           cwd=cwd, input=stdin if stdin is not None else "")
     except FileNotFoundError:
         raise EngineError(f"{engine} is not on PATH") from None
     except subprocess.TimeoutExpired:
         raise EngineError(f"{engine} did not answer within {TIMEOUT}s") from None
+    except OSError as e:                 # E2BIG for an oversized argv, among others
+        raise EngineError(f"{engine} could not be started: {e}") from None
+    # A failed run that still printed an object is a failed run.
+    if r.returncode != 0:
+        raise EngineError(f"{engine} exited {r.returncode}.\n{_tail(r)}")
+    return r
 
 
 def _parse(engine: str, body: str) -> dict:
@@ -177,8 +268,13 @@ def main() -> int:
     ap.add_argument("--schema")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args()
-    if a.selftest or not (a.engine or a.running):
+    if a.selftest or not (a.engine or a.running or a.prompt_file or a.schema):
         return selftest()
+    if not (a.engine or a.running):
+        # A prompt with no engine named was a check someone meant to run;
+        # answering it with a reachability table would read as having done so.
+        print("name the checker or pass --running; it is never guessed", file=sys.stderr)
+        return 2
     if not (a.prompt_file and a.schema):
         print("need --prompt-file and --schema", file=sys.stderr)
         return 2

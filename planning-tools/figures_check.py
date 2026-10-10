@@ -57,7 +57,7 @@ def q(d, p):
 
 def rows_after(header_substr: str) -> list[list[str]]:
     """The body rows of the first table whose header contains the substring."""
-    lines = PAGE.read_text().splitlines()
+    lines = PAGE.read_text(encoding="utf-8").splitlines()
     for i, l in enumerate(lines):
         if l.strip().startswith("|") and header_substr in l:
             out = []
@@ -66,6 +66,10 @@ def rows_after(header_substr: str) -> list[list[str]]:
                 if not (s.startswith("|") and s.endswith("|")):
                     break
                 out.append([c.strip() for c in s.strip("|").split("|")])
+            # A short row reads as empty cells, which then fail as unparsable
+            # rather than raising out of the checker.
+            width = len(l.strip().strip("|").split("|"))
+            out = [r + [""] * (width - len(r)) for r in out]
             return out
     fail("page", f"no table whose header contains {header_substr!r} — "
                  "the checker has stopped checking anything")
@@ -80,8 +84,14 @@ def num(cell: str) -> float | None:
     return float(m.group()) if m else None
 
 
-def near(a: float, b: float, dp: int) -> bool:
-    return round(a, dp) == round(b, dp)
+def near(a: float | None, b: float, dp: int) -> bool:
+    return a is not None and round(a, dp) == round(b, dp)
+
+
+def missing(where: str, want, seen: set, what: str) -> None:
+    """A row the model has and the page dropped is a figure nobody checks."""
+    for k in sorted(set(want) - seen):
+        fail(where, f"the model has a row for {what}{k}; the page has none")
 
 
 def check_endpoints(fx) -> int:
@@ -91,7 +101,7 @@ def check_endpoints(fx) -> int:
     e = fx["endpoints"]
     want = {"Sum O … sum P": (e["sum_o"], e["sum_p"], e["pct_o"], e["pct_p"]),
             "Simulated p10 … p90": (e["p10"], e["p90"], None, None)}
-    n = 0
+    n, seen = 0, set()
     for r in rows:
         label = r[0]
         lo, hi = _split_range(r[1])
@@ -100,14 +110,18 @@ def check_endpoints(fx) -> int:
             fail("endpoints", f"unexpected row {label!r}")
             continue
         n += 1
+        seen.add(label)
         w = want[label]
-        if lo is None or not near(lo, w[0], 1) or not near(hi, w[1], 1):
+        if not near(lo, w[0], 1) or not near(hi, w[1], 1):
             fail("endpoints", f"{label}: page says {lo} … {hi}, "
                               f"model gives {w[0]:.1f} … {w[1]:.1f}")
-        if w[2] is not None and plo is not None:
+        # A cell the model has figures for and the page no longer parses is a
+        # mismatch, not a cell to skip.
+        if w[2] is not None:
             if not near(plo, w[2], 2) or not near(phi, w[3], 2):
                 fail("endpoints", f"{label}: page says p{plo} … p{phi}, "
                                   f"model gives p{w[2]:.2f} … p{w[3]:.2f}")
+    missing("endpoints", want, seen, "")
     return n
 
 
@@ -118,23 +132,25 @@ def _split_range(cell: str):
 
 def _split_pct(cell: str):
     parts = [num(p) for p in cell.split("…")]
-    return (parts + [None, None])[:2] if any(x is not None for x in parts) else (None, None)
+    return (parts + [None, None])[:2]
 
 
 def check_percentiles(fx) -> int:
     rows = rows_after("Simulated p80")
-    n = 0
+    n, seen = 0, set()
     for r in rows:
         want = fx["percentiles"].get(r[0])
         if want is None:
             fail("percentiles", f"page has a row for {r[0]} tasks; the model has none")
             continue
+        seen.add(r[0])
         for col in range(4):
             n += 1
             got = num(r[col + 1])
-            if got is None or not near(got, want[col], 2):
+            if not near(got, want[col], 2):
                 fail("percentiles", f"{r[0]} tasks, column {col + 1}: page says {got}, "
                                     f"model gives {want[col]:.2f}")
+    missing("percentiles", fx["percentiles"], seen, "tasks=")
     if n == 0:
         fail("percentiles", "no rows compared — the checker has stopped checking")
     return n
@@ -143,20 +159,26 @@ def check_percentiles(fx) -> int:
 def check_merge(fx) -> int:
     rows = rows_after("p50 of the merge")
     mean = fx["merge"]["chain_mean"]
-    n = 0
+    n, seen = 0, set()
     for r in rows:
-        want = fx["merge"].get(r[0])
+        want = fx["merge"].get(r[0]) if r[0] != "chain_mean" else None
         if want is None:
             fail("merge", f"page has a row for k={r[0]}; the model has none")
             continue
         n += 1
+        seen.add(r[0])
         got = num(r[1])
-        if got is None or not near(got, want, 2):
+        if not near(got, want, 2):
             fail("merge", f"k={r[0]}: page says {got}, model gives {want:.2f}")
+        # A dash is the page declining to state a slip; anything else that does
+        # not parse is a figure that stopped being checked.
+        if r[2].strip("* ") in ("—", "–", "-"):
+            continue
         slip = num(r[2])
-        if slip is not None and not near(slip, want - mean, 2):
+        if not near(slip, want - mean, 2):
             fail("merge", f"k={r[0]} slip: page says {slip}, "
                           f"model gives {want - mean:+.2f}")
+    missing("merge", [k for k in fx["merge"] if k != "chain_mean"], seen, "k=")
     if n == 0:
         fail("merge", "no rows compared — the checker has stopped checking")
     return n
@@ -173,7 +195,7 @@ def check_near_critical(fx) -> int:
         for col, dp in enumerate((1, 2, 2, 1, 1)):
             n += 1
             got = num(r[col])
-            if got is None or not near(got, want[col], dp):
+            if not near(got, want[col], dp):
                 fail("near-critical", f"side mean {want[0]:.1f}, column {col + 1}: "
                                       f"page says {got}, model gives {want[col]:.2f}")
     return n
@@ -181,18 +203,20 @@ def check_near_critical(fx) -> int:
 
 def check_correlation(fx) -> int:
     rows = rows_after("| σ | p50 | p90 |")
-    n = 0
+    n, seen = 0, set()
     for r in rows:
         want = fx["correlation"].get(r[0])
         if want is None:
             fail("correlation", f"unexpected row {r[0]!r}")
             continue
+        seen.add(r[0])
         for col, dp in enumerate((2, 1, 1)):
             n += 1
             got = num(r[col + 1])
-            if got is None or not near(got, want[col], dp):
+            if not near(got, want[col], dp):
                 fail("correlation", f"{r[0]}, column {col + 1}: page says {got}, "
                                     f"model gives {want[col]:.2f}")
+    missing("correlation", fx["correlation"], seen, "")
     if n == 0:
         fail("correlation", "no rows compared — the checker has stopped checking")
     return n
@@ -262,7 +286,7 @@ def load_fixture() -> dict | None:
     if not FIXTURE.exists():
         fail("fixture", f"{FIXTURE.name} is missing — run `make figures-full`")
         return None
-    f = json.loads(FIXTURE.read_text())
+    f = json.loads(FIXTURE.read_text(encoding="utf-8"))
     if f.get("seed") != SEED or f.get("runs") != N:
         fail("fixture", f"built from seed {f.get('seed')} over {f.get('runs')} runs; "
                         f"this checker models seed {SEED} over {N} — run `make figures-full`")
@@ -271,11 +295,15 @@ def load_fixture() -> dict | None:
 
 
 def main() -> int:
+    try:                                  # the messages quote `…` and `−` from the page
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
     rewrite = "--rewrite" in sys.argv
     full = rewrite or "--full" in sys.argv
     if full:
         fresh = compute()
-        stored = json.loads(FIXTURE.read_text()) if FIXTURE.exists() else None
+        stored = json.loads(FIXTURE.read_text(encoding="utf-8")) if FIXTURE.exists() else None
         if stored is not None and stored != fresh and not rewrite:
             # Rewriting here would make the slow tier the one thing it exists to
             # rule out: a check that repairs its own oracle and reports green. A
@@ -285,7 +313,7 @@ def main() -> int:
             print(f"If the model changed, run `make figures-rewrite` and commit "
                   f"{FIXTURE.name} with it. If it did not, that difference is the finding.")
             return 1
-        FIXTURE.write_text(json.dumps(fresh, indent=2, sort_keys=True) + "\n")
+        FIXTURE.write_text(json.dumps(fresh, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         fx = fresh
     else:
         fx = load_fixture()

@@ -5,14 +5,14 @@ Purpose: How per-task ranges combine into the total the deliverable asks for, wh
 Read when: filling in "Critical path total", combining any set of task ranges, or setting the confidence label on a schedule.
 Source: none — nothing outside this page can move what it states.
 Verified: 2026-08-21 — the tables through "Where the method stops holding" came from a 200,000-run
-Monte Carlo over the Beta-PERT distribution `sizing.md`'s formulas assume. `make figures` holds every one of them against a generated fixture on every commit; `make
+Monte Carlo over the Beta-PERT distribution `playbooks/sizing.md`'s formulas assume. `make figures` holds every one of them against a generated fixture on every commit; `make
 figures-full` re-derives that fixture from the seed. The fast tier catches a number edited
 here, and is the only one that runs automatically; the slow tier is the only thing that
 catches a stale fixture, so it runs when the model changes rather than never:
 those are `[verified]`. The confidence thresholds in the last section are `[assumed]` — a convention
 this set is adopting, not a measured boundary. Replace them the moment local actuals can set them.
 
-`sizing.md` defines σ = `(P − O) / 6` per task and the template asks for a
+`playbooks/sizing.md` defines σ = `(P − O) / 6` per task and the template asks for a
 **critical path total** as a range. Nothing said how to get from one to the
 other, and the obvious route — add the optimistic values, add the pessimistic
 values — produces a range with no achievable endpoint.

@@ -47,6 +47,7 @@ limits:
 # Nine skills is the closest this family comes to the point where selection
 # degrades. Crossing the line below is the trigger to split the set into named
 # subsets, not a reason to delete a phase.
+# Documentation only: no check in this repo reads it; the call it records is a person's.
 listing:
   packs_needed_above: 20
 
@@ -56,6 +57,9 @@ listing:
 # the domains do: every file under plans/ opens with `> Status:` and `> Updated:`
 # that a later phase rewrites in place (ARTIFACTS.md), and a set whose rule is
 # "never write code" does not hand out a shell to keep it.
+#
+# `tools` is what V15 holds each SKILL.md to. `writes` is documentation only — no check
+# in this repo reads it; the grant that matters is the tool list.
 permission_classes:
   route:
     tools: "Read, Grep, Glob, Skill"          # dispatches; writes nothing itself

@@ -6,7 +6,7 @@ Read when: a finding has hit one of the triggers and the shape is not obvious.
 Source: none — nothing outside this page can move what it states.
 Verified: 2026-08-23 — no automated check reads the drawings. What is checked is
 that this page and `visualise` between them define every trigger, form and floor
-word the registry declares; a rule in `planning-tools/validate.py` re-runs that on
+word the registry declares; a rule in the validator re-runs that on
 every commit, so a word deleted from here fails the build.
 
 Four shapes cover almost everything. Pick by trigger, not by taste.

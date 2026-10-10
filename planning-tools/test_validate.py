@@ -22,10 +22,9 @@ sys.dont_write_bytecode = True                     # no __pycache__ in the tools
 import validate                                    # noqa: E402  — for RULES only
 
 
-def run(root: Path) -> str:
-    r = subprocess.run([sys.executable, str(root / "planning-tools" / "validate.py")],
-                       capture_output=True, text=True)
-    return r.stdout + r.stderr
+def run(root: Path) -> subprocess.CompletedProcess:
+    return subprocess.run([sys.executable, str(root / "planning-tools" / "validate.py")],
+                          capture_output=True, text=True, encoding="utf-8")
 
 
 def sub(path: Path, old: str, new: str) -> None:
@@ -57,15 +56,15 @@ def _(r): sub(r / f"{S}planning-risk/SKILL.md", "Finding what could go wrong",
 
 
 @case("V3")
-def _(r): (r / f"{S}planning-ghost").mkdir(); (r / f"{S}planning-ghost/SKILL.md").write_text("x")
+def _(r): (r / f"{S}planning-ghost").mkdir(); (r / f"{S}planning-ghost/SKILL.md").write_text("x", encoding="utf-8")
 
 
 @case("V4")
-def _(r): (r / f"{S}planning-risk/playbooks/orphan.md").write_text("<!-- planning:guidance -->\n")
+def _(r): (r / f"{S}planning-risk/playbooks/orphan.md").write_text("<!-- planning:guidance -->\n", encoding="utf-8")
 
 
 @case("V5")
-def _(r): (r / f"{S}planning-risk/playbooks/traps.md").write_text("y\n" * 400)
+def _(r): (r / f"{S}planning-risk/playbooks/traps.md").write_text("y\n" * 400, encoding="utf-8")
 
 
 @case("V6")
@@ -86,6 +85,18 @@ def _(r): sub(r / "planning-registry/capabilities.yaml", "signals: [pre-mortem, 
               "signals: [task shape, register with likelihood")
 
 
+@case("V9-scalar")
+def _(r):
+    p = r / "planning-registry/capabilities.yaml"
+    p.write_text(p.read_text(encoding="utf-8") + "\nplanning-scalar: 3\n", encoding="utf-8")
+
+
+@case("V10-empty")
+def _(r):
+    """A fixture file that holds nothing checks nothing, and must not read green."""
+    (r / "planning-registry/fixtures.yaml").write_text("[]\n", encoding="utf-8")
+
+
 @case("V10")
 def _(r): sub(r / "planning-registry/fixtures.yaml",
               '- ask: "what are the abort conditions"\n  expect: planning-risk',
@@ -102,7 +113,7 @@ def _(r):
 
 
 @case("V12")
-def _(r): (r / f"{S}rogue").mkdir(); (r / f"{S}rogue/SKILL.md").write_text("x")
+def _(r): (r / f"{S}rogue").mkdir(); (r / f"{S}rogue/SKILL.md").write_text("x", encoding="utf-8")
 
 
 @case("V13")
@@ -111,6 +122,11 @@ def _(r):
     t += "".join(f"\nfiller{i}:\n  pattern: linear\n  when: x\n  chain: [planning-risk]\n"
                  for i in range(20))
     (r / "planning-registry/routes.yaml").write_text(t, encoding="utf-8")
+
+
+@case("V13-stages")
+def _(r): sub(r / "planning-registry/routes.yaml", "planning-risk, planning-review]\n  gate",
+              "planning-risk, planning-review, planning-replan, planning-router]\n  gate")
 
 
 @case("V14")
@@ -131,6 +147,16 @@ def _(r): sub(r / f"{S}planning-risk/SKILL.md", "- **Tag every factual claim",
               "- **Tag some factual claims")
 
 
+@case("V17-twice")
+def _(r):
+    """A second copy of a block goes unread by a check that compares the first."""
+    p = r / f"{S}planning-risk/SKILL.md"
+    t = p.read_text(encoding="utf-8")
+    block = re.search(r"<!-- deliver:score -->.*?<!-- /deliver:score -->", t, re.S).group(0)
+    p.write_text(t.replace(block, block + "\n" + block.replace("Tag every", "Tag some"), 1),
+                 encoding="utf-8")
+
+
 @case("V18")
 def _(r): sub(r / f"{S}planning-risk/SKILL.md", "abort conditions", "stop rules")
 
@@ -141,6 +167,13 @@ def _(r): sub(r / f"{S}planning-risk/SKILL.md", "`_planning/CONTRACT.md`", "`../
 
 @case("V19-shared")
 def _(r): sub(r / f"{S}_planning/ROUTING.md", "(`_planning/SIZING.md`)", "(`SIZING.md`)")
+
+
+@case("V19-reference")
+def _(r):
+    p = r / f"{S}planning-risk/reference/template.md"
+    p.write_text(p.read_text(encoding="utf-8") + "\nSee `../_planning/CONTRACT.md`.\n",
+                 encoding="utf-8")
 
 
 @case("V20")
@@ -158,9 +191,30 @@ checkable today, and a mitigation behind an imaginary alarm is not a mitigation.
               "Likelihood and impact rest on whatever backs them.")
 
 
+@case("V21-untagged")
+def _(r):
+    """The word without the tag: "verified" sits inside "unverified"."""
+    p = r / f"{S}planning-risk/SKILL.md"
+    t = p.read_text(encoding="utf-8")
+    i = t.index("## Verify with")
+    j = t.index("<!-- deliver:", i)
+    body = re.sub(r"`?\[(verified|assumed|unknown)\]`?", "unverified", t[i:j])
+    p.write_text(t[:i] + body + t[j:], encoding="utf-8")
+
+
 @case("V22")
 def _(r): sub(r / f"{S}planning-risk/SKILL.md", "## Done when",
               "## Done when\n\n#" + "TODO(agent): tidy this up later\n")
+
+
+@case("V22-backtick")
+def _(r): sub(r / f"{S}planning-risk/SKILL.md", "## Done when",
+              "## Done when\n\n#" + "TODO(agent): tidy `this` up later\n")
+
+
+@case("V23-undeclared")
+def _(r): sub(r / "planning-registry/harness.yaml",
+              "document_labels: [contract, guidance, deferred]", "document_labels: [contract, guidance]")
 
 
 @case("V23")
@@ -186,12 +240,30 @@ def _(r):
     (r / f"{S}planning-risk/_planning").symlink_to("../_gone")
 
 
+@case("V27-nested")
+def _(r):
+    """A link below the top level installs with the skill all the same."""
+    (r.parent / "outside.txt").write_text("x", encoding="utf-8")
+    (r / f"{S}planning-risk/assets").mkdir()
+    (r / f"{S}planning-risk/assets/outside.txt").symlink_to(r.parent / "outside.txt")
+
+
 @case("V28")
 def _(r): sub(r / "planning-registry/harness.yaml", "set: planning", "set: plan")
 
 
 @case("V28-generic-dir")
 def _(r): (r / "registry").mkdir()
+
+
+@case("V28-tracked-dotdir")
+def _(r):
+    """An untracked `.venv` is the checkout's; a tracked dot-directory ships."""
+    (r / ".venv").mkdir()
+    (r / ".rogue").mkdir()
+    (r / ".rogue/x").write_text("x", encoding="utf-8")
+    subprocess.run(["git", "init", "-q", str(r)], check=True)
+    subprocess.run(["git", "-C", str(r), "add", ".rogue"], check=True)
 
 
 @case("V29")
@@ -202,16 +274,17 @@ def _(r):
 
 @case("V30")
 def _(r): (r / f"{S}planning-risk/reference/orphan.md").write_text(
-    "<!-- planning:deferred -->\n# Orphan\n\nPurpose: x\nRead when: y\nVerified: 2026-08-21\n")
+    "<!-- planning:deferred -->\n# Orphan\n\nPurpose: x\nRead when: y\nVerified: 2026-08-21\n",
+    encoding="utf-8")
 
 
 @case("V31")
 def _(r):
     for f in sorted((r / f"{S}").glob("*/reference/*.md")):
-        t = f.read_text()
+        t = f.read_text(encoding="utf-8")
         i = t.index("Verified:")
         j = t.index("\n\n", i)
-        f.write_text(t[:i] + "Verified: 2026-08-21" + t[j:])
+        f.write_text(t[:i] + "Verified: 2026-08-21" + t[j:], encoding="utf-8")
         return
 
 
@@ -258,8 +331,8 @@ def _(r):
 def _(r):
     """A link where the class grants no shell reads like a capability and is not one."""
     import yaml as _y
-    caps = _y.safe_load((r / "planning-registry/capabilities.yaml").read_text())
-    cls = _y.safe_load((r / "planning-registry/harness.yaml").read_text())["permission_classes"]
+    caps = _y.safe_load((r / "planning-registry/capabilities.yaml").read_text(encoding="utf-8"))
+    cls = _y.safe_load((r / "planning-registry/harness.yaml").read_text(encoding="utf-8"))["permission_classes"]
     for name, e in caps.items():
         if "Bash" not in cls[e["class"]]["tools"]:
             (r / "skills" / name / "refute.py").symlink_to("../../planning-tools/refute.py")
@@ -326,14 +399,22 @@ def _(r):
         "Source: none — nothing outside this page can move what it states.", "Source:")
 
 
+@case("V37-not-the-marker")
+def _(r):
+    """The marker word inside another word is not the admission."""
+    sub(r / f"{S}planning-frame/reference/template.md",
+        "Source: none — nothing outside", "Source: nonetheless — nothing outside")
+
+
 @case("V37-none-declared")
 def _(r): sub(r / "planning-registry/harness.yaml", "source_authorities:", "unused_authorities:")
 
 
 def main() -> int:
     baseline = run(ROOT)
-    if "green" not in baseline:
-        print("the working tree is already failing; fix that first:\n" + baseline)
+    if baseline.returncode != 0:
+        print("the working tree is already failing; fix that first:\n"
+              + baseline.stdout + baseline.stderr)
         return 1
 
     bad: list[str] = []
@@ -343,7 +424,8 @@ def main() -> int:
             shutil.copytree(ROOT, copy, symlinks=True,
                             ignore=shutil.ignore_patterns(".git", "__pycache__"))
             mutate(copy)
-            out = run(copy)
+            r = run(copy)
+            out = r.stdout + r.stderr
             expect = rule.split("-")[0]
             if not re.search(rf"^\s*{expect}: ", out, re.M):
                 bad.append(rule)
