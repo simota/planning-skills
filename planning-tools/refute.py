@@ -13,8 +13,8 @@ to default to refuted when uncertain — a claim that cannot survive a hostile
 reading is exactly what this exists to catch, and the cost of a false refutation
 is one argument while the cost of a false pass is a shipped defect.
 
-**Independence is counted by source, not by voice** (`DESIGN.md` §5.4b). Two
-verdicts from one engine are one verdict. The pool is therefore `runs_on` minus
+**Independence is counted by source, not by voice.** Two verdicts from one
+engine are one verdict. The pool is therefore `runs_on` minus
 whichever engine is running, and the count is printed with every result: with
 three engines declared, a claim gets at most **two** independent readings.
 
@@ -25,6 +25,10 @@ majority to appeal to, and inventing one would turn a disagreement into a verdic
 
 What counts as a refutation in this domain is `refutation` in harness.yaml, not
 here: the tool is the same in every set, and the lens is not.
+
+Exit status, so a caller cannot read a run that checked nothing as a pass:
+0 every claim stands · 1 the run could not start · 2 usage ·
+3 a claim was refuted or contested · 4 otherwise, a claim no engine answered.
 """
 from __future__ import annotations
 
@@ -84,7 +88,13 @@ def ask(engine_name: str, claim: dict) -> dict:
     prompt = PROMPT.format(lens=REFUTATION.get("lens", "").strip(),
                            refuted_when=REFUTATION.get("refuted_when", "").strip(),
                            cid=claim.get("id", "?"), claim=claim["claim"], extra=extra)
-    return engine.run(engine_name, prompt, SCHEMA)
+    got = engine.run(engine_name, prompt, SCHEMA)
+    # engine.run holds the answer to the schema; this is the one field a verdict
+    # turns on, and the string "false" is truthy.
+    if not isinstance(got.get("refuted"), bool):
+        raise engine.EngineError(f"{engine_name} answered refuted={got.get('refuted')!r}, "
+                                 "not a boolean")
+    return got
 
 
 def refuters(running: str) -> list[str]:
@@ -107,7 +117,9 @@ def verdict(votes: dict[str, dict]) -> str:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(
+        epilog="exit: 0 all stand, 1 cannot start, 2 usage, "
+               "3 refuted or contested, 4 unchecked")
     ap.add_argument("claims", help="JSON list of {id, claim, [evidence], [where]}")
     ap.add_argument("--running", required=True,
                     help="the engine running this — stated, never sniffed")
@@ -119,9 +131,17 @@ def main() -> int:
               "framing is a second opinion, not an adversary", file=sys.stderr)
         return 1
 
-    claims = json.loads(pathlib.Path(a.claims).read_text(encoding="utf-8"))
+    try:
+        claims = json.loads(pathlib.Path(a.claims).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        print(f"cannot read claims from {a.claims}: {e}", file=sys.stderr)
+        return 2
     if isinstance(claims, dict):
         claims = [claims]
+    # An empty list checks nothing, and exit 0 would read as everything standing.
+    if not isinstance(claims, list) or not claims:
+        print(f"{a.claims} holds no claims", file=sys.stderr)
+        return 2
     try:
         pool = refuters(a.running)
     except engine.EngineError as e:
@@ -141,9 +161,12 @@ def main() -> int:
                         "independent_readings": len(votes),
                         "votes": votes, "unreachable": silent})
 
+    kinds = [r["verdict"] for r in results]
+    status = (3 if {"REFUTED", "CONTESTED"} & set(kinds)
+              else 4 if "UNCHECKED" in kinds else 0)
     if a.json:
         print(json.dumps(results, ensure_ascii=False, indent=2))
-        return 0
+        return status
 
     for r in results:
         print(f"\n[{r['verdict']}] {r['id']}   "
@@ -153,11 +176,10 @@ def main() -> int:
             print(f"    would settle it: {v['what_would_settle_it']}")
         for name, why in r["unreachable"].items():
             print(f"  {name}: NO VERDICT — {why}")
-    kinds = [r["verdict"] for r in results]
     print(f"\n{kinds.count('REFUTED')} refuted · {kinds.count('CONTESTED')} contested · "
           f"{kinds.count('STANDS')} unrefuted · {kinds.count('UNCHECKED')} unchecked")
     print("Unrefuted means nothing was found, not that nothing is there.")
-    return 0
+    return status
 
 
 if __name__ == "__main__":

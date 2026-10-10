@@ -21,7 +21,7 @@ Run these against every request. An unanswerable one becomes a `Q-n`.
 ### SC-1: <what becomes true>
 - Serves: G-1
 - Metric: <the number>
-- Baseline: <today's value> [verified|assumed|unknown]
+- Baseline: <today's value> [verified: <pointer>] | [assumed] | [unknown]
 - Target: <value> by <when>
 - Measured by: <query, dashboard, test, or manual check>
 ```

@@ -10,12 +10,31 @@ Verified: 2026-08-21 — no automated check.
 # <initiative> — Changelog
 > Status: draft
 > Updated: YYYY-MM-DD
+> Tier: S | M | L
 
 ## YYYY-MM-DD — <trigger in one line>
-- Class: <divergence class>
+
+### Planned vs actual
+| ID | Planned (range) | Midpoint | Actual | Delta | % | Status | Source |
+|---|---|---|---|---|---|---|---|
+<!-- before any prose; Delta against the midpoint; Source is the export, artifact or person -->
+
+### Ranges scored
+| ID | Original range | Actual | Outcome | Ratio |
+|---|---|---|---|---|
+<!-- every range this divergence closed, on the original, never the revision -->
+
+### Continue or stop
+| Option | Remaining cost (range) | Remaining value | Salvageable |
+|---|---|---|---|
+| Continue | | | |
+| Stop | | | |
+<!-- when continuation is in question; a record-only entry writes "not priced: record-only" -->
+
+- Class: <divergence class> (`course-correct` key: <key>)
 - Measured: <the gap, as a number>
 - Changed: <artifacts and IDs>
 - Superseded: <file> → <replacement>
-- Revised commitment: <range> (confidence: <level>)
+- Revised commitment: <range> (confidence: <level> — <reason>)
 - Lesson: <one line>
 ```

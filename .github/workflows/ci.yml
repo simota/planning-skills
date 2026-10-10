@@ -28,6 +28,8 @@ jobs:
         run: python3 planning-tools/validate.py
       - name: Every rule still fires
         run: make test
+      - name: Published figures match the fixture
+        run: make figures
       - name: Delivered blocks are current
         run: |
           python3 planning-tools/render.py

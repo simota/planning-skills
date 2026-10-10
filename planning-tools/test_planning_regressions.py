@@ -57,8 +57,8 @@ def main() -> int:
     parser.add_argument('--root',type=Path,default=Path(__file__).resolve().parent.parent)
     parser.add_argument('--mutate',choices=MUTATIONS)
     args=parser.parse_args()
-    routes=yaml.safe_load((args.root/'planning-registry/routes.yaml').read_text())
-    cases=yaml.safe_load((args.root/'planning-registry/phase-regressions.yaml').read_text())['cases']
+    routes=yaml.safe_load((args.root/'planning-registry/routes.yaml').read_text(encoding='utf-8'))
+    cases=yaml.safe_load((args.root/'planning-registry/phase-regressions.yaml').read_text(encoding='utf-8'))['cases']
     tested=mutate(routes,args.mutate) if args.mutate else routes
     errors=validate(tested,cases)
     for error in errors: print('FAIL:',error)

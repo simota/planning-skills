@@ -38,7 +38,7 @@ Phases: `INTERROGATE → STATE → BOUND → CRITERIA → CONSTRAIN`.
   written down is the cheapest scope control there is (`_planning/SIZING.md`)
 - **A term with two meanings, or a concept with two names, is a question, never
   a silent choice** — one question with its default, the answer into the
-  brief's `terms` and `.agents/glossary.md`, and the glossary's names only from
+  brief's `terms` and, above `S`, `.agents/glossary.md`; the glossary's names from
   then on (`_planning/SIZING.md` § Terms)
 <!-- /deliver:sizing -->
 
@@ -49,10 +49,10 @@ Phases: `INTERROGATE → STATE → BOUND → CRITERIA → CONSTRAIN`.
 | Interrogating a vague request | [shape](playbooks/shape.md) — the probes, and the shape a criterion has to take |
 | Writing the deliverable | [template](reference/template.md) — downstream phases parse these headings |
 | About to write the brief | [traps](playbooks/traps.md) |
-| A goal has no measurable criterion | Delete it or downgrade it to a non-goal. **A goal nobody can test is a goal nobody can finish** |
+| A goal has no measurable criterion | Rewrite it with one, or drop it and say why. If no `SC-n` is measurable, gate 2 fires. **A goal nobody can test is a goal nobody can finish** |
 | Fewer non-goals than goals | Keep going. Under-specified non-goals are the single most common cause of scope creep |
-| A technology name appears in the brief | Take it out. Framing that leaks a solution has pre-decided the options phase |
-| The request is already a well-formed problem | Say so and stop. Re-framing a stated problem is ceremony |
+| A technology name appears in the brief | Take it out, unless it is a sourced hard `C-n`. Framing that leaks a solution has pre-decided the options phase |
+| The request is already a well-formed problem | Say so and write the brief from it as given. Re-framing a stated problem is ceremony |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
   completeness · mechanism over intent · **deciding over deferring** ·
@@ -71,7 +71,7 @@ Phases: `INTERROGATE → STATE → BOUND → CRITERIA → CONSTRAIN`.
   each `[assumed]` with what it costs to be wrong
 - Always: state the definition of done in terms someone other than the author
   could check
-- Never: propose a solution, name a technology, or estimate
+- Never: propose a solution, name a technology outside a sourced `C-n`, or estimate
 - Never: accept "improve", "modernise", or "clean up" as a goal. Those are
   words with no achievement condition, and the brief exists to replace them
 - Never: write a criterion whose measurement method is "we will know"
@@ -79,8 +79,8 @@ Phases: `INTERROGATE → STATE → BOUND → CRITERIA → CONSTRAIN`.
 ## Verify with
 
 A criterion is `[verified]` only where its metric already exists and can be read
-today — with the pointer. Where the measurement does not exist yet, that is an
-`A-n` about measurability, not a criterion.
+today — with the pointer. An unknown baseline value is still a criterion; a
+metric nobody could measure yet is an `A-n` about measurability, not a criterion.
 
 - **Test each `SC-n` by asking who would run what, and what number would settle
   it.** A criterion that cannot survive that question is prose
@@ -94,13 +94,13 @@ today — with the pointer. Where the measurement does not exist yet, that is an
   confidence with a one-line reason. `Low` on a load-bearing item is a blocking
   finding, not a footnote
 - **Report `status`**: `DONE` (every claim tagged, every load-bearing assumption
-  verified or costed, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
+  verified or costed past reach, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
 - **Every residual is `BLOCKED` / `OUT-OF-SCOPE` / `DEFERRED` / `UNVERIFIED`**
-  and appears in the handoff's `open` with its `A-n` or `Q-n`. `UNVERIFIED` is
+  and appears in the handoff's `open` with its `A-n`, `Q-n` or note. `UNVERIFIED` is
   the one that matters: every other class is visible in the plan, while **an
   unverified assumption reads exactly like a fact**
 - **Never omit the sweep** — markers against `open`, claims against claims
-  tagged: `swept, 0 markers; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
+  tagged: `swept, 0 markers / 0 in open; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
 <!-- /deliver:report -->
 <!-- deliver:score -->
 - **A range is scored, or it never meant anything.** Whatever was given one
@@ -117,8 +117,8 @@ The problem is one sentence, every goal has a measurable criterion, non-goals
 outnumber or match goals, every claim carries a tag, and no solution has been
 proposed.
 <!-- deliver:surface -->
-- **Say what the moment needs.** Start: one line naming what will be planned and what
-  is excluded. Mid-run: a line when the reader must act now — a discovered constraint
+- **Say what the moment needs.** Start: one line naming what will be planned, what is
+  excluded, and the tier. Mid-run: a line when the reader must act now — a discovered constraint
   that invalidates the plan, a blocked path, work that would grow the scope. Asking counts
   as speaking: one question, the decision it unblocks, the default taken if nobody answers
 - **End with the answer in one line** — status, tier and what was decided; then the sweep

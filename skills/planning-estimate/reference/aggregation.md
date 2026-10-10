@@ -5,14 +5,14 @@ Purpose: How per-task ranges combine into the total the deliverable asks for, wh
 Read when: filling in "Critical path total", combining any set of task ranges, or setting the confidence label on a schedule.
 Source: none — nothing outside this page can move what it states.
 Verified: 2026-08-21 — the tables through "Where the method stops holding" came from a 200,000-run
-Monte Carlo over the Beta-PERT distribution `sizing.md`'s formulas assume. `make figures` holds every one of them against a generated fixture on every commit; `make
+Monte Carlo over the Beta-PERT distribution `playbooks/sizing.md`'s formulas assume. `make figures` holds every one of them against a generated fixture on every commit; `make
 figures-full` re-derives that fixture from the seed. The fast tier catches a number edited
 here, and is the only one that runs automatically; the slow tier is the only thing that
 catches a stale fixture, so it runs when the model changes rather than never:
 those are `[verified]`. The confidence thresholds in the last section are `[assumed]` — a convention
 this set is adopting, not a measured boundary. Replace them the moment local actuals can set them.
 
-`sizing.md` defines σ = `(P − O) / 6` per task and the template asks for a
+`playbooks/sizing.md` defines σ = `(P − O) / 6` per task and the template asks for a
 **critical path total** as a range. Nothing said how to get from one to the
 other, and the obvious route — add the optimistic values, add the pessimistic
 values — produces a range with no achievable endpoint.
@@ -28,7 +28,7 @@ Twelve independent tasks, each `[2 / 3 / 8]` days:
 | Sum O … sum P | **24.0 … 96.0** | p0.00 … p100.00 |
 | Simulated p10 … p90 | **39.6 … 48.6** | the honest 80% interval |
 
-The naive range is nine times wider than the real one, and **neither end can
+The naive range is about eight times wider than the real one (72 against 9.0), and **neither end can
 happen**: every one of 200,000 runs finished above 24 and below 96. A range
 where both endpoints are impossible is not a conservative estimate; it carries
 no information, and the reader who converts it to a date will use the midpoint.
@@ -71,9 +71,11 @@ coin flip" are the same number and different commitments.
 chain: **everything must finish, so the merge lands on the slowest draw, not the
 average one.**
 
-Eight parallel chains, each with an identical mean of 14.67:
+Eight parallel chains, each with an identical mean of 14.67. Slip is measured
+against that mean, not against row 1's p50 — one chain is right-skewed, so its
+median sits slightly below its mean:
 
-| Chains | p50 of the merge | Slip vs one chain |
+| Chains | p50 of the merge | Slip vs one chain's mean (14.67) |
 |---|---|---|
 | 1 | 14.55 | — |
 | 2 | 15.71 | +1.04 |
@@ -100,7 +102,8 @@ critical path's *relative to its own spread*. Against a critical path of mean
 
 So: **a parallel chain within about one of its own σ of the critical path is not
 non-critical**, however comfortable the gap looks in days. Past roughly 2σ it
-can be dropped. A chain that is short but wild belongs in the total; a chain
+can be dropped. Between 1σ and 2σ it stays in the total by default; dropping it
+is a stated choice that names what it costs — about 1% of p90 at a 1.5σ gap (table above). A chain that is short but wild belongs in the total; a chain
 that is long but tight often does not move it at all.
 
 ## Where the method stops holding

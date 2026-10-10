@@ -7,10 +7,10 @@
 |----------------|--------------|--------|
 | Cheap | Yes | Verify now. Not verifying is negligence. |
 | Cheap | No | Verify only if it is on the way. |
-| Expensive | Yes | Design a cheap proxy check, or make it `Q-n` and plan a spike task. |
+| Expensive | Yes | Design a cheap proxy check, or make it `Q-n` and name the spike for `planning-decompose`. |
 | Expensive | No | Leave as `[assumed]`. Record it and move on. |
 
-"Load-bearing" means: if this is false, at least one `G-n`, `D-n`, or `T-n` changes.
+"Load-bearing" means: if this is false, at least one `G-n`, `D-n`, or `T-n` changes — or, before those exist, an option's viability does.
 
 ## Probe Checklist
 

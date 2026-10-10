@@ -4,7 +4,7 @@
 Binding on every `planning-*` skill that produces, revises, or reviews an
 estimate. A range is a claim about the future, and a claim nobody ever settles
 is not a forecast — it is a mood. **Every range is scored once the work it
-covered is done, and the score stays in the plan directory.**
+covered is done, and the score stays in the plan: `35-estimate.md`, else `changelog.md`.**
 
 ## The failure this prevents
 
@@ -28,11 +28,11 @@ one score.
 | `within` | The actual fell inside the range, endpoints included |
 | `under` | Faster than the low end |
 | `over` | Slower than the high end |
-| `open` | The work is done or abandoned, and nobody recorded the actual |
+| `open` | The work is done, and nobody recorded the actual |
 | `abandoned` | The work was cancelled or its scope changed materially. Not scored, and not counted against the method |
 
 Alongside the outcome, one number: the **ratio** — actual divided by the
-midpoint. It is what survives aggregation; `over` says the range failed, and
+midpoint, `(low + high) / 2`. It is what survives aggregation; `over` says the range failed, and
 `2.4x` says by how much.
 
 ## The rate that matters, and the direction people get wrong
@@ -52,8 +52,8 @@ record.
 
 ## Carrying it forward
 
-The record lives with the plan and is read by the next estimate for the same
-kind of work. It is applied as a stated adjustment or not at all — never as a
+The record lives with the plan, and the next estimate for the same kind of work
+reads the scored ranges in `plans/*/`. It is applied as a stated adjustment or not at all — never as a
 silent multiplier, and never before there are enough scored ranges to see a
 direction rather than a run of luck. Three is not enough. Say the count.
 

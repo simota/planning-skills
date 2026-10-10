@@ -40,7 +40,7 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
   written down is the cheapest scope control there is (`_planning/SIZING.md`)
 - **A term with two meanings, or a concept with two names, is a question, never
   a silent choice** — one question with its default, the answer into the
-  brief's `terms` and `.agents/glossary.md`, and the glossary's names only from
+  brief's `terms` and, above `S`, `.agents/glossary.md`; the glossary's names from
   then on (`_planning/SIZING.md` § Terms)
 <!-- /deliver:sizing -->
 
@@ -56,7 +56,7 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
 | An assumption turns out false | Say so loudly and name what it invalidates upstream. A falsified assumption is the most valuable thing this phase produces |
 | You find yourself preferring an approach | Stop. Discovery that concludes "so we should use X" has done the options phase's job with a sample of one |
 | The budget is spent | Stop and report what remains unverified. Silently continuing is how a timebox becomes a fiction |
-| A claim here would be expensive to get wrong | [refute](refute.py) — put it to the engines that did not make it, asked to break it rather than to agree. Unrefuted is n engines finding nothing, never proof |
+| A claim here would be expensive to get wrong | [refute](refute.py) — `python3 <this skill's directory>/refute.py --running <this engine> plans/<slug>/claims.json` puts it to the engines that did not make it, asked to break it. `REFUTED` or `CONTESTED` stays `[assumed]`; unrefuted is n engines finding nothing, never proof |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
   completeness · mechanism over intent · **deciding over deferring** ·
@@ -73,7 +73,7 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
 - Always: rank unknowns by **decision impact**, not by how interesting they are
 - Always: state what was not verified, as its own section. A context document
   silent about its gaps reads as complete
-- Never: modify a file or run a command with side effects
+- Never: modify a file outside `plans/<slug>/`, or run a command with side effects
 - Never: recommend an approach, or score one
 - Never: report a finding whose command you did not run. Reconstructed output is
   `[assumed]` at best
@@ -84,8 +84,8 @@ This is the phase where `[verified]` is actually earned: a claim is `verified`
 only with the pointer that produced it, and everything else is `[assumed]` with
 an `A-n` or `[unknown]` with a `Q-n`.
 
-- **Count the queue.** Assumptions received, verified, falsified, still open —
-  the four must add up, and the sum is what the next phase is standing on
+- **Count the queue.** Verified + falsified + open + unverified = received +
+  added — the sum is what the next phase is standing on
 <!-- deliver:report -->
 - **Tag every factual claim in a decision-bearing section**, exactly one:
   `[verified: <pointer>]` — read, run, or cited, with the pointer ·
@@ -96,13 +96,13 @@ an `A-n` or `[unknown]` with a `Q-n`.
   confidence with a one-line reason. `Low` on a load-bearing item is a blocking
   finding, not a footnote
 - **Report `status`**: `DONE` (every claim tagged, every load-bearing assumption
-  verified or costed, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
+  verified or costed past reach, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
 - **Every residual is `BLOCKED` / `OUT-OF-SCOPE` / `DEFERRED` / `UNVERIFIED`**
-  and appears in the handoff's `open` with its `A-n` or `Q-n`. `UNVERIFIED` is
+  and appears in the handoff's `open` with its `A-n`, `Q-n` or note. `UNVERIFIED` is
   the one that matters: every other class is visible in the plan, while **an
   unverified assumption reads exactly like a fact**
 - **Never omit the sweep** — markers against `open`, claims against claims
-  tagged: `swept, 0 markers; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
+  tagged: `swept, 0 markers / 0 in open; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
 <!-- /deliver:report -->
 <!-- deliver:score -->
 - **A range is scored, or it never meant anything.** Whatever was given one
@@ -115,12 +115,12 @@ an `A-n` or `[unknown]` with a `Q-n`.
 
 ## Done when
 
-Every queued assumption is verified, falsified, or converted to a ranked
-unknown; every finding carries a pointer; the unverified are named; and no
-approach has been preferred.
+Every queued assumption is verified, falsified, converted to a ranked unknown,
+or left `[assumed]` with its cost under Not verified; every finding carries a
+pointer; and no approach has been preferred.
 <!-- deliver:surface -->
-- **Say what the moment needs.** Start: one line naming what will be planned and what
-  is excluded. Mid-run: a line when the reader must act now — a discovered constraint
+- **Say what the moment needs.** Start: one line naming what will be planned, what is
+  excluded, and the tier. Mid-run: a line when the reader must act now — a discovered constraint
   that invalidates the plan, a blocked path, work that would grow the scope. Asking counts
   as speaking: one question, the decision it unblocks, the default taken if nobody answers
 - **End with the answer in one line** — status, tier and what was decided; then the sweep

@@ -6,6 +6,11 @@ cases:
     lifecycle: pre
     finding_class: goal
     expect: planning-frame
+  - id: F11
+    request: '着手前のレビューで、合意した制約の一つが実はもう存在しないと分かった。前提を直してから再判定して。'
+    lifecycle: pre
+    finding_class: constraint
+    expect: planning-frame
   - id: R43
     request: '実装前のレビューで、重要な制約の裏付けがないと分かった。そこを確認してから再判定して。'
     lifecycle: pre

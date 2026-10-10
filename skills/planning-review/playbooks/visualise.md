@@ -71,14 +71,14 @@ numbered marks and the findings referring to the numbers beats one map each.
 
 ## In this family
 
-- **A dependency graph** for anything with `hops` or `ordering` — tasks as
+- **A dependency graph** for anything with `hops` — tasks as
   nodes, the critical path marked, and the finding hung off the edge it is
   about. Mermaid earns its keep here more than anywhere else in the family
 - **A coverage grid** for a silence audit: what a plan has to settle down one
   axis, what this plan settles across the other, and the blank row as the
   finding. The absence is the point, and a blank cell shows it faster than a
   paragraph saying nothing was said
-- **A timeline** when the finding is that two pieces of work were sequenced as
+- **A timeline** for `ordering`: two pieces of work were sequenced as
   though independent — two lanes, the shared resource marked where they collide
 - **Two columns** when an estimate and a constraint disagree: the range against
   the date, on one line

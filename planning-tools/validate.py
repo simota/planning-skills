@@ -9,7 +9,9 @@ belongs in a review, not in this file.
 """
 from __future__ import annotations
 
+import os
 import re
+import subprocess
 import sys
 import unicodedata
 from pathlib import Path
@@ -32,7 +34,10 @@ def load(name: str):
 
 
 H = load("harness.yaml")
-CAP = load("capabilities.yaml")
+CAP_RAW = load("capabilities.yaml") or {}
+# A skill entry is a mapping. A scalar one is V9's to report; every other rule
+# reads only the mappings, so one bad line is one failure rather than a crash.
+CAP = {k: v for k, v in CAP_RAW.items() if isinstance(v, dict)}
 ROUTES = load("routes.yaml")
 FIX = load("fixtures.yaml")
 
@@ -50,6 +55,15 @@ SKILLS_ROOT = ROOT / H["skills_dir"] if H.get("skills_dir") else ROOT
 SKILL_DIRS = sorted(p for p in SKILLS_ROOT.glob(f"{PREFIX}*") if (p / "SKILL.md").exists())
 SKILLS = [p.name for p in SKILL_DIRS]
 LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+
+
+def link_path(target: str) -> str:
+    """The file a link points at: no `"title"`, no `#anchor`, no `<>`."""
+    t = target.strip()
+    t = t[1:t.index(">")] if t.startswith("<") and ">" in t else (t.split() or [""])[0]
+    return t.split("#", 1)[0]
+
+
 # A backticked token is a path if it contains a slash or names a file. Matching
 # only on the slash misses the bare sibling reference (`SIZING.md`), which is
 # the form that breaks: it resolves against the skill directory, not against
@@ -120,7 +134,7 @@ def v2_description_terms():
 
 
 def v3_roster():
-    declared = set(k for k in CAP if k.startswith(PREFIX))
+    declared = set(k for k in CAP_RAW if k.startswith(PREFIX))
     if declared != set(SKILLS):
         fail("V3", f"capabilities.yaml vs disk: only in yaml={sorted(declared - set(SKILLS))} "
                    f"only on disk={sorted(set(SKILLS) - declared)}")
@@ -132,7 +146,7 @@ def v4_playbook_orphans():
         if not pb_dir.exists():
             continue
         body = sections(read(d / "SKILL.md")).get("Decide first", "")
-        linked = {Path(m).name for m in LINK_RE.findall(body)}
+        linked = {Path(link_path(m)).name for m in LINK_RE.findall(body)}
         for pb in sorted(pb_dir.glob("*.md")):
             if pb.name not in linked:
                 fail("V4", f"{d.name}/playbooks/{pb.name} is not linked from Decide first")
@@ -178,7 +192,7 @@ def v8_links():
         for target in LINK_RE.findall(read(f)):
             if target.startswith(("http", "#", "mailto:")):
                 continue
-            if not (f.parent / target.split("#")[0]).exists():
+            if not (f.parent / link_path(target)).exists():
                 fail("V8", f"{f.relative_to(ROOT)} links to missing {target}")
 
 
@@ -188,8 +202,11 @@ def _norm(s: str) -> str:
 
 def v9_signals():
     seen: dict[str, str] = {}
-    for name, c in CAP.items():
-        sigs = c.get("signals", [])
+    for name, c in CAP_RAW.items():
+        if not isinstance(c, dict):
+            fail("V9", f"capabilities.yaml {name} is {c!r}, not a mapping")
+            continue
+        sigs = c.get("signals") or []
         if not sigs:
             fail("V9", f"{name} declares no signals")
         for s in sigs:
@@ -200,8 +217,15 @@ def v9_signals():
 
 
 def v10_fixtures():
-    pairs = [(_norm(s), name) for name, c in CAP.items() for s in c.get("signals", [])]
-    for entry in FIX if isinstance(FIX, list) else []:
+    pairs = [(_norm(s), name) for name, c in CAP.items() for s in c.get("signals") or []]
+    # An empty or mis-shaped fixture file checks nothing, and would say green.
+    if not isinstance(FIX, list) or not FIX:
+        fail("V10", "fixtures.yaml is not a non-empty list of {ask, expect}")
+        return
+    for entry in FIX:
+        if not (isinstance(entry, dict) and "ask" in entry and "expect" in entry):
+            fail("V10", f"fixture {entry!r} is not an {{ask, expect}} pair")
+            continue
         ask, expect = _norm(entry["ask"]), entry["expect"]
         hits = [(len(sig), owner) for sig, owner in pairs if sig in ask]
         if not hits:
@@ -228,6 +252,10 @@ def v12_prefix():
 def v13_route_budget():
     if len(ROUTES) > LIM["routes_max"]:
         fail("V13", f"{len(ROUTES)} routes (max {LIM['routes_max']})")
+    for name, r in ROUTES.items():
+        n = len(r.get("chain") or [])
+        if n > LIM["route_stages_max"]:
+            fail("V13", f"route {name} chains {n} stages (max {LIM['route_stages_max']})")
 
 
 def v14_patterns():
@@ -273,6 +301,11 @@ def v17_delivery():
             if open_m not in text or close_m not in text:
                 fail("V17", f"{d.name}/SKILL.md is missing the {key} delivery block")
                 continue
+            # Only the first block is compared below; a second would go unread.
+            if text.count(open_m) != 1 or text.count(close_m) != 1:
+                fail("V17", f"{d.name}/SKILL.md carries the {key} markers "
+                            f"{text.count(open_m)}/{text.count(close_m)} times; one each")
+                continue
             got = text.split(open_m, 1)[1].split(close_m, 1)[0].strip("\n")
             if got != want:
                 fail("V17", f"{d.name}/SKILL.md {key} block differs from "
@@ -299,11 +332,13 @@ def v19_paths_resolve():
     applies to the shared contracts too — they are read *by* a skill, so a
     sibling-relative path in them points at nothing once installed.
     """
+    if not SKILL_DIRS:
+        return                            # V3 reports the empty roster
     probe = SKILL_DIRS[0]
     shared = sorted((SKILLS_ROOT / SHARED).glob("*.md"))
     for d in SKILL_DIRS:
         readable = [d / "SKILL.md"] + sorted((d / "playbooks").glob("*.md")) \
-            if (d / "playbooks").exists() else [d / "SKILL.md"]
+            + sorted((d / "reference").glob("*.md"))
         for f in readable:
             _check_paths(f, d, f"{d.name}/{f.relative_to(d)}")
     for f in shared:                      # checked once, against one skill dir
@@ -323,7 +358,7 @@ def _is_own_reference(p: str) -> bool:
 
 def _check_paths(f: Path, base: Path, label: str) -> None:
     for p in TICK_PATH_RE.findall(read(f)):
-        if p.startswith(("http", "~", "/")) or " " in p or not _is_own_reference(p):
+        if p.startswith(("http", "~", "/")) or not _is_own_reference(p):
             continue
         if ".." in p:
             fail("V19", f"{label} references {p!r}; paths are normalised lexically, "
@@ -369,7 +404,8 @@ def strip_delivered(text: str) -> str:
 def v21_verify_names_a_grade():
     for d in SKILL_DIRS:
         body = strip_delivered(sections(read(d / "SKILL.md")).get("Verify with", ""))
-        if not any(g in body for g in VOCAB["evidence_levels"]):
+        # The tag, not the word: "verified" is inside "unverified".
+        if not any(f"[{g}]" in body for g in VOCAB["evidence_levels"]):
             fail("V21", f"{d.name} Verify with names no evidence grade of its own; "
                         "the delivered block does not count")
 
@@ -379,13 +415,20 @@ def v22_markers_classified():
         if ".git" in f.parts or f.parts[-2:-1] == ("delivered",):
             continue
         for i, line in enumerate(read(f).splitlines(), 1):
-            if MARKER_RE.search(line) and "`" not in line:
+            # A marker quoted in a code span is the form being described, not a
+            # gap left open; a backtick elsewhere on the line is not that.
+            if MARKER_RE.search(re.sub(r"`[^`]*`", "", line)):
                 if not any(c in line for c in VOCAB["residual_classes"]):
                     fail("V22", f"{f.relative_to(ROOT)}:{i} marker carries no residual class")
 
 
 def v23_labels():
     import fnmatch
+    allowed = H.get("document_labels")
+    if allowed is not None:
+        for pat, label in H["label_by_path"].items():
+            if label not in allowed:
+                fail("V23", f"label_by_path[{pat!r}] is {label!r}, not one of {allowed}")
     for f in sorted(ROOT.rglob("*.md")):
         if ".git" in f.parts:
             continue
@@ -440,16 +483,24 @@ def v26_boundaries_real():
 
 
 def v27_symlinks_stay_inside():
-    """What a skill reaches must live in this repo, and must actually be there."""
+    """What a skill reaches must live in this repo, and must actually be there.
+
+    The whole tree, not the top level: a link under playbooks/ installs too.
+    Links are not followed, so `_planning` and `registry` are each checked once
+    as links rather than walked into.
+    """
     for d in SKILL_DIRS:
-        for entry in sorted(d.iterdir()):
-            if not entry.is_symlink():
-                continue
-            target = (entry.parent / entry.readlink()).resolve()
-            if not target.exists():
-                fail("V27", f"{d.name}/{entry.name} is a broken symlink")
-            elif ROOT.resolve() not in target.parents and target != ROOT.resolve():
-                fail("V27", f"{d.name}/{entry.name} points outside the repo ({target})")
+        for top, dirs, files in os.walk(d, followlinks=False):
+            for n in sorted(dirs + files):
+                entry = Path(top) / n
+                if not entry.is_symlink():
+                    continue
+                rel = entry.relative_to(d.parent)
+                target = (entry.parent / os.readlink(entry)).resolve()
+                if not target.exists():
+                    fail("V27", f"{rel} is a broken symlink")
+                elif ROOT.resolve() not in target.parents and target != ROOT.resolve():
+                    fail("V27", f"{rel} points outside the repo ({target})")
 
 
 def v28_namespace_agrees():
@@ -472,10 +523,25 @@ def v28_namespace_agrees():
     for d in sorted(list(ROOT.iterdir()) + list(SKILLS_ROOT.iterdir() if SKILLS_ROOT != ROOT else [])):
         if not d.is_dir() or d.name in PLATFORM_DIRS:
             continue
+        # `.venv`, `.pytest_cache`, `.idea` are the checkout's, not the set's;
+        # a dot-directory git tracks is shipped, and is held to the rule.
+        if d.name.startswith(".") and not _tracked(d):
+            continue
         if not (d.name.startswith(PREFIX) or d.name == SHARED):
             fail("V28", f"{d.name}/ carries no set name; a directory this set owns "
                         f"is {PREFIX}* or {SHARED}, so that copying it into a shared "
                         "skills directory cannot collide")
+
+
+def _tracked(d: Path) -> bool:
+    """Whether git ships `d`. With no git to ask — the pre-commit hook's copy of
+    the index, a bare export — it is assumed shipped, so the rule stays whole."""
+    try:
+        r = subprocess.run(["git", "-C", str(ROOT), "ls-files", "--", str(d.relative_to(ROOT))],
+                           capture_output=True, text=True)
+    except OSError:
+        return True
+    return r.returncode != 0 or bool(r.stdout.strip())
 
 
 def v29_reference_headers():
@@ -502,9 +568,9 @@ def v30_reference_orphans():
         if not ref_dir.exists():
             continue
         body = sections(read(d / "SKILL.md")).get("Decide first", "")
-        linked = {Path(m).name for m in LINK_RE.findall(body)}
+        linked = {Path(link_path(m)).name for m in LINK_RE.findall(body)}
         for pb in sorted((d / "playbooks").glob("*.md")) if (d / "playbooks").exists() else []:
-            linked |= {Path(m).name for m in LINK_RE.findall(read(pb))}
+            linked |= {Path(link_path(m)).name for m in LINK_RE.findall(read(pb))}
             linked |= {Path(m).name for m in TICK_PATH_RE.findall(read(pb))}
         for f in sorted(ref_dir.glob("*.md")):
             if f.name not in linked:
@@ -777,7 +843,10 @@ def v37_source_pins_the_rot():
             head = " ".join(lines[start:end + 1])
             body = "\n".join(lines[:start] + lines[end + 1:])
             named = [a for a in declared if names(head, a)]
-            if not named and none_marker not in head:
+            # The marker is the answer, not a word somewhere in it: `Source:
+            # nonetheless the vendor docs` declares a source and says nothing.
+            says_none = re.match(rf"Source:\s*{re.escape(none_marker)}(?![\w-])", head)
+            if not named and not says_none:
                 fail("V37", f"{f.relative_to(ROOT)} names no source and does not say "
                             f"{none_marker!r}; a page that depends on nothing says so, "
                             "because silence reads the same from a page that rots")
@@ -847,12 +916,34 @@ RULES = [v1_sizes, v2_description_terms, v3_roster, v4_playbook_orphans,
          v38_enumerations_declared]
 
 
+def hooks_dir() -> Path | None:
+    """Where git looks for hooks: not `.git/hooks` in a worktree, or under
+    `core.hooksPath`."""
+    try:
+        r = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--git-path", "hooks"],
+                           capture_output=True, text=True)
+    except OSError:
+        return None
+    if r.returncode != 0 or not r.stdout.strip():
+        return None
+    return (ROOT / r.stdout.strip()).resolve()
+
+
 def main() -> int:
+    # The messages carry `·`, `—` and quoted page text; an ASCII stdout (a bare
+    # CI locale, a pipe under LANG=C) must not turn a failure into a traceback.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
     for rule in RULES:
         rule()
-    hooks = (ROOT / ".git" / "hooks" / "pre-commit").exists()
-    print(f"{len(RULES)} rules · {len(SKILLS)} skills · "
-          f"hooks {'on' if hooks else 'off — run: make hooks'}")
+    hd = hooks_dir()
+    # No repository, no hooks to report: the pre-commit hook runs this on a
+    # scratch copy of the index, where "off" would be false.
+    hooks = "" if hd is None else (" · hooks on" if (hd / "pre-commit").exists()
+                                   else " · hooks off — run: make hooks")
+    print(f"{len(RULES)} rules · {len(SKILLS)} skills{hooks}")
     if FAILURES:
         for f in sorted(FAILURES):
             print(f"  {f}")

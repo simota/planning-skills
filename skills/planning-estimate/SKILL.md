@@ -38,7 +38,7 @@ Phases: `REFERENCE → SIZE → AGGREGATE → BUFFER → STRESS`.
   written down is the cheapest scope control there is (`_planning/SIZING.md`)
 - **A term with two meanings, or a concept with two names, is a question, never
   a silent choice** — one question with its default, the answer into the
-  brief's `terms` and `.agents/glossary.md`, and the glossary's names only from
+  brief's `terms` and, above `S`, `.agents/glossary.md`; the glossary's names from
   then on (`_planning/SIZING.md` § Terms)
 <!-- /deliver:sizing -->
 
@@ -54,7 +54,7 @@ Phases: `REFERENCE → SIZE → AGGREGATE → BUFFER → STRESS`.
 | Several tracks run in parallel | They do not add, and they do not take the longest either: everything must finish, so the merge lands on the slowest draw. Eight equal chains slipped the p50 by 20% with none of them late ([aggregation](reference/aggregation.md)) |
 | Someone wants the number lower | Reducing scope changes the estimate. Wishing does not. Offer the scope cut, not a smaller number |
 | The range is uncomfortably wide | That is information. Narrowing it without new facts is fabrication |
-| The estimate is written and about to be handed over | Leave the scoring row empty and present — task, range, midpoint, `open`. **A calibration record starts as blanks in the estimate**, because nobody creates it later |
+| The estimate is written and about to be handed over | Write the scoring row with the outcome blank — task, range, midpoint, `—` until the work closes (`open` is a result, not a placeholder) and who records the actual. **A calibration record starts as blanks in the estimate**, because nobody creates it later |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
   completeness · mechanism over intent · **deciding over deferring** ·
@@ -95,13 +95,13 @@ and is stated rather than dressed up by the precision of the number.
   confidence with a one-line reason. `Low` on a load-bearing item is a blocking
   finding, not a footnote
 - **Report `status`**: `DONE` (every claim tagged, every load-bearing assumption
-  verified or costed, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
+  verified or costed past reach, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
 - **Every residual is `BLOCKED` / `OUT-OF-SCOPE` / `DEFERRED` / `UNVERIFIED`**
-  and appears in the handoff's `open` with its `A-n` or `Q-n`. `UNVERIFIED` is
+  and appears in the handoff's `open` with its `A-n`, `Q-n` or note. `UNVERIFIED` is
   the one that matters: every other class is visible in the plan, while **an
   unverified assumption reads exactly like a fact**
 - **Never omit the sweep** — markers against `open`, claims against claims
-  tagged: `swept, 0 markers; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
+  tagged: `swept, 0 markers / 0 in open; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
 <!-- /deliver:report -->
 <!-- deliver:score -->
 - **A range is scored, or it never meant anything.** Whatever was given one
@@ -115,11 +115,11 @@ and is stated rather than dressed up by the precision of the number.
 ## Done when
 
 Every estimate is a range with confidence and a reason, effort and elapsed time
-are separate, the total came from the critical path rather than a sum, the
-buffer is a named line, and the three widest range drivers are stated in order.
+are separate, the path total sums means and adds σ in quadrature — never the
+endpoints — the buffer is a named line, and the three widest drivers are in order.
 <!-- deliver:surface -->
-- **Say what the moment needs.** Start: one line naming what will be planned and what
-  is excluded. Mid-run: a line when the reader must act now — a discovered constraint
+- **Say what the moment needs.** Start: one line naming what will be planned, what is
+  excluded, and the tier. Mid-run: a line when the reader must act now — a discovered constraint
   that invalidates the plan, a blocked path, work that would grow the scope. Asking counts
   as speaking: one question, the decision it unblocks, the default taken if nobody answers
 - **End with the answer in one line** — status, tier and what was decided; then the sweep

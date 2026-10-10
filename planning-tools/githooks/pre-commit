@@ -1,6 +1,15 @@
 #!/bin/sh
 # Budgets enforced by a mechanism rather than by remembering.
 # Install with: make hooks
+#
+# Checked is what this commit holds — the index — not the working tree, which
+# can carry an unstaged fix that makes a broken commit pass, or an unstaged
+# breakage that blocks a good one. `checkout-index` writes the staged files,
+# symlinks as symlinks, into a scratch tree, and the checks run there. A stale
+# delivered block is V17's to report (`make render`), so it is covered here too.
 set -e
-python3 "$(git rev-parse --show-toplevel)/planning-tools/validate.py"
-python3 "$(git rev-parse --show-toplevel)/planning-tools/figures_check.py"
+tmp=$(mktemp -d "${TMPDIR:-/tmp}/planning-pre-commit.XXXXXX")
+trap 'rm -rf "$tmp"' EXIT INT TERM
+git checkout-index -a --prefix="$tmp/"
+python3 "$tmp/planning-tools/validate.py"
+python3 "$tmp/planning-tools/figures_check.py"

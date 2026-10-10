@@ -61,11 +61,12 @@ figures-full:
 figures-rewrite:
 	@python3 planning-tools/figures_check.py --rewrite
 
+# Where git looks, not where it usually is: a worktree's hooks live in the main
+# repository, and `core.hooksPath` moves them anywhere.
 hooks:
-	@mkdir -p .git/hooks
-	@cp planning-tools/githooks/pre-commit .git/hooks/pre-commit
-	@chmod +x .git/hooks/pre-commit
-	@echo "pre-commit installed"
+	@dir=$$(git rev-parse --git-path hooks) && mkdir -p "$$dir" && \
+		cp planning-tools/githooks/pre-commit "$$dir/pre-commit" && \
+		chmod +x "$$dir/pre-commit" && echo "pre-commit installed in $$dir"
 
 # A skill is a directory holding a SKILL.md, under skills/ where the plugin
 # format expects it. The prefix alone is not the test: planning-registry/ and

@@ -14,15 +14,15 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
 
 ## Before starting
 
-- **Read `registry/capabilities.yaml` before choosing.** Routing from memory is
-  how a request lands on the phase whose name it happened to use
+- **Read `registry/capabilities.yaml` and `registry/routes.yaml` before choosing.**
+  Routing from memory is how a request lands on the phase whose name it used
 - **Classify the tier first and state it in the first three lines**, with its
   reason. The tier decides the artifact set, and a chain chosen before the tier
   plans work nobody asked for
-- **Apply only gate conditions 1 and 4 here** — the goal that needs "and", and
-  the already-decided request. Conditions 2 and 3 describe artifacts that do not
-  exist until later phases have run, and halting on them would block the very
-  work this skill exists to start
+- **Apply gate conditions 1, 4 and 5 here, never 2 or 3** — the goal that needs
+  "and", the already-decided request, and an ambiguous term. Conditions 2 and 3
+  describe artifacts that do not exist until later phases have run, and halting
+  on them would block the very work this skill exists to start
 <!-- deliver:sizing -->
 - **Declare the tier before anything else**, read off the work and stated at the
   top of the deliverable. `S` — under a day, reversible: one brief in the
@@ -40,7 +40,7 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
   written down is the cheapest scope control there is (`_planning/SIZING.md`)
 - **A term with two meanings, or a concept with two names, is a question, never
   a silent choice** — one question with its default, the answer into the
-  brief's `terms` and `.agents/glossary.md`, and the glossary's names only from
+  brief's `terms` and, above `S`, `.agents/glossary.md`; the glossary's names from
   then on (`_planning/SIZING.md` § Terms)
 <!-- /deliver:sizing -->
 
@@ -51,7 +51,7 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
 | Picking the chain | [chains](playbooks/chains.md) — the canonical order, and the shortest path through it |
 | About to dispatch | [traps](playbooks/traps.md) |
 | A phase's output would not change any decision | Skip it, and **name the skipped phases and why**. A silent skip and a considered one read identically in the output |
-| The user has already chosen the approach | Skip the options phase and say so. Manufacturing alternatives to look thorough costs a phase and buys nothing |
+| The user has already chosen the approach | Skip the options phase and say so, or run it in decided mode when the choice needs a `D-n` on record. Manufacturing alternatives to look thorough costs a phase and buys nothing |
 | The goal needs "and" to state | Stop. Two goals are two briefs, and splitting them is the work rather than a preliminary to it |
 | The request is actually asking for execution | Stop and say so. A plan written for a decided question is pure cost |
 | A finding invalidates an earlier decision | Return to its owning phase. Before execution this is a phase revisit, not replan; after work starts use the divergence classification. Recheck decisions that used the changed input, preserving unaffected work and IDs |
@@ -70,7 +70,7 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
   running anything
 - Always: distinguish lifecycle from phase order. A pre-start revisit does not
   invoke replan; a post-start divergence selects its owner, not a fixed next phase
-- Always: pass the brief whole to every stage. It does not change mid-chain
+- Always: pass the brief whole to every stage. It changes only through framing
 - Never: write an artifact. This skill dispatches; the phases produce
 - Never: run a phase to make the chain look complete
 - Never: work around a gate that fired. Report it
@@ -94,13 +94,13 @@ which is why the skip list is part of the deliverable rather than a footnote.
   confidence with a one-line reason. `Low` on a load-bearing item is a blocking
   finding, not a footnote
 - **Report `status`**: `DONE` (every claim tagged, every load-bearing assumption
-  verified or costed, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
+  verified or costed past reach, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
 - **Every residual is `BLOCKED` / `OUT-OF-SCOPE` / `DEFERRED` / `UNVERIFIED`**
-  and appears in the handoff's `open` with its `A-n` or `Q-n`. `UNVERIFIED` is
+  and appears in the handoff's `open` with its `A-n`, `Q-n` or note. `UNVERIFIED` is
   the one that matters: every other class is visible in the plan, while **an
   unverified assumption reads exactly like a fact**
 - **Never omit the sweep** — markers against `open`, claims against claims
-  tagged: `swept, 0 markers; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
+  tagged: `swept, 0 markers / 0 in open; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
 <!-- /deliver:report -->
 <!-- deliver:score -->
 - **A range is scored, or it never meant anything.** Whatever was given one
@@ -114,11 +114,11 @@ which is why the skip list is part of the deliverable rather than a footnote.
 ## Done when
 
 The tier is declared with its reason, the chain is named with every skip
-explained, each phase returned a handoff, and the artifacts on disk match the
-set the tier requires.
+explained, each phase run at `M` or `L` returned a handoff (at `S`, the inline
+brief came back), and the artifacts on disk match the set the tier requires.
 <!-- deliver:surface -->
-- **Say what the moment needs.** Start: one line naming what will be planned and what
-  is excluded. Mid-run: a line when the reader must act now — a discovered constraint
+- **Say what the moment needs.** Start: one line naming what will be planned, what is
+  excluded, and the tier. Mid-run: a line when the reader must act now — a discovered constraint
   that invalidates the plan, a blocked path, work that would grow the scope. Asking counts
   as speaking: one question, the decision it unblocks, the default taken if nobody answers
 - **End with the answer in one line** — status, tier and what was decided; then the sweep

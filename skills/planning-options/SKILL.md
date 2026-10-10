@@ -17,7 +17,7 @@ Decided mode: `RECORD → PRESSURE-TEST → DECIDE`.
 ## Before starting
 
 - **Take the criteria from the brief, not from taste.** Options are scored
-  against the `SC-n` and `C-n` that already exist; inventing criteria here is
+  against the `SC-n` and soft `C-n` that already exist; inventing criteria here is
   choosing the winner and then justifying it
 - **Check whether the approach is already decided.** If it is, run decided mode
   — record the decision, attack it once, move on — and say the three-option
@@ -41,7 +41,7 @@ Decided mode: `RECORD → PRESSURE-TEST → DECIDE`.
   written down is the cheapest scope control there is (`_planning/SIZING.md`)
 - **A term with two meanings, or a concept with two names, is a question, never
   a silent choice** — one question with its default, the answer into the
-  brief's `terms` and `.agents/glossary.md`, and the glossary's names only from
+  brief's `terms` and, above `S`, `.agents/glossary.md`; the glossary's names from
   then on (`_planning/SIZING.md` § Terms)
 <!-- /deliver:sizing -->
 
@@ -54,8 +54,8 @@ Decided mode: `RECORD → PRESSURE-TEST → DECIDE`.
 | Writing the deliverable | [template](reference/template.md) |
 | About to decide | [traps](playbooks/traps.md) |
 | Two options differ only in naming | That is one option. Say so and generate a real alternative |
-| The approach is undecided | At least three options, one of which is do-nothing-or-the-minimum. **Do-nothing is the baseline every other option has to beat** |
-| The deciding factor rests on an `[assumed]` fact | Say so and mark the decision `Low` confidence. A `Low`-confidence decision on a load-bearing choice is a blocking finding |
+| The approach is undecided | At least three options, one of which is do-nothing-or-the-minimum — fewer only by saying no third real candidate exists, never by inventing one. **Do-nothing is the baseline every other option has to beat** |
+| The deciding factor rests on an `[assumed]` fact | Cheap to verify: gate 3 fires — stop and send it to `planning-discover`. Expensive: say so and mark the decision `Low` confidence, which on a load-bearing choice is a blocking finding |
 | You want to present the table and let the user pick | Recommend anyway. They can overrule; they cannot un-see a neutral table that hid your judgement |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
@@ -99,13 +99,13 @@ table from laundering opinion into arithmetic.
   confidence with a one-line reason. `Low` on a load-bearing item is a blocking
   finding, not a footnote
 - **Report `status`**: `DONE` (every claim tagged, every load-bearing assumption
-  verified or costed, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
+  verified or costed past reach, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
 - **Every residual is `BLOCKED` / `OUT-OF-SCOPE` / `DEFERRED` / `UNVERIFIED`**
-  and appears in the handoff's `open` with its `A-n` or `Q-n`. `UNVERIFIED` is
+  and appears in the handoff's `open` with its `A-n`, `Q-n` or note. `UNVERIFIED` is
   the one that matters: every other class is visible in the plan, while **an
   unverified assumption reads exactly like a fact**
 - **Never omit the sweep** — markers against `open`, claims against claims
-  tagged: `swept, 0 markers; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
+  tagged: `swept, 0 markers / 0 in open; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
 <!-- /deliver:report -->
 <!-- deliver:score -->
 - **A range is scored, or it never meant anything.** Whatever was given one
@@ -123,8 +123,8 @@ foreclosure, failure mode and reversal cost, one is recommended with its
 deciding factor in a sentence, and every decision has a revisit trigger or an
 explicit permanence.
 <!-- deliver:surface -->
-- **Say what the moment needs.** Start: one line naming what will be planned and what
-  is excluded. Mid-run: a line when the reader must act now — a discovered constraint
+- **Say what the moment needs.** Start: one line naming what will be planned, what is
+  excluded, and the tier. Mid-run: a line when the reader must act now — a discovered constraint
   that invalidates the plan, a blocked path, work that would grow the scope. Asking counts
   as speaking: one question, the decision it unblocks, the default taken if nobody answers
 - **End with the answer in one line** — status, tier and what was decided; then the sweep

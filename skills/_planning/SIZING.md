@@ -16,7 +16,7 @@ Match depth to stakes. Declare the tier at the top of the deliverable.
 | `M` | Multi-day, single owner | `00-brief.md` + `30-plan.md` | `10-context.md`, `20-options.md`, `35-estimate.md` |
 | `L` | Multi-week or multi-owner, or hard to reverse | Full artifact set, ending in `40-risks.md` + `50-review.md` | — |
 
-These are minimum sets, not exact ones: a chain that runs `planning-estimate` produces `35-estimate.md` at any tier. `L` is the exception — `40-risks.md` and a `planning-review` verdict are mandatory, never optional.
+These are minimum sets, not exact ones: a chain that runs `planning-estimate` produces `35-estimate.md` at `M` or `L`. `L` is the exception — `40-risks.md` and a `planning-review` verdict are mandatory, never optional.
 
 ## The planning gate
 
@@ -30,7 +30,7 @@ No `planning-*` skill proceeds past its own phase while its own gate conditions 
 | 4 | The user has already decided and is actually asking for execution | `planning-router`, or whichever skill is invoked directly | Immediately |
 | 5 | A term in the request or the plan carries two meanings, or one concept goes by two names, and the host's glossary does not settle it | Whichever skill meets it first | When first met — one question with its default (§ Terms) |
 
-`planning-router` checks only conditions 1 and 4 before dispatch — conditions 2 and 3 describe artifacts that do not exist until `planning-frame` and `planning-discover` have run, and halting on them up front would block the request the router exists to serve.
+`planning-router` checks conditions 1, 4 and 5 before dispatch, never 2 or 3 — those describe artifacts that do not exist until `planning-frame` and `planning-discover` have run, and halting on them up front would block the request the router exists to serve.
 
 ## The brief the gate produces
 

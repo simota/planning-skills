@@ -10,9 +10,11 @@
 | Weeks | Slow down, verify assumptions first | Send load-bearing `[assumed]` items back to `planning-discover` |
 | Practically never | Require a second opinion and a pre-mortem | Run the **inline pre-mortem** below before finalizing; the full `planning-risk` phase still runs after `decompose → estimate` |
 
+The decision record's `Reversible:` field carries the same scale: `hours` or `days` is `yes`, `weeks` is `costly (<what undoing it takes>)`, `practically never` is `no`.
+
 ## Inline Pre-Mortem (irreversible options only)
 
-For an option whose reversal cost is `weeks` or `practically never`, run this before writing the `D-n`. It is deliberately smaller than the `planning-risk` phase — no register, no mitigation tasks, no rollback plan, because none of the inputs those need exist yet.
+For an option whose reversal cost is `practically never`, run this before writing the `D-n`. It is deliberately smaller than the `planning-risk` phase — no register, no mitigation tasks, no rollback plan, because none of the inputs those need exist yet.
 
 1. Assume this option was chosen and the project failed. Name the three most likely causes.
 2. For each, ask whether a different option on the table avoids it outright.
