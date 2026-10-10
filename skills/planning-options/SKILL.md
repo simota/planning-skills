@@ -17,7 +17,7 @@ Decided mode: `RECORD → PRESSURE-TEST → DECIDE`.
 ## Before starting
 
 - **Take the criteria from the brief, not from taste.** Options are scored
-  against the `SC-n` and `C-n` that already exist; inventing criteria here is
+  against the `SC-n` and soft `C-n` that already exist; inventing criteria here is
   choosing the winner and then justifying it
 - **Check whether the approach is already decided.** If it is, run decided mode
   — record the decision, attack it once, move on — and say the three-option
@@ -54,8 +54,8 @@ Decided mode: `RECORD → PRESSURE-TEST → DECIDE`.
 | Writing the deliverable | [template](reference/template.md) |
 | About to decide | [traps](playbooks/traps.md) |
 | Two options differ only in naming | That is one option. Say so and generate a real alternative |
-| The approach is undecided | At least three options, one of which is do-nothing-or-the-minimum. **Do-nothing is the baseline every other option has to beat** |
-| The deciding factor rests on an `[assumed]` fact | Say so and mark the decision `Low` confidence. A `Low`-confidence decision on a load-bearing choice is a blocking finding |
+| The approach is undecided | At least three options, one of which is do-nothing-or-the-minimum — fewer only by saying no third real candidate exists, never by inventing one. **Do-nothing is the baseline every other option has to beat** |
+| The deciding factor rests on an `[assumed]` fact | Cheap to verify: gate 3 fires — stop and send it to `planning-discover`. Expensive: say so and mark the decision `Low` confidence, which on a load-bearing choice is a blocking finding |
 | You want to present the table and let the user pick | Recommend anyway. They can overrule; they cannot un-see a neutral table that hid your judgement |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
