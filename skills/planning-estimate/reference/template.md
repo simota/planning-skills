@@ -10,7 +10,7 @@ Verified: 2026-08-21 — no automated check.
 # <initiative> — Estimate
 > Status: draft
 > Updated: YYYY-MM-DD
-> Tier: S | M | L
+> Tier: M | L   <!-- S writes no files (_planning/SIZING.md) -->
 > Capacity assumption: <productive fraction, basis>
 
 ## Per task
@@ -40,10 +40,17 @@ Confidence: High | Medium | Low (<reason>)
 | Condition | Earliest signal |
 |---|---|
 
+## Parallel tracks
+| Track | Gap to the critical path | Track σ | Gap ÷ σ | Non-critical? |
+|---|---|---|---|---|
+<!-- every track planning-decompose flagged; aggregation § Non-critical -->
+
 ## Calibration
 Actual recorded by: <owner>
-| ID | Range | Midpoint | Actual | Outcome | Ratio |
-|---|---|---|---|---|---|
-<!-- one row per range, O … P; Midpoint = (O + P) / 2. Actual, Outcome and Ratio
-     stay `—` until the work closes; then Outcome per `_planning/CALIBRATION.md` -->
+| ID | Unit (effort / elapsed) | Range | Midpoint | Actual | Outcome | Ratio |
+|---|---|---|---|---|---|---|
+<!-- one row per task range (O … P) and one for the critical-path total (p10 … p90);
+     only the total counts toward the 80% rate. Midpoint = (low + high) / 2. Actual,
+     Outcome and Ratio stay `—` here: once the work closes, planning-replan scores
+     each row in changelog.md (_planning/CALIBRATION.md) -->
 ```

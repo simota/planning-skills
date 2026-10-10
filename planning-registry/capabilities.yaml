@@ -90,10 +90,10 @@ planning-review:
 
 planning-replan:
   class: doc-write
-  does: [divergence-classification, measurement, stop-test, changelog]
+  does: [divergence-classification, measurement, stop-test, close-out, changelog]
   not:
     - what: "judging a plan before any work started"
       go: planning-review
     - what: "a change in the problem rather than the path"
       go: planning-frame
-  signals: [reality diverges, divergence, stop test, dated changelog, what changed and why]
+  signals: [reality diverges, divergence, stop test, close-out scoring, dated changelog, what changed and why]

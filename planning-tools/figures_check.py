@@ -170,9 +170,12 @@ def check_merge(fx) -> int:
         got = num(r[1])
         if not near(got, want, 2):
             fail("merge", f"k={r[0]}: page says {got}, model gives {want:.2f}")
-        # A dash is the page declining to state a slip; anything else that does
-        # not parse is a figure that stopped being checked.
+        # One chain is the reference the slips are measured from, so it alone
+        # may decline to state one; a dash anywhere else is a figure that
+        # stopped being checked.
         if r[2].strip("* ") in ("—", "–", "-"):
+            if r[0] != "1":
+                fail("merge", f"k={r[0]} slip: page states none, model gives {want - mean:+.2f}")
             continue
         slip = num(r[2])
         if not near(slip, want - mean, 2):

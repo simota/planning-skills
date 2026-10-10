@@ -404,8 +404,10 @@ def strip_delivered(text: str) -> str:
 def v21_verify_names_a_grade():
     for d in SKILL_DIRS:
         body = strip_delivered(sections(read(d / "SKILL.md")).get("Verify with", ""))
-        # The tag, not the word: "verified" is inside "unverified".
-        if not any(f"[{g}]" in body for g in VOCAB["evidence_levels"]):
+        # The tag, not the word: "verified" is inside "unverified". The tag may
+        # carry its pointer, `[verified: <pointer>]`, as the contract writes it.
+        if not any(re.search(rf"\[{re.escape(g)}(?=[\]:])", body)
+                   for g in VOCAB["evidence_levels"]):
             fail("V21", f"{d.name} Verify with names no evidence grade of its own; "
                         "the delivered block does not count")
 

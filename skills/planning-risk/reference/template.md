@@ -10,7 +10,7 @@ Verified: 2026-08-21 — no automated check.
 # <initiative> — Risks
 > Status: draft
 > Updated: YYYY-MM-DD
-> Tier: S | M | L
+> Tier: M | L   <!-- S writes no files (_planning/SIZING.md) -->
 
 ## Pre-mortem
 <past-tense failure narrative>
@@ -25,7 +25,7 @@ Verified: 2026-08-21 — no automated check.
 <!-- all seven; "no material risk" is a valid status -->
 
 ## Mitigation tasks
-| Risk | Task | Owner | Estimated? |
+| Risk | Task proposal (unnumbered) | Owner | Estimated? |
 |---|---|---|---|
 
 ## Rollback
@@ -34,4 +34,14 @@ Verified: 2026-08-21 — no automated check.
 ## Abort conditions
 | Observable state | Cost of stopping there |
 |---|---|
+
+## Open questions
+| ID | Question | Gates | Who answers |
+|---|---|---|---|
+<!-- includes UNASSIGNED owners -->
+
+## Reclassified assumptions
+| ID | Assumption | Cost if wrong |
+|---|---|---|
+<!-- a "risk" with no detection signal, handed back to verify -->
 ```

@@ -10,7 +10,7 @@ Verified: 2026-08-21 — no automated check.
 # <initiative> — Changelog
 > Status: draft
 > Updated: YYYY-MM-DD
-> Tier: S | M | L
+> Tier: M | L   <!-- S writes no files (_planning/SIZING.md) -->
 
 ## YYYY-MM-DD — <trigger in one line>
 
@@ -20,18 +20,18 @@ Verified: 2026-08-21 — no automated check.
 <!-- before any prose; Delta against the midpoint; Source is the export, artifact or person -->
 
 ### Ranges scored
-| ID | Original range | Actual | Outcome | Ratio |
-|---|---|---|---|---|
-<!-- every range this divergence closed, on the original, never the revision -->
+| ID | Unit (effort / elapsed) | Original range | Actual | Outcome | Ratio |
+|---|---|---|---|---|---|
+<!-- every range this divergence (or, at close-out, the finished work) closed, on the original, never the revision -->
 
 ### Continue or stop
 | Option | Remaining cost (range) | Remaining value | Salvageable |
 |---|---|---|---|
 | Continue | | | |
 | Stop | | | |
-<!-- when continuation is in question; a record-only entry writes "not priced: record-only" -->
+<!-- when continuation is in question; a record-only entry writes "not priced: record-only", a close-out "not priced: close-out" -->
 
-- Class: <divergence class> (`course-correct` key: <key>)
+- Class: <divergence class> (`course-correct` key: <key>) — a close-out writes `close-out` and omits Changed, Superseded and Revised commitment
 - Measured: <the gap, as a number>
 - Changed: <artifacts and IDs>
 - Superseded: <file> → <replacement>

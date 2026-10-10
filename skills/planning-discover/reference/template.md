@@ -10,14 +10,14 @@ Verified: 2026-08-21 — no automated check.
 # <initiative> — Context
 > Status: draft
 > Updated: YYYY-MM-DD
-> Tier: S | M | L
+> Tier: M | L   <!-- S writes no files (_planning/SIZING.md) -->
 > Timebox: <budget> — <spent>
 
 ## Assumption queue
 | ID | Assumption | Status | Evidence | Cost if wrong |
 |---|---|---|---|---|
-<!-- every A-n from 00-brief.md, plus any added here. Status: verified / falsified / open (Q-n) / unverified.
-     The status lives here: 00-brief.md is not edited downstream. Count: received n · verified n · falsified n · open n · unverified n · added n -->
+<!-- every A-n from 00-brief.md, plus any added here. Status: verified / falsified / open (Q-n) / assumed (costed; no check was within reach — a cheap load-bearing one fires gate 3).
+     The status lives here: 00-brief.md is not edited downstream. Count: received n · verified n · falsified n · open n · assumed n · added n -->
 
 ## Verified facts
 | Fact | Evidence | Informs |

@@ -56,7 +56,7 @@ are in its `checks` playbook.
 
 ## Residuals
 
-Anything left behind is classified and appears in the handoff's `open` list — at `S`, which has no handoff, in the brief.
+Anything left behind is classified and appears in the handoff's `open` list — at `S`, which has no handoff, listed in the inline brief with its class.
 
 | Class | Means | Lives as |
 |---|---|---|

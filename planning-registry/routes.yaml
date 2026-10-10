@@ -2,7 +2,8 @@
 #
 # These are route templates, not a universal workflow. Enter the phase whose
 # input is missing; repeat only phases whose decisions a new finding invalidates.
-# A pre-execution repair is not post-start replanning.
+# A pre-execution repair is not post-start replanning. In any chain, task
+# proposals from planning-risk re-enter decompose (and estimate) before review.
 
 full-plan:
   pattern: linear
@@ -53,6 +54,12 @@ course-correct:
     materialized-risk: planning-risk
     record-only: none
     stop: none
+
+close-out:
+  pattern: report-only
+  when: "the work finished, within its forecast or not"
+  chain: [planning-replan]
+  stops_at: "every range scored on its original in changelog.md; nothing re-enters"
 
 review-to-ready:
   pattern: loop

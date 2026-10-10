@@ -4,7 +4,7 @@
 Binding on every `planning-*` skill that produces, revises, or reviews an
 estimate. A range is a claim about the future, and a claim nobody ever settles
 is not a forecast — it is a mood. **Every range is scored once the work it
-covered is done, and the score stays in the plan: `35-estimate.md`, else `changelog.md`.**
+covered is done; `planning-replan` records it in `changelog.md`, at a divergence or at close-out.**
 
 ## The failure this prevents
 
@@ -53,7 +53,7 @@ record.
 ## Carrying it forward
 
 The record lives with the plan, and the next estimate for the same kind of work
-reads the scored ranges in `plans/*/`. It is applied as a stated adjustment or not at all — never as a
+reads the scored ranges in `plans/*/changelog.md`. It is applied as a stated adjustment or not at all — never as a
 silent multiplier, and never before there are enough scored ranges to see a
 direction rather than a run of luck. Three is not enough. Say the count.
 

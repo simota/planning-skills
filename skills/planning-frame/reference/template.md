@@ -11,6 +11,7 @@ Verified: 2026-08-21 — no automated check.
 > Status: draft
 > Updated: YYYY-MM-DD
 > Tier: S | M | L
+> Delivers: <the artifact set for the declared tier>
 
 ## Problem
 <one sentence, no "and">
@@ -54,4 +55,5 @@ Verified: 2026-08-21 — no automated check.
 ## Open questions
 | ID | Question | Blocking? | Who answers |
 |---|---|---|---|
+<!-- artifact Q-n. The handoff's brief.open_questions holds only an unsettled goal, tier, or excludes -->
 ```

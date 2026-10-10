@@ -10,7 +10,7 @@ Verified: 2026-08-21 — no automated check.
 # <initiative> — Plan
 > Status: draft
 > Updated: YYYY-MM-DD
-> Tier: S | M | L
+> Tier: M | L   <!-- S writes no files (_planning/SIZING.md) -->
 > Implements: D-n | none (approach decided before planning — by whom)
 
 ## Tasks
@@ -31,8 +31,8 @@ T-1 → T-3 → T-7
 1. T-1 — <why first>
 
 ## Parallelizable
-| Set | Coordination cost |
-|---|---|
+| Set | Coordination cost | Flagged for estimate's σ check? |
+|---|---|---|
 
 ## Non-deployable windows
 | Between | Length (tasks) | Why |

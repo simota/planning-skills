@@ -15,8 +15,8 @@ Phases: `SLICE → VERIFY → LINK → SEQUENCE → MARK`.
 
 ## Before starting
 
-- **Confirm the approach is chosen.** Slicing before choosing plans work that
-  may not happen, and the sunk effort argues for the approach afterwards
+- **Confirm the approach is chosen** — a `D-n` (a draft is enough) or the person's
+  stated choice. Slicing first plans work that may not happen
 - **Take the goals from the brief.** A task serving no `G-n` is cut, or
   justified in writing as enabling work
 - **Stop splitting when a subtask could not be handed to a different person
@@ -52,7 +52,7 @@ Phases: `SLICE → VERIFY → LINK → SEQUENCE → MARK`.
 | Choosing the order | **Retire the largest uncertainty first**, never bottom-up. Layer-by-layer order defers all integration risk to the end, where it is most expensive |
 | A step would leave the system undeployable | Mark the window explicitly and state its length in tasks — how long in time is `planning-estimate`'s. An unmarked one is discovered during the deploy |
 | A task has no dependencies | `none` is a valid, deliberate answer. An empty column is not the same as a considered one |
-| Calling a parallel track non-critical | Do not call it here: name the track and hand the call to `planning-estimate`, which measures the gap in the track's own spread. A short but wildly-varying track decides the date far more often than a long tight one |
+| Calling a parallel track non-critical | Mark the critical path provisionally, by task count and size, and flag any parallel track of similar length for `planning-estimate` to confirm in σ. A short but wildly-varying track decides the date far more often than a long tight one |
 | You are tempted to write hours | Relative task size (`S`/`M`/`L` — a task's size, not the plan's tier) is allowed here; hours and dates are a different phase |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over

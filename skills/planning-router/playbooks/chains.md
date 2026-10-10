@@ -16,7 +16,7 @@ The recurring chains, with their control structure, are `registry/routes.yaml`; 
 | Request shape | Tier | Chain |
 |---------------|------|-------|
 | Small reversible change, approach obvious | `S` | `planning-frame` only, inline brief |
-| Feature with a known approach | `M` | `frame → decompose → estimate` |
+| Feature with a known approach | `M` | `frame → decompose → estimate`; insert `discover` after frame when the brief carries a cheap load-bearing `A-n` |
 | Feature with a contested approach | `M` | `frame → discover → options → decompose → estimate` |
 | Feature with a contested approach, multi-owner or hard to reverse | `L` | `frame → discover → options → decompose → estimate → risk → review` |
 | Migration, rewrite, or irreversible change | `L` | Full chain; `risk` and `review` mandatory |
@@ -24,5 +24,6 @@ The recurring chains, with their control structure, are `registry/routes.yaml`; 
 | Deadline is fixed, scope is not | `M`/`L` | `frame → options` (options over *scope*, not approach) `→ decompose → estimate`; `L` continues to `risk → review` |
 | Plan exists, reality diverged | The plan's declared tier | `planning-replan` alone; re-enter the chain only where it points |
 | Plan exists, needs sign-off | The plan's declared tier | `planning-review` alone |
+| Work finished | The plan's declared tier | `planning-replan` alone, to score every range (`close-out`) |
 
 Any chain classified `L` ends in `risk → review`. A tier-`L` chain that stops at `estimate` hands an unreviewed irreversible plan to execution — the failure `planning-review` exists to prevent.

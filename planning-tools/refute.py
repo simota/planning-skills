@@ -142,6 +142,14 @@ def main() -> int:
     if not isinstance(claims, list) or not claims:
         print(f"{a.claims} holds no claims", file=sys.stderr)
         return 2
+    # A claim with no text would reach the engines as a question about nothing.
+    bad = [i for i, c in enumerate(claims)
+           if not (isinstance(c, dict) and isinstance(c.get("id"), str)
+                   and isinstance(c.get("claim"), str) and c["claim"].strip())]
+    if bad:
+        print(f"{a.claims}: entries {bad} need a string id and a non-empty claim",
+              file=sys.stderr)
+        return 2
     try:
         pool = refuters(a.running)
     except engine.EngineError as e:
