@@ -2,7 +2,7 @@
 
 Nine agent skills covering the planning loop, the contracts they share, and the
 budgets that keep the set from growing into something nobody can route through.
-Each skill owns one phase and produces one artifact.
+Each phase skill owns one phase and produces one artifact; the router produces none.
 
 **No planning skill writes code or modifies application files.** Output is
 documents under `plans/<slug>/` in the host project.
@@ -32,9 +32,9 @@ like a fact.
 
 **Over-planning is a failure of the same weight as under-planning.** The tier
 (`S` / `M` / `L`) is read off the work and declared at the top, and the planning
-gate stops a run before it starts — a goal that needs "and", no measurable
-criterion, a cheap unverified assumption, or a person who has already decided
-and is asking for execution.
+gate stops a run at the phase that owns the condition — a goal that needs "and",
+no measurable criterion, a cheap unverified assumption, a person who has already
+decided and is asking for execution, or a term with two meanings.
 
 **A range nobody ever scores is not a forecast.** Estimating in ranges already
 sounds rigorous, so the practice survives without being checked: ranges are
@@ -74,7 +74,7 @@ sections change when the artifact set does — carries no line budget, and state
 its purpose and a checked-on date instead.
 
 **Where the set does arithmetic, the arithmetic is measured.**
-`sizing.md` defined σ per task and the estimate template asked for a critical
+[`sizing`](skills/planning-estimate/playbooks/sizing.md) defined σ per task and the estimate template asked for a critical
 path total; nothing joined them, and the obvious route — add the optimistic
 values, add the pessimistic ones — puts both endpoints outside the achievable
 range. Twelve tasks of `[2/3/8]` sum to `24 … 96`, where the simulated p10–p90
@@ -113,8 +113,7 @@ linked.
 named `_planning` and `registry`. Relative paths are normalised *lexically*, so
 `../_planning/X.md` written inside a `SKILL.md` does not travel back through the
 install symlink — a shell follows the link and finds the file, which is what
-makes this fail quietly. Seventeen such references were what this set carried
-before.
+makes this fail quietly.
 
 ## Files
 
@@ -127,6 +126,7 @@ before.
 | [`skills/_planning/VALUES.md`](skills/_planning/VALUES.md) | The order when two goods conflict, and the escape hatch |
 | [`skills/_planning/ROUTING.md`](skills/_planning/ROUTING.md) | Guidance. Which phase owns the call when two could take it |
 | [`skills/_planning/REPORT.md`](skills/_planning/REPORT.md) | What a person reads: the order, the ceiling per tier, and why the artifacts are the record |
+| [`skills/_planning/CALIBRATION.md`](skills/_planning/CALIBRATION.md) | Scoring every range once its work closes, and carrying the record forward |
 
 ## Layout
 
@@ -136,7 +136,7 @@ planning-skills/
 ├── Makefile
 ├── .claude-plugin/plugin.json    # named by the plugin format
 ├── planning-registry/            # budgets, boundaries, routes, delivered blocks
-├── planning-tools/               # validate · test_validate · render · pre-commit
+├── planning-tools/               # validate · tests · render · figures · refute · pre-commit
 └── skills/                       # named by the plugin format: skills live here
     ├── _planning/                # contracts in force on every run
     └── planning-<phase>/
@@ -145,13 +145,13 @@ planning-skills/
         ├── _planning -> ../_planning
         ├── registry  -> ../../planning-registry
         ├── playbooks/            # judgement. Budgeted, and must not rot
-        └── reference/            # the artifact template. No line budget, dated
+        └── reference/            # the artifact template and what goes stale. No line budget, dated
 ```
 
 ## Working on it
 
 ```sh
-make check      # what CI runs: the rules, then proof the rules still fire
+make check      # what CI runs: the rules, proof they still fire, and the figures
 make render     # after editing anything in planning-registry/delivered/
 make hooks      # run the rules on every commit
 ```
@@ -164,7 +164,7 @@ with the phases.
 **As individual skills.**
 
 ```sh
-make link                       # into ~/.claude/skills
+make link                       # into each installed CLI: claude, codex, agy
 make link CLAUDE_DIR=.claude/skills
 ```
 
