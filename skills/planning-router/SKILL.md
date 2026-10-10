@@ -20,7 +20,8 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
   reason. The tier decides the artifact set, and a chain chosen before the tier
   plans work nobody asked for
 - **Apply gate conditions 1, 4 and 5 here, never 2 or 3** — the goal that needs
-  "and", the already-decided request, and an ambiguous term. Conditions 2 and 3
+  "and", the already-decided request, and an ambiguous term — its answer goes to
+  the brief's `terms`, and `planning-frame` writes the glossary. Conditions 2 and 3
   describe artifacts that do not exist until later phases have run, and halting
   on them would block the very work this skill exists to start
 <!-- deliver:sizing -->
@@ -115,7 +116,8 @@ which is why the skip list is part of the deliverable rather than a footnote.
 
 The tier is declared with its reason, the chain is named with every skip
 explained, each phase run at `M` or `L` returned a handoff (at `S`, the inline
-brief came back), and the artifacts on disk match the set the tier requires.
+brief came back), and the artifacts on disk match the set the tier requires —
+or the run reports `PARTIAL` naming what is missing.
 <!-- deliver:surface -->
 - **Say what the moment needs.** Start: one line naming what will be planned, what is
   excluded, and the tier. Mid-run: a line when the reader must act now — a discovered constraint

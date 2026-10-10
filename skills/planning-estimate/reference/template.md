@@ -44,6 +44,8 @@ Confidence: High | Medium | Low (<reason>)
 Actual recorded by: <owner>
 | ID | Range | Midpoint | Actual | Outcome | Ratio |
 |---|---|---|---|---|---|
-<!-- one row per range, O … P; Midpoint = (O + P) / 2. Actual, Outcome and Ratio
-     stay `—` until the work closes; then Outcome per `_planning/CALIBRATION.md` -->
+<!-- one row per task range (O … P) and one for the critical-path total (p10 … p90);
+     only the total counts toward the 80% rate. Midpoint = (low + high) / 2. Actual,
+     Outcome and Ratio stay `—` here: once the work closes, planning-replan scores
+     each row in changelog.md (_planning/CALIBRATION.md) -->
 ```

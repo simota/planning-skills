@@ -16,8 +16,8 @@ Verified: 2026-08-21 — no automated check.
 ## Assumption queue
 | ID | Assumption | Status | Evidence | Cost if wrong |
 |---|---|---|---|---|
-<!-- every A-n from 00-brief.md, plus any added here. Status: verified / falsified / open (Q-n) / unverified.
-     The status lives here: 00-brief.md is not edited downstream. Count: received n · verified n · falsified n · open n · unverified n · added n -->
+<!-- every A-n from 00-brief.md, plus any added here. Status: verified / falsified / open (Q-n) / assumed (costed; no check was within reach — a cheap load-bearing one fires gate 3).
+     The status lives here: 00-brief.md is not edited downstream. Count: received n · verified n · falsified n · open n · assumed n · added n -->
 
 ## Verified facts
 | Fact | Evidence | Informs |

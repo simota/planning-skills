@@ -54,4 +54,5 @@ Verified: 2026-08-21 — no automated check.
 ## Open questions
 | ID | Question | Blocking? | Who answers |
 |---|---|---|---|
+<!-- artifact Q-n. The handoff's brief.open_questions holds only an unsettled goal, tier, or excludes -->
 ```

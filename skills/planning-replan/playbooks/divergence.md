@@ -15,7 +15,7 @@ The `course-correct` key is what `registry/routes.yaml` re-enters on; the class 
 | Changed goal | `goal` | The problem itself moved | Re-frame. Everything downstream is suspect. | `planning-frame` |
 | Wrong approach | `approach` | The chosen `O-n` is not working on contact | Revisit the decision; check its `Revisit when` trigger | `planning-options` |
 | Record-only | `record-only` | A task missed its range and no future decision changes | Score the original range, record the actual; nothing re-enters | none |
-| Stop | `stop` | The stop test below answers "no" to question 4 | Recommend stopping, name what is salvageable; the user decides | none |
+| Stop | `stop` | The stop test below answers "no" to question 4 — this replaces the cause's class, which is recorded as context | Recommend stopping, name what is salvageable; the user decides | none |
 
 Misclassification is the expensive failure here: treating missing work as estimation error produces a wider buffer and the same surprise next week.
 

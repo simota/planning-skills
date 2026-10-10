@@ -56,7 +56,7 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
 | An assumption turns out false | Say so loudly and name what it invalidates upstream. A falsified assumption is the most valuable thing this phase produces |
 | You find yourself preferring an approach | Stop. Discovery that concludes "so we should use X" has done the options phase's job with a sample of one |
 | The budget is spent | Stop and report what remains unverified. Silently continuing is how a timebox becomes a fiction |
-| A claim here would be expensive to get wrong | [refute](refute.py) — `python3 <this skill's directory>/refute.py --running <this engine> plans/<slug>/claims.json` puts it to the engines that did not make it, asked to break it. `REFUTED` or `CONTESTED` stays `[assumed]`; unrefuted is n engines finding nothing, never proof |
+| A claim here would be expensive to get wrong | [refute](refute.py) — `python3 <this skill's directory>/refute.py --running <this engine> <scratch>/claims.json` — a working file, never under `plans/`, puts it to the engines that did not make it, asked to break it. `REFUTED` or `CONTESTED` stays `[assumed]`; unrefuted is n engines finding nothing, never proof |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
   completeness · mechanism over intent · **deciding over deferring** ·
@@ -73,7 +73,8 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
 - Always: rank unknowns by **decision impact**, not by how interesting they are
 - Always: state what was not verified, as its own section. A context document
   silent about its gaps reads as complete
-- Never: modify a file outside `plans/<slug>/`, or run a command with side effects
+- Never: write anything but `10-context.md` and, above `S`, `.agents/glossary.md`,
+  or run a command with side effects
 - Never: recommend an approach, or score one
 - Never: report a finding whose command you did not run. Reconstructed output is
   `[assumed]` at best
@@ -84,7 +85,7 @@ This is the phase where `[verified]` is actually earned: a claim is `verified`
 only with the pointer that produced it, and everything else is `[assumed]` with
 an `A-n` or `[unknown]` with a `Q-n`.
 
-- **Count the queue.** Verified + falsified + open + unverified = received +
+- **Count the queue.** Verified + falsified + open + assumed = received +
   added — the sum is what the next phase is standing on
 <!-- deliver:report -->
 - **Tag every factual claim in a decision-bearing section**, exactly one:
@@ -116,7 +117,8 @@ an `A-n` or `[unknown]` with a `Q-n`.
 ## Done when
 
 Every queued assumption is verified, falsified, converted to a ranked unknown,
-or left `[assumed]` with its cost under Not verified; every finding carries a
+or left `[assumed]` with its cost where no check was within reach (a cheap
+load-bearing one fires gate 3), listed under Not verified; every finding carries a
 pointer; and no approach has been preferred.
 <!-- deliver:surface -->
 - **Say what the moment needs.** Start: one line naming what will be planned, what is

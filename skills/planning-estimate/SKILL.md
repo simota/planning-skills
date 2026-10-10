@@ -52,6 +52,7 @@ Phases: `REFERENCE → SIZE → AGGREGATE → BUFFER → STRESS`.
 | Effort and calendar time are being conflated | Separate them. **Two days of work spanning a review cycle and a weekly deploy is two days of effort and eight days of elapsed time** — this is the most common scheduling error there is |
 | Combining task ranges into a total | [aggregation](reference/aggregation.md) — **means add, σ adds in quadrature.** Summing the pessimistic values put the total at p100 in every simulated run |
 | Several tracks run in parallel | They do not add, and they do not take the longest either: everything must finish, so the merge lands on the slowest draw. Eight equal chains slipped the p50 by 20% with none of them late ([aggregation](reference/aggregation.md)) |
+| `planning-decompose` flagged a parallel track | Confirm or overturn its non-critical mark by the gap in the track's own σ ([aggregation](reference/aggregation.md) § Non-critical) |
 | Someone wants the number lower | Reducing scope changes the estimate. Wishing does not. Offer the scope cut, not a smaller number |
 | The range is uncomfortably wide | That is information. Narrowing it without new facts is fabrication |
 | The estimate is written and about to be handed over | Write the scoring row with the outcome blank — task, range, midpoint, `—` until the work closes (`open` is a result, not a placeholder) and who records the actual. **A calibration record starts as blanks in the estimate**, because nobody creates it later |
