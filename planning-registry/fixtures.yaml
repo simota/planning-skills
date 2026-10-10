@@ -40,3 +40,5 @@
   expect: planning-replan
 - ask: "apply the stop test and write the dated changelog"
   expect: planning-replan
+- ask: "the work finished on time, do the close-out scoring of every range"
+  expect: planning-replan

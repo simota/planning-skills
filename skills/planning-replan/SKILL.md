@@ -1,6 +1,6 @@
 ---
 name: planning-replan
-description: "Deciding what a plan becomes once reality diverges: classifying the divergence, measuring it, the stop test, and a dated changelog of what changed and why."
+description: "Deciding what a plan becomes once reality diverges: classifying the divergence, measuring it, the stop test, close-out scoring, and a dated changelog of what changed and why."
 allowed-tools: Read, Grep, Glob, Write, Edit
 ---
 <!-- planning:contract -->
@@ -13,6 +13,7 @@ a plan that met its forecast is scored too. A pre-start edit is not a replan: it
 and is priced like any other option.**
 
 Phases: `MEASURE → CLASSIFY → PRICE → CORRECT → RECORD`.
+Close-out: `MEASURE → SCORE → RECORD` — finished work carries no class and nothing is priced or corrected.
 
 ## Before starting
 
@@ -71,7 +72,7 @@ Phases: `MEASURE → CLASSIFY → PRICE → CORRECT → RECORD`.
 ## Always / Never
 
 - Always: state planned versus actual in a table before any prose
-- Always: classify into exactly one primary cause
+- Always: classify a divergence into exactly one primary cause
 - Always: append to the changelog and **never rewrite history**. A superseded
   artifact is marked superseded with a pointer to what replaced it, not deleted
 - Always: preserve IDs. **Renumbering breaks every reference the changelog
@@ -120,7 +121,7 @@ from memory is the one that gets classified wrong**: memory reconstructs the cau
 
 ## Done when
 
-Planned versus actual is tabulated, the divergence carries exactly one class,
+Planned versus actual is tabulated, a divergence carries exactly one class (a close-out none),
 continuing and stopping are priced when continuation is in question, the correction touches the minimum
 surface, IDs are preserved, and the changelog entry is dated with its trigger.
 <!-- deliver:surface -->
