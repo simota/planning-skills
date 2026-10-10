@@ -19,10 +19,10 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
 - **Classify the tier first and state it in the first three lines**, with its
   reason. The tier decides the artifact set, and a chain chosen before the tier
   plans work nobody asked for
-- **Apply only gate conditions 1 and 4 here** — the goal that needs "and", and
-  the already-decided request. Conditions 2 and 3 describe artifacts that do not
-  exist until later phases have run, and halting on them would block the very
-  work this skill exists to start
+- **Apply gate conditions 1, 4 and 5 here, never 2 or 3** — the goal that needs
+  "and", the already-decided request, and an ambiguous term. Conditions 2 and 3
+  describe artifacts that do not exist until later phases have run, and halting
+  on them would block the very work this skill exists to start
 <!-- deliver:sizing -->
 - **Declare the tier before anything else**, read off the work and stated at the
   top of the deliverable. `S` — under a day, reversible: one brief in the
@@ -51,7 +51,7 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
 | Picking the chain | [chains](playbooks/chains.md) — the canonical order, and the shortest path through it |
 | About to dispatch | [traps](playbooks/traps.md) |
 | A phase's output would not change any decision | Skip it, and **name the skipped phases and why**. A silent skip and a considered one read identically in the output |
-| The user has already chosen the approach | Skip the options phase and say so. Manufacturing alternatives to look thorough costs a phase and buys nothing |
+| The user has already chosen the approach | Run options in decided mode — record the `D-n`, attack it once — and say so. Manufacturing alternatives to look thorough costs a phase and buys nothing |
 | The goal needs "and" to state | Stop. Two goals are two briefs, and splitting them is the work rather than a preliminary to it |
 | The request is actually asking for execution | Stop and say so. A plan written for a decided question is pure cost |
 | A finding invalidates an earlier decision | Return to its owning phase. Before execution this is a phase revisit, not replan; after work starts use the divergence classification. Recheck decisions that used the changed input, preserving unaffected work and IDs |
@@ -114,8 +114,8 @@ which is why the skip list is part of the deliverable rather than a footnote.
 ## Done when
 
 The tier is declared with its reason, the chain is named with every skip
-explained, each phase returned a handoff, and the artifacts on disk match the
-set the tier requires.
+explained, each phase run at `M` or `L` returned a handoff (at `S`, the inline
+brief came back), and the artifacts on disk match the set the tier requires.
 <!-- deliver:surface -->
 - **Say what the moment needs.** Start: one line naming what will be planned and what
   is excluded. Mid-run: a line when the reader must act now — a discovered constraint

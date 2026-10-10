@@ -30,7 +30,7 @@ No `planning-*` skill proceeds past its own phase while its own gate conditions 
 | 4 | The user has already decided and is actually asking for execution | `planning-router`, or whichever skill is invoked directly | Immediately |
 | 5 | A term in the request or the plan carries two meanings, or one concept goes by two names, and the host's glossary does not settle it | Whichever skill meets it first | When first met — one question with its default (§ Terms) |
 
-`planning-router` checks only conditions 1 and 4 before dispatch — conditions 2 and 3 describe artifacts that do not exist until `planning-frame` and `planning-discover` have run, and halting on them up front would block the request the router exists to serve.
+`planning-router` checks conditions 1, 4 and 5 before dispatch, never 2 or 3 — those describe artifacts that do not exist until `planning-frame` and `planning-discover` have run, and halting on them up front would block the request the router exists to serve.
 
 ## The brief the gate produces
 
