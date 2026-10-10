@@ -10,7 +10,7 @@ The `course-correct` key is what `registry/routes.yaml` re-enters on; the class 
 | Estimation error | `estimate` | Work is what was planned and takes longer, or only capacity (headcount, availability) moved | Re-estimate, widen buffer, recalibrate the reference class | `planning-estimate` |
 | Missing work | `dependency` | Tasks appearing that were never in the plan | Re-decompose; ask why the slicing missed them | `planning-decompose` |
 | Falsified assumption | `evidence` | An `A-n` turned out false | Verify related assumptions, then reconsider the decision it fed | `planning-discover` → `planning-options` |
-| Materialized risk | `materialized-risk` | An `R-n` came true | Execute the mitigation; re-price the remaining register | `planning-risk` |
+| Materialized risk | `materialized-risk` | An `R-n` came true | The mitigation's owner executes it; risk re-prices the remaining register | `planning-risk` |
 | Changed constraint | `constraint` | A deadline, budget, or other agreed `C-n` in the brief moved | Re-scope against the new `C-n` | `planning-frame` → `planning-options` |
 | Changed goal | `goal` | The problem itself moved | Re-frame. Everything downstream is suspect. | `planning-frame` |
 | Wrong approach | `approach` | The chosen `O-n` is not working on contact | Revisit the decision; check its `Revisit when` trigger | `planning-options` |

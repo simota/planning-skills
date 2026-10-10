@@ -11,6 +11,7 @@ Verified: 2026-08-21 — no automated check.
 > Status: draft
 > Updated: YYYY-MM-DD
 > Tier: S | M | L
+> Delivers: <the artifact set for the declared tier>
 
 ## Problem
 <one sentence, no "and">

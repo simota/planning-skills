@@ -15,8 +15,8 @@ Phases: `SLICE → VERIFY → LINK → SEQUENCE → MARK`.
 
 ## Before starting
 
-- **Confirm the approach is chosen.** Slicing before choosing plans work that
-  may not happen, and the sunk effort argues for the approach afterwards
+- **Confirm the approach is chosen** — a `D-n`, draft is enough, or the person's
+  stated choice. Slicing first plans work that may not happen
 - **Take the goals from the brief.** A task serving no `G-n` is cut, or
   justified in writing as enabling work
 - **Stop splitting when a subtask could not be handed to a different person

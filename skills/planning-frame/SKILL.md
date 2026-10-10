@@ -46,6 +46,7 @@ Phases: `INTERROGATE → STATE → BOUND → CRITERIA → CONSTRAIN`.
 
 | Situation | How to proceed |
 |---|---|
+| The tier is `S` | The brief inline: the `_planning/SIZING.md` fields plus one line each for goal, non-goal and criterion. No file, no `> Status`, no empty sections |
 | Interrogating a vague request | [shape](playbooks/shape.md) — the probes, and the shape a criterion has to take |
 | Writing the deliverable | [template](reference/template.md) — downstream phases parse these headings |
 | About to write the brief | [traps](playbooks/traps.md) |

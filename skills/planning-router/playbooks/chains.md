@@ -16,7 +16,7 @@ The recurring chains, with their control structure, are `registry/routes.yaml`; 
 | Request shape | Tier | Chain |
 |---------------|------|-------|
 | Small reversible change, approach obvious | `S` | `planning-frame` only, inline brief |
-| Feature with a known approach | `M` | `frame → decompose → estimate` |
+| Feature with a known approach | `M` | `frame → decompose → estimate`; insert `discover` after frame when the brief carries a cheap load-bearing `A-n` |
 | Feature with a contested approach | `M` | `frame → discover → options → decompose → estimate` |
 | Feature with a contested approach, multi-owner or hard to reverse | `L` | `frame → discover → options → decompose → estimate → risk → review` |
 | Migration, rewrite, or irreversible change | `L` | Full chain; `risk` and `review` mandatory |

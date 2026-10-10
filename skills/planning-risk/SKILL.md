@@ -51,7 +51,7 @@ Phases: `PREMORTEM → CATEGORIZE → SCORE → DETECT → MITIGATE → ABORT`.
 | About to score | [traps](playbooks/traps.md) |
 | A risk has no detection signal | It is undetectable, so it is not a risk — reclassify it as an assumption to verify and hand it back |
 | No named person is available to own a mitigation | Write `UNASSIGNED [unknown]` with a `Q-n` asking who takes it and by when. **Never invent a name**: a fabricated owner survives into execution and nobody notices until the risk fires |
-| A mitigation changes the plan | Emit it as an **unnumbered task proposal**, not a `T-n`. Task numbering, the graph and the critical path belong to the decomposition phase |
+| A mitigation changes the plan | Emit it as an **unnumbered task proposal**, not a `T-n`, and set the handoff's `next` to `planning-decompose` (then estimate) before review. Task numbering, the graph and the critical path belong to the decomposition phase |
 | A category has nothing in it | Record "no material risk" explicitly. **An omitted category reads as an overlooked one** |
 | The likelihood is a feeling | Give the basis or drop the number. A likelihood with no basis is a guess wearing a number |
 <!-- deliver:values -->

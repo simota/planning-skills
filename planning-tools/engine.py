@@ -40,6 +40,7 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
@@ -77,15 +78,36 @@ _TYPES = {"object": dict, "array": list, "string": str, "boolean": bool,
           "null": type(None), "number": (int, float), "integer": int}
 
 
+# What conforms() checks, and what it may ignore. Any other keyword is refused
+# rather than skipped: a constraint nobody checks reads as one that held.
+_CHECKED = {"type", "enum", "const", "required", "properties", "additionalProperties",
+            "items", "allOf", "anyOf", "oneOf", "not", "minLength", "maxLength",
+            "pattern", "minimum", "maximum", "minItems", "maxItems"}
+_ANNOTATIONS = {"$schema", "$id", "title", "description", "default", "examples",
+                "$comment"}
+
+
+def _same(a, b) -> bool:
+    """JSON equality: true is not 1, and 1 is 1.0."""
+    if isinstance(a, bool) or isinstance(b, bool):
+        return isinstance(a, bool) and isinstance(b, bool) and a == b
+    return a == b
+
+
 def conforms(schema: dict, value, at: str = "$") -> str | None:
-    """The first way `value` breaks `schema`, or None. Types, required keys,
-    enums and combinators — enough to refuse a malformed verdict, no dependency.
+    """The first way `value` breaks `schema`, or None — no dependency.
 
     The engines claim to enforce the schema themselves; this is not trusting
     that, because a wrong-shaped answer read as a verdict is a verdict nobody gave.
+    A schema keyword outside `_CHECKED` raises: a partial validator that passed
+    what it could not check would be the green run that verified nothing.
     """
     if not isinstance(schema, dict):
         return None
+    unknown = set(schema) - _CHECKED - _ANNOTATIONS
+    if unknown:
+        raise EngineError(f"schema at {at} uses {sorted(unknown)}, which this "
+                          "check does not implement; extend conforms() first")
     want = schema.get("type")
     if want:
         types = want if isinstance(want, list) else [want]
@@ -94,8 +116,22 @@ def conforms(schema: dict, value, at: str = "$") -> str | None:
                    and not (t in ("number", "integer") and isinstance(value, bool))
                    for t in types):
             return f"{at} is {type(value).__name__}, schema wants {want}"
-    if "enum" in schema and value not in schema["enum"]:
+    if "const" in schema and not _same(value, schema["const"]):
+        return f"{at} is {value!r}, not {schema['const']!r}"
+    if "enum" in schema and not any(_same(value, e) for e in schema["enum"]):
         return f"{at} is {value!r}, not one of {schema['enum']}"
+    if isinstance(value, str):
+        if len(value) < schema.get("minLength", 0):
+            return f"{at} is shorter than {schema['minLength']}"
+        if "maxLength" in schema and len(value) > schema["maxLength"]:
+            return f"{at} is longer than {schema['maxLength']}"
+        if "pattern" in schema and not re.search(schema["pattern"], value):
+            return f"{at} does not match {schema['pattern']!r}"
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        if "minimum" in schema and value < schema["minimum"]:
+            return f"{at} is below {schema['minimum']}"
+        if "maximum" in schema and value > schema["maximum"]:
+            return f"{at} is above {schema['maximum']}"
     if isinstance(value, dict):
         for k in schema.get("required") or []:
             if k not in value:
@@ -108,11 +144,18 @@ def conforms(schema: dict, value, at: str = "$") -> str | None:
                     return why
             elif schema.get("additionalProperties") is False:
                 return f"{at} carries {k!r}, which the schema does not allow"
-    if isinstance(value, list) and isinstance(schema.get("items"), dict):
-        for i, v in enumerate(value):
-            why = conforms(schema["items"], v, f"{at}[{i}]")
-            if why:
-                return why
+    if isinstance(value, list):
+        if len(value) < schema.get("minItems", 0):
+            return f"{at} has fewer than {schema['minItems']} items"
+        if "maxItems" in schema and len(value) > schema["maxItems"]:
+            return f"{at} has more than {schema['maxItems']} items"
+        if isinstance(schema.get("items"), dict):
+            for i, v in enumerate(value):
+                why = conforms(schema["items"], v, f"{at}[{i}]")
+                if why:
+                    return why
+    if "not" in schema and conforms(schema["not"], value, at) is None:
+        return f"{at} matches a schema it must not"
     for s in schema.get("allOf") or []:
         why = conforms(s, value, at)
         if why:

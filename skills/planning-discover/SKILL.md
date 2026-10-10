@@ -73,8 +73,8 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
 - Always: rank unknowns by **decision impact**, not by how interesting they are
 - Always: state what was not verified, as its own section. A context document
   silent about its gaps reads as complete
-- Never: write anything but `10-context.md` and, above `S`, `.agents/glossary.md`,
-  or run a command with side effects
+- Never: write anything but `10-context.md`, above `S` `.agents/glossary.md`, and
+  refute's scratch file outside `plans/`, or run a command with side effects
 - Never: recommend an approach, or score one
 - Never: report a finding whose command you did not run. Reconstructed output is
   `[assumed]` at best

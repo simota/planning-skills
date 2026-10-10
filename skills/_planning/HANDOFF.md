@@ -46,11 +46,11 @@ next: "<the skill that should receive this, or none>"
 
 ## What the receiver checks before starting
 
-1. Is a whole `brief` attached, with every field present? A subset is a brief
-   that lost a constraint in transit
+1. Is a whole `brief` attached, with every field present? A subset lost a constraint
+   in transit; a later session with none rebuilds it from `00-brief.md`, IDs from the files
 2. Is everything produced allowed by the declared `tier`, and can the chain still reach its minimum set?
-3. Does `open` hold a `BLOCKED` or `UNVERIFIED`? Stop dependent work; send the
-   named failed check to its repair owner, or to the human for a required decision
+3. Does `open` hold a `BLOCKED` or `UNVERIFIED`? Stop dependent work — `planning-review`
+   instead records each as a finding and issues its verdict — and send it to its owner
 4. Does every file in `produced` exist, and does every decision-bearing claim in
    it carry a tag?
 5. Does `ids_added` cover every ID the artifacts introduced? Continue from there,
@@ -63,6 +63,6 @@ next: "<the skill that should receive this, or none>"
 A send-back **names the check that failed and the field it failed on**. Without
 that, the same handoff returns unchanged and the round trip bought nothing.
 
-**After two round-trips on the same handoff, hand back to the human.** Being
+**After two round-trips on the same handoff, hand back to the human** (a loop route keeps its `max_cycles`). Being
 rejected twice points at the brief or at how the phases were divided, not at the
 plan.
