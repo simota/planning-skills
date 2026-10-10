@@ -65,7 +65,8 @@ figures-rewrite:
 # repository, and `core.hooksPath` moves them anywhere.
 hooks:
 	@dir=$$(git rev-parse --git-path hooks) && mkdir -p "$$dir" && \
-		cp planning-tools/githooks/pre-commit "$$dir/pre-commit" && \
+		{ [ "$$dir/pre-commit" -ef planning-tools/githooks/pre-commit ] || \
+		  cp planning-tools/githooks/pre-commit "$$dir/pre-commit"; } && \
 		chmod +x "$$dir/pre-commit" && echo "pre-commit installed in $$dir"
 
 # A skill is a directory holding a SKILL.md, under skills/ where the plugin

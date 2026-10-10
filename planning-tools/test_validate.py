@@ -22,6 +22,17 @@ sys.dont_write_bytecode = True                     # no __pycache__ in the tools
 import validate                                    # noqa: E402  — for RULES only
 
 
+def _untracked(src: str, names: list[str]) -> set[str]:
+    """What the copy leaves behind. The copy has no git, so V28 there counts
+    every dot-directory as shipped: a local `.venv` carried across would make
+    every case report V28 and let a broken V28 pass on that noise."""
+    skip = {".git", "__pycache__"}
+    if Path(src) == ROOT:
+        skip |= {n for n in names if n.startswith(".") and (ROOT / n).is_dir()
+                 and not validate._tracked(ROOT / n)}
+    return skip
+
+
 def run(root: Path) -> subprocess.CompletedProcess:
     return subprocess.run([sys.executable, str(root / "planning-tools" / "validate.py")],
                           capture_output=True, text=True, encoding="utf-8")
@@ -421,8 +432,7 @@ def main() -> int:
     for rule, mutate in CASES.items():
         with tempfile.TemporaryDirectory() as tmp:
             copy = Path(tmp) / "repo"
-            shutil.copytree(ROOT, copy, symlinks=True,
-                            ignore=shutil.ignore_patterns(".git", "__pycache__"))
+            shutil.copytree(ROOT, copy, symlinks=True, ignore=_untracked)
             mutate(copy)
             r = run(copy)
             out = r.stdout + r.stderr
