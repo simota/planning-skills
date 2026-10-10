@@ -40,7 +40,7 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
   written down is the cheapest scope control there is (`_planning/SIZING.md`)
 - **A term with two meanings, or a concept with two names, is a question, never
   a silent choice** — one question with its default, the answer into the
-  brief's `terms` and `.agents/glossary.md`, and the glossary's names only from
+  brief's `terms` and, above `S`, `.agents/glossary.md`; the glossary's names from
   then on (`_planning/SIZING.md` § Terms)
 <!-- /deliver:sizing -->
 
@@ -96,13 +96,13 @@ an `A-n` or `[unknown]` with a `Q-n`.
   confidence with a one-line reason. `Low` on a load-bearing item is a blocking
   finding, not a footnote
 - **Report `status`**: `DONE` (every claim tagged, every load-bearing assumption
-  verified or costed, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
+  verified or costed past reach, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
 - **Every residual is `BLOCKED` / `OUT-OF-SCOPE` / `DEFERRED` / `UNVERIFIED`**
-  and appears in the handoff's `open` with its `A-n` or `Q-n`. `UNVERIFIED` is
+  and appears in the handoff's `open` with its `A-n`, `Q-n` or note. `UNVERIFIED` is
   the one that matters: every other class is visible in the plan, while **an
   unverified assumption reads exactly like a fact**
 - **Never omit the sweep** — markers against `open`, claims against claims
-  tagged: `swept, 0 markers; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
+  tagged: `swept, 0 markers / 0 in open; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
 <!-- /deliver:report -->
 <!-- deliver:score -->
 - **A range is scored, or it never meant anything.** Whatever was given one

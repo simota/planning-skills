@@ -11,7 +11,7 @@
 | 4 | Decision integrity | A `D-n` has no deciding factor, no reversal cost, or no revisit trigger |
 | 5 | Dependency soundness | The graph has a cycle, or a coupling from `planning-decompose`'s **Dependency Discovery** table (same file, shared/schema/deploy/reviewer/backfill/external) is unaddressed |
 | 6 | Verifiable done | A `T-n` done condition is not observable by a third party |
-| 7 | Estimate honesty | A point estimate appears, a confidence level or its reason is missing, buffer is hidden, or elapsed time is conflated with effort |
+| 7 | Estimate honesty | A point estimate appears, a confidence level or its reason is missing, buffer is hidden, elapsed time is conflated with effort, or the calibration loop cannot close — no scoring row, or nobody named to record the actual |
 | 8 | Risk coverage | A category is unaddressed, a risk lacks a detection signal, or the rollback path fails the rehearsal rule below |
 | 9 | Shippability | A step leaves the system undeployable with no marked window |
 
@@ -31,11 +31,13 @@ Ask what the plan never mentions. In order of how often each turns out to matter
 
 ## Verdict Rules
 
-| Verdict | Condition |
-|---------|-----------|
-| All nine checks pass; no blocking findings; open `Q-n` are non-blocking | `READY` |
-| Findings exist but each has a named owner and a resolution that fits before the task it gates | `READY-WITH-CONDITIONS` |
-| Any check-1/2/3 failure, an unresolved `Q-n` on the critical path, or an irreversible step with no rollback | `NOT-READY` |
+Read top to bottom; the first row that holds is the verdict, so `NOT-READY` takes precedence.
+
+| Condition | Verdict |
+|-----------|---------|
+| Any check-1/2/3 failure; any failed check or blocking finding with no named owner, or whose resolution cannot land before the task it gates; an unresolved `Q-n` on the critical path; or an irreversible step with no rollback | `NOT-READY` |
+| Failed checks or blocking findings exist, and each has a named owner and a resolution that lands before the task it gates | `READY-WITH-CONDITIONS` |
+| All nine checks pass or are not-applicable-because; no blocking findings; open `Q-n` are non-blocking | `READY` |
 
 The three words are defined once, in `_planning/CONTRACT.md` § Readiness; this table says which the checks produce.
 

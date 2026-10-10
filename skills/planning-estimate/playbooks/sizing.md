@@ -7,7 +7,7 @@
 |--------|--------------------|----------|
 | Three-point (PERT) | `(O + 4L + P) / 6`, σ = `(P − O) / 6` | Default for individual tasks |
 | Reference class | Look up actuals for similar past work; adjust | Comparable history exists — always prefer this |
-| T-shirt + throughput | Map `S`/`M`/`L` to observed cycle times | Team has flow data |
+| T-shirt + throughput | Map the plan's task sizes `S`/`M`/`L` (not the tier) to observed cycle times | Team has flow data |
 | Decomposition check | Estimate the whole, estimate the parts, compare | The two disagree by >2× → the breakdown is wrong |
 | Timeboxed spike | Fix the budget instead of estimating the unknown | A `Q-n` makes estimation meaningless |
 
@@ -23,6 +23,8 @@ Buffer covers estimation error. It does not cover risk with a named cause — th
 | Familiar domain, new specifics | Same system, new feature | 25–40% |
 | Unfamiliar system or stack | No reference class | 50–100% |
 | Open `Q-n` on the critical path | A decision is still pending | Do not schedule. Estimate the spike, re-estimate after. |
+
+The percentage is of the critical-path effort p50 (`mean` in [aggregation](../reference/aggregation.md)). A p80 or p90 already prices the spread of the ranges, so buffer on top of a percentile counts the same uncertainty twice: commit to p50 plus buffer, or to a named percentile, never both.
 
 Buffer sits at the project level, not per task. Per-task buffer is consumed by Parkinson's law; project-level buffer is visible when it is being spent.
 

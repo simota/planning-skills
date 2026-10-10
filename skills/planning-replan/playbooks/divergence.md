@@ -3,37 +3,41 @@
 
 ## Divergence Classes
 
-| Class | Signal | Correction surface | Skill |
-|-------|--------|-------------------|-------|
-| Estimation error | Work is what was planned; it takes longer | Re-estimate, widen buffer, recalibrate the reference class | `planning-estimate` |
-| Missing work | Tasks appearing that were never in the plan | Re-decompose; ask why the slicing missed them | `planning-decompose` |
-| Falsified assumption | An `A-n` turned out false | Verify related assumptions, then reconsider the decision it fed | `planning-discover` → `planning-options` |
-| Materialized risk | An `R-n` came true | Execute the mitigation; re-price the remaining register | `planning-risk` |
-| Changed constraint | Deadline, budget, or headcount moved | Re-scope against the new `C-n` | `planning-frame` → `planning-options` |
-| Changed goal | The problem itself moved | Re-frame. Everything downstream is suspect. | `planning-frame` |
-| Wrong approach | The chosen `O-n` is not working on contact | Revisit the decision; check its `Revisit when` trigger | `planning-options` |
+The `course-correct` key is what `registry/routes.yaml` re-enters on; the class name is for the reader.
+
+| Class | `course-correct` key | Signal | Correction surface | Skill |
+|-------|----------------------|--------|-------------------|-------|
+| Estimation error | `estimate` | Work is what was planned and takes longer, or only capacity (headcount, availability) moved | Re-estimate, widen buffer, recalibrate the reference class | `planning-estimate` |
+| Missing work | `dependency` | Tasks appearing that were never in the plan | Re-decompose; ask why the slicing missed them | `planning-decompose` |
+| Falsified assumption | `evidence` | An `A-n` turned out false | Verify related assumptions, then reconsider the decision it fed | `planning-discover` → `planning-options` |
+| Materialized risk | `materialized-risk` | An `R-n` came true | Execute the mitigation; re-price the remaining register | `planning-risk` |
+| Changed constraint | `constraint` | A deadline, budget, or other agreed `C-n` in the brief moved | Re-scope against the new `C-n` | `planning-frame` → `planning-options` |
+| Changed goal | `goal` | The problem itself moved | Re-frame. Everything downstream is suspect. | `planning-frame` |
+| Wrong approach | `approach` | The chosen `O-n` is not working on contact | Revisit the decision; check its `Revisit when` trigger | `planning-options` |
+| Record-only | `record-only` | A task missed its range and no future decision changes | Score the original range, record the actual; nothing re-enters | none |
+| Stop | `stop` | The stop test below answers "no" to question 4 | Recommend stopping, name what is salvageable; the user decides | none |
 
 Misclassification is the expensive failure here: treating missing work as estimation error produces a wider buffer and the same surprise next week.
 
 ## Divergence Measurement
 
-Planned, Actual, and Delta use **one unit throughout** — the same effort or elapsed unit `35-estimate.md` used. Never mix a T-shirt size into a numeric delta: `+2` against `S → L` is unreadable as days, size steps, or percent, and the 30% stop-test threshold cannot be computed from it.
+Planned, Actual, and Delta use **one unit throughout** — the same effort or elapsed unit `35-estimate.md` used. Planned is the original range; **Delta and % are taken against its midpoint, `(low + high) / 2`** — the same midpoint the calibration ratio uses. Never mix a T-shirt size into a numeric delta: `+2` against `S → L` is unreadable as days, size steps, or percent, and the 30% stop-test threshold cannot be computed from it.
 
 ```
-| ID  | Planned (d) | Actual (d) | Delta | %    | Status |
-|-----|-------------|------------|-------|------|--------|
-| T-1 | 2.0         | 2.0        | 0     | 0%   | done   |
-| T-4 | 1.0         | 3.0        | +2.0  | +200%| done   |
-| T-7 | 2.0         | —          | —     | —    | blocked (Q-3) |
+| ID  | Planned (d) | Midpoint | Actual (d) | Delta | %    | Status |
+|-----|-------------|----------|------------|-------|------|--------|
+| T-1 | 1.5–2.5     | 2.0      | 2.0        | 0     | 0%   | done   |
+| T-4 | 0.5–1.5     | 1.0      | 3.0        | +2.0  | +200%| done   |
+| T-7 | 1.5–2.5     | 2.0      | —          | —     | —    | blocked (Q-3) |
 ```
 
-When the plan was sized in T-shirts only, convert first: pull the observed cycle-time range per size from `35-estimate.md` and state the mapping used (`S = 0.5–1d, M = 1–3d, L = 3–8d`). An unconverted table cannot feed the stop test.
+When the plan was sized in T-shirts only, convert first and state the mapping used. Take it from the team's observed cycle times per size where `35-estimate.md` or flow data records them. Where neither exists — the usual case at tier `M`, which has no estimate file — state the mapping as `[assumed]` with an `A-n`, inside the half-a-day-to-two-days slice `planning-decompose` cuts to: `S = 0.5–1d, M = 1–1.5d, L = 1.5–2d`. An unconverted table cannot feed the stop test.
 
 Then project: at the observed rate, the remaining critical path finishes in `[range]`. Compare against the committed date and state the gap as a number before discussing it.
 
 ## The Stop Test
 
-Run it on every replan where the delta exceeds 30% of the original estimate. Answer all four:
+Run it when the projected finish — critical-path actuals to date plus the remaining critical path at the observed rate — exceeds the original critical-path total by more than 30%, both taken at their midpoints. One task's delta alone never triggers it: with the path unmoved, that is `record-only`. Answer all four:
 
 1. What is the remaining cost, as a range?
 2. What is the remaining value, given what is now known? (Not the value assumed at planning time.)

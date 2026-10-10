@@ -10,11 +10,12 @@ Verified: 2026-08-21 — no automated check.
 # <initiative> — Plan
 > Status: draft
 > Updated: YYYY-MM-DD
-> Implements: D-1
+> Tier: S | M | L
+> Implements: D-n | none (approach given in 00-brief.md)
 
 ## Tasks
 ### T-1: <imperative>
-- Serves / Depends on / Done when / Size / Deployable after
+- Serves / Depends on / Done when / Size (task size, not the tier) / Deployable after
 
 ## Dependency graph
 <!-- mermaid `graph LR` block, or text: T-1 -> T-2 -> T-5 -->
@@ -34,6 +35,6 @@ T-1 → T-3 → T-7
 |---|---|
 
 ## Non-deployable windows
-| Between | Length | Why |
+| Between | Length (tasks) | Why |
 |---|---|---|
 ```

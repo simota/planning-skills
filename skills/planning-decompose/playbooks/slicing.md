@@ -21,8 +21,8 @@ Splitting by layer (all models, then all handlers, then all UI) is the anti-patt
 - Serves: G-2
 - Depends on: T-1, T-3 (none = deliberate)
 - Done when: <observable condition>
-- Size: S | M | L
-- Deployable after: yes | no (<window length and why>)
+- Size: S | M | L   # relative task size, not the plan's tier
+- Deployable after: yes | no (<window length in tasks, and why>)
 - Risk note: <only if this task carries the plan's uncertainty>
 ```
 

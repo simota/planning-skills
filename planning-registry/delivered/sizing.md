@@ -14,5 +14,5 @@
   written down is the cheapest scope control there is (`_planning/SIZING.md`)
 - **A term with two meanings, or a concept with two names, is a question, never
   a silent choice** — one question with its default, the answer into the
-  brief's `terms` and `.agents/glossary.md`, and the glossary's names only from
+  brief's `terms` and, above `S`, `.agents/glossary.md`; the glossary's names from
   then on (`_planning/SIZING.md` § Terms)

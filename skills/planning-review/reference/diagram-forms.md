@@ -1,4 +1,6 @@
 <!-- planning:deferred -->
+# Diagram forms
+
 Purpose: the copy-paste form for each trigger, so a diagram costs a minute rather than a decision.
 Read when: a finding has hit one of the triggers and the shape is not obvious.
 Source: none — nothing outside this page can move what it states.
@@ -6,8 +8,6 @@ Verified: 2026-08-23 — no automated check reads the drawings. What is checked 
 that this page and `visualise` between them define every trigger, form and floor
 word the registry declares; a rule in `planning-tools/validate.py` re-runs that on
 every commit, so a word deleted from here fails the build.
-
-# Forms
 
 Four shapes cover almost everything. Pick by trigger, not by taste.
 
@@ -48,7 +48,7 @@ When two pieces of work were sequenced as though independent. Time to the right,
 the shared resource marked where they collide.
 
 ```
-team A   schema change ────────────┐
+team A   schema change ─────────────────┐
 team B          feature on old schema ──┴── ships
                                         ▲ B built against a schema A replaced
 ```

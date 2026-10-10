@@ -7,7 +7,7 @@ allowed-tools: Read, Grep, Glob, Write, Edit
 
 ## Owns
 
-Post-start divergence, classified and corrected at its owning phase. Pre-start edits return there directly. **Stopping stays on the table
+Post-start divergence, classified and corrected at its owning phase. A pre-start edit is not a replan: it goes straight to the phase that owns it. **Stopping stays on the table
 and is priced like any other option.**
 
 Phases: `MEASURE → CLASSIFY → PRICE → CORRECT → RECORD`.
@@ -39,7 +39,7 @@ Phases: `MEASURE → CLASSIFY → PRICE → CORRECT → RECORD`.
   written down is the cheapest scope control there is (`_planning/SIZING.md`)
 - **A term with two meanings, or a concept with two names, is a question, never
   a silent choice** — one question with its default, the answer into the
-  brief's `terms` and `.agents/glossary.md`, and the glossary's names only from
+  brief's `terms` and, above `S`, `.agents/glossary.md`; the glossary's names from
   then on (`_planning/SIZING.md` § Terms)
 <!-- /deliver:sizing -->
 
@@ -82,10 +82,10 @@ Phases: `MEASURE → CLASSIFY → PRICE → CORRECT → RECORD`.
 
 ## Verify with
 
-Planned-versus-actual is `[verified]` from the tracker, the commits, or the
-artifacts themselves, with pointers. **A divergence measured from memory is the
-one that gets classified wrong**, because memory reconstructs the cause it
-already believes.
+Planned-versus-actual is `[verified]` from a tracker or commit export saved as a
+file, the artifacts, or figures the person states — with pointers. This skill
+cannot query a tracker or run git, so ask for the export. **A divergence measured
+from memory is the one that gets classified wrong**: memory reconstructs the cause.
 
 - **When continuation is in question, price continuing and stopping.** A
   record-only variance needs neither branch priced; never invent costs to fill a table
@@ -99,13 +99,13 @@ already believes.
   confidence with a one-line reason. `Low` on a load-bearing item is a blocking
   finding, not a footnote
 - **Report `status`**: `DONE` (every claim tagged, every load-bearing assumption
-  verified or costed, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
+  verified or costed past reach, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
 - **Every residual is `BLOCKED` / `OUT-OF-SCOPE` / `DEFERRED` / `UNVERIFIED`**
-  and appears in the handoff's `open` with its `A-n` or `Q-n`. `UNVERIFIED` is
+  and appears in the handoff's `open` with its `A-n`, `Q-n` or note. `UNVERIFIED` is
   the one that matters: every other class is visible in the plan, while **an
   unverified assumption reads exactly like a fact**
 - **Never omit the sweep** — markers against `open`, claims against claims
-  tagged: `swept, 0 markers; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
+  tagged: `swept, 0 markers / 0 in open; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
 <!-- /deliver:report -->
 <!-- deliver:score -->
 - **A range is scored, or it never meant anything.** Whatever was given one

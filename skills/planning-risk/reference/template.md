@@ -10,13 +10,14 @@ Verified: 2026-08-21 — no automated check.
 # <initiative> — Risks
 > Status: draft
 > Updated: YYYY-MM-DD
+> Tier: S | M | L
 
 ## Pre-mortem
 <past-tense failure narrative>
 
 ## Register
 ### R-1: <failure>
-- Category / Likelihood / Impact / Detection / Threshold / Mitigation / Residual
+- Category / Likelihood / Impact / Score (L×I = n) / Detection / Threshold / Mitigation / Residual
 
 ## Category coverage
 | Category | Status |

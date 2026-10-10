@@ -22,21 +22,21 @@
 - Impact: High (<what it costs: users, money, time, trust>)
 - Detection: <the observable signal>
 - Threshold: <the value at which we act>
-- Mitigation: <avoid | reduce | transfer | accept> — <action> (owner: <name>) → T-7
+- Mitigation: <avoid | reduce | transfer | accept> — <action> (owner: <name>) → unnumbered task proposal to `planning-decompose`
 - Residual: <what remains after mitigation>
 ```
 
 ## Prioritization
 
-Map both axes to an ordinal scale — `Low = 1`, `Medium = 2`, `High = 3` — and order by the product (1–9). Ties break by impact first (a 1×3 outranks a 3×1: rare and severe beats frequent and cheap), then by detection lead time. State the pair and the product per risk (`R-3: M×H = 6`) so a second pass over the same register produces the same order.
+Map both axes to an ordinal scale — `Low = 1`, `Medium = 2`, `High = 3` — and order by the product (1–9). Ties break by impact first (a 1×3 outranks a 3×1: rare and severe beats frequent and cheap), then by detection lead time, shorter first. That is the whole ordering key. State the pair and the product per risk (`R-3: M×H = 6`) so a second pass over the same register produces the same order.
 
-Then reorder by detection lead time: a score-6 risk detectable a week ahead is calmer than a score-4 risk that surfaces only at failure.
+Lead time then shapes the handling, never the order: a score-6 risk detectable a week ahead keeps its place above a score-4 and gets a calmer response.
 
 | Detection lead time | Handling |
 |---------------------|----------|
 | Days before impact | Monitor; mitigation can stay contingent |
 | Hours before impact | Pre-build the mitigation; rehearse the response |
-| None — visible only as failure | Prevent, or build the detection first as a task |
+| None — visible only as failure | Not a risk yet: reclassify it as an assumption to verify, and propose the detection as an unnumbered task. It enters the register once the signal exists |
 
 ## Rollback Requirements
 

@@ -38,7 +38,7 @@ Phases: `SLICE → VERIFY → LINK → SEQUENCE → MARK`.
   written down is the cheapest scope control there is (`_planning/SIZING.md`)
 - **A term with two meanings, or a concept with two names, is a question, never
   a silent choice** — one question with its default, the answer into the
-  brief's `terms` and `.agents/glossary.md`, and the glossary's names only from
+  brief's `terms` and, above `S`, `.agents/glossary.md`; the glossary's names from
   then on (`_planning/SIZING.md` § Terms)
 <!-- /deliver:sizing -->
 
@@ -50,10 +50,10 @@ Phases: `SLICE → VERIFY → LINK → SEQUENCE → MARK`.
 | Writing the deliverable | [template](reference/template.md) |
 | About to sequence | [traps](playbooks/traps.md) |
 | Choosing the order | **Retire the largest uncertainty first**, never bottom-up. Layer-by-layer order defers all integration risk to the end, where it is most expensive |
-| A step would leave the system undeployable | Mark the window explicitly and state its length. An unmarked one is discovered during the deploy |
+| A step would leave the system undeployable | Mark the window explicitly and state its length in tasks — how long in time is `planning-estimate`'s. An unmarked one is discovered during the deploy |
 | A task has no dependencies | `none` is a valid, deliberate answer. An empty column is not the same as a considered one |
-| Calling a parallel track non-critical | Measure the gap in that track's own spread, not in days. A short but wildly-varying track decides the date far more often than a long tight one, and `planning-estimate` has the figures |
-| You are tempted to write hours | Relative size (`S`/`M`/`L`) is allowed here; hours and dates are a different phase |
+| Calling a parallel track non-critical | Do not call it here: name the track and hand the call to `planning-estimate`, which measures the gap in the track's own spread. A short but wildly-varying track decides the date far more often than a long tight one |
+| You are tempted to write hours | Relative task size (`S`/`M`/`L` — a task's size, not the plan's tier) is allowed here; hours and dates are a different phase |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
   completeness · mechanism over intent · **deciding over deferring** ·
@@ -71,7 +71,8 @@ Phases: `SLICE → VERIFY → LINK → SEQUENCE → MARK`.
 - Always: give every `T-n` an explicit dependency list and the `G-n` it serves
 - Always: identify and mark the critical path. **Tasks off it are the
   parallelisation budget**, and naming them is what makes parallel work possible
-- Always: slice to roughly half a day to two days of work
+- Always: slice to roughly half a day to two days of work — a granularity target
+  for the slicer, never a duration written against a task
 - Never: estimate durations
 - Never: create a task that serves no goal without justifying it as enabling work
 - Never: sequence to match the architecture diagram. The diagram is a picture of
@@ -96,13 +97,13 @@ serial one on the first day.
   confidence with a one-line reason. `Low` on a load-bearing item is a blocking
   finding, not a footnote
 - **Report `status`**: `DONE` (every claim tagged, every load-bearing assumption
-  verified or costed, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
+  verified or costed past reach, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
 - **Every residual is `BLOCKED` / `OUT-OF-SCOPE` / `DEFERRED` / `UNVERIFIED`**
-  and appears in the handoff's `open` with its `A-n` or `Q-n`. `UNVERIFIED` is
+  and appears in the handoff's `open` with its `A-n`, `Q-n` or note. `UNVERIFIED` is
   the one that matters: every other class is visible in the plan, while **an
   unverified assumption reads exactly like a fact**
 - **Never omit the sweep** — markers against `open`, claims against claims
-  tagged: `swept, 0 markers; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
+  tagged: `swept, 0 markers / 0 in open; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
 <!-- /deliver:report -->
 <!-- deliver:score -->
 - **A range is scored, or it never meant anything.** Whatever was given one
@@ -115,9 +116,9 @@ serial one on the first day.
 
 ## Done when
 
-Every task has an observable done condition, an explicit dependency list, and a
-goal it serves; the critical path is marked; every non-deployable window is
-named with its length; and no duration appears anywhere.
+Every task has an observable done condition, an explicit dependency list, a
+goal and a relative size; the critical path is marked; every non-deployable
+window is named with its length in tasks; and no task carries a duration.
 <!-- deliver:surface -->
 - **Say what the moment needs.** Start: one line naming what will be planned and what
   is excluded. Mid-run: a line when the reader must act now — a discovered constraint

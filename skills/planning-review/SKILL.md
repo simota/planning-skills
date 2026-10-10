@@ -40,7 +40,7 @@ Phases: `TRACE → AUDIT → ATTACK → VERDICT`.
   written down is the cheapest scope control there is (`_planning/SIZING.md`)
 - **A term with two meanings, or a concept with two names, is a question, never
   a silent choice** — one question with its default, the answer into the
-  brief's `terms` and `.agents/glossary.md`, and the glossary's names only from
+  brief's `terms` and, above `S`, `.agents/glossary.md`; the glossary's names from
   then on (`_planning/SIZING.md` § Terms)
 <!-- /deliver:sizing -->
 
@@ -57,7 +57,7 @@ Phases: `TRACE → AUDIT → ATTACK → VERDICT`.
 | The plan never mentions something | That is the silence audit, and it is where the authors' blind spots are. Absence is the finding |
 | You can see how to fix it | Say what would fix it and hand it to the owning phase. Fixing it yourself ends the review |
 | The verdict is conditional | Each condition gets an owner and a trigger, or it is not a condition |
-| The plan carries an estimate | Check the calibration loop is closable: a scoring row exists, and the plan names who records the actual. **An estimate nobody will score is a readiness finding**, not a style one |
+| The plan carries an estimate | Check the calibration loop is closable — it is part of check 7: a scoring row exists, and the plan names who records the actual. **An estimate nobody will score is a readiness finding**, not a style one |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
   completeness · mechanism over intent · **deciding over deferring** ·
@@ -101,13 +101,13 @@ finding was worth.
   confidence with a one-line reason. `Low` on a load-bearing item is a blocking
   finding, not a footnote
 - **Report `status`**: `DONE` (every claim tagged, every load-bearing assumption
-  verified or costed, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
+  verified or costed past reach, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
 - **Every residual is `BLOCKED` / `OUT-OF-SCOPE` / `DEFERRED` / `UNVERIFIED`**
-  and appears in the handoff's `open` with its `A-n` or `Q-n`. `UNVERIFIED` is
+  and appears in the handoff's `open` with its `A-n`, `Q-n` or note. `UNVERIFIED` is
   the one that matters: every other class is visible in the plan, while **an
   unverified assumption reads exactly like a fact**
 - **Never omit the sweep** — markers against `open`, claims against claims
-  tagged: `swept, 0 markers; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
+  tagged: `swept, 0 markers / 0 in open; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
 <!-- /deliver:report -->
 <!-- deliver:score -->
 - **A range is scored, or it never meant anything.** Whatever was given one
