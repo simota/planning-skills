@@ -54,13 +54,13 @@ Before execution, return findings to their owning phase, then check only decisio
 that used the changed input. `review-to-ready` repairs at that owner and reviews again.
 
 Where a stage repeats until a condition holds — `review-to-ready` is the one
-that does — the entry carries the stopping condition, the judge, and a hard
-cycle limit. **The judge is never the skill that produced the plan.**
+that does — the entry carries the stopping condition (`oracle`), the `checker`,
+and a hard cycle limit. **The checker is never the engine or skill that produced the plan.**
 
 ## Rules for running a chain
 
 - **Settle the brief before the first stage**, including the tier. Every stage
-  receives it whole and it does not change mid-run (`_planning/SIZING.md`)
+  receives it whole, changed only by framing with human re-agreement (`_planning/SIZING.md`)
 - **A stage's output is a handoff** (`_planning/HANDOFF.md`), and the next stage
   runs the seven receiver checks before starting
 - **IDs continue across stages.** A receiver that renumbers has broken every

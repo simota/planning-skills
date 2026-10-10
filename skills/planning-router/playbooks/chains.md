@@ -11,6 +11,8 @@ replan selects the minimum correction surface; only affected decisions are revis
 
 ## Chain Selection
 
+The recurring chains, with their control structure, are `registry/routes.yaml`; this table is how to pick one.
+
 | Request shape | Tier | Chain |
 |---------------|------|-------|
 | Small reversible change, approach obvious | `S` | `planning-frame` only, inline brief |

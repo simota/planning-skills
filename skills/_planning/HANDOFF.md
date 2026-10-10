@@ -18,7 +18,7 @@ brief:                        # every field of the brief in _planning/SIZING.md
   delivers: "<the artifact set for the declared tier>"
   tier: S | M | L
   excludes: [...]             # may not be empty
-  open_questions: []          # must be empty; a non-empty one never travels
+  open_questions: []          # the brief's own; must be empty to travel. Artifact Q-n may stay open
   terms: {}                   # the names this run used, as the glossary spells them
 status: DONE                  # DONE | PARTIAL | BLOCKED  (_planning/CONTRACT.md)
 produced: ["plans/<slug>/30-plan.md"]        # the files, not a description of them
@@ -48,7 +48,7 @@ next: "<the skill that should receive this, or none>"
 
 1. Is a whole `brief` attached, with every field present? A subset is a brief
    that lost a constraint in transit
-2. Does the declared `tier` match the artifact set actually produced?
+2. Is everything produced allowed by the declared `tier`, and can the chain still reach its minimum set?
 3. Does `open` hold a `BLOCKED` or `UNVERIFIED`? Stop dependent work; send the
    named failed check to its repair owner, or to the human for a required decision
 4. Does every file in `produced` exist, and does every decision-bearing claim in

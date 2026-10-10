@@ -3,7 +3,7 @@
 
 ## Artifact layout
 
-All planning output lives under `plans/<slug>/`, where `<slug>` is a kebab-case name for the initiative.
+All planning output lives under `plans/<slug>/`, where `<slug>` is a kebab-case name for the initiative. The one write outside it is the host's `.agents/glossary.md` (`_planning/SIZING.md` § Terms), never at `S`.
 
 | File | Owner skill | Content |
 |------|-------------|---------|
@@ -31,7 +31,7 @@ Every planning object gets a stable ID. IDs are never reused or renumbered; a dr
 | `NG-n` | Non-goal | `planning-frame` |
 | `SC-n` | Success criterion (measurable) | `planning-frame` |
 | `C-n` | Constraint | `planning-frame` / `planning-discover` |
-| `A-n` | Assumption | `planning-frame` (initial numbering) / `planning-discover` (adds, verifies, updates status) |
+| `A-n` | Assumption | `planning-frame` (initial numbering) / `planning-discover` (verifies; status in `10-context.md`) / any (adds) |
 | `Q-n` | Open question | any |
 | `O-n` | Option | `planning-options` |
 | `D-n` | Decision | `planning-options` |
@@ -42,7 +42,7 @@ Every planning object gets a stable ID. IDs are never reused or renumbered; a dr
 
 Cross-reference by ID, not by prose: `T-4 (serves G-2, blocked by T-1)` beats a paragraph.
 
-Re-running a phase continues the existing sequence — it never restarts at 1. A second `planning-review` pass on the same plan numbers its findings `F-4, F-5, …` after the first pass's `F-1..F-3`, and marks superseded ones `(resolved in <date>)` rather than reusing the number.
+Re-running a phase continues the existing sequence — it never restarts at 1. A second `planning-review` pass on the same plan numbers its findings `F-4, F-5, …` after the first pass's `F-1..F-3`, and marks resolved ones `(resolved in <date>)` rather than reusing the number.
 
 ## Decision record shape
 

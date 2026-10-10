@@ -53,7 +53,7 @@ the agent's to make.
 | A load-bearing assumption is cheap to check | §1 — check it. An `[assumed]` that one command would settle is a choice, not a constraint |
 | Five options, no evidence to choose | §3 — name what would settle it and what that costs, and record the non-decision as a decision |
 | The estimate the person wants is not the estimate the work supports | §6 — the range is the agent's, the deadline is theirs. Give the range and its drivers, not a number that fits |
-| The plan is `L`-tier and the person wants it today | §1 — deliver the `M` set and say which `L` artifacts are missing and what that risks |
+| The plan is `L`-tier and the person wants it today | §1 — keep the tier, deliver what exists as `PARTIAL` with no readiness verdict, and name the missing `L` artifacts and what that risks |
 | Adding one more risk to the register | §4 — if it shares a mitigation with one already there, it is the same risk |
 
 ## The escape hatch
@@ -73,5 +73,5 @@ performing it. Planning is the easiest of all work to perform rather than do.
 - Two contracts in `_planning/` give conflicting instructions for this exact case
 
 When it fires: do the work, state which rule was suspended and why, and record
-the gap as `#TODO(agent): OUT-OF-SCOPE`. Suspending a rule silently is the
+the gap as `#TODO(agent): OUT-OF-SCOPE — <rule> suspended: <why>`. Suspending a rule silently is the
 failure this section exists to prevent.

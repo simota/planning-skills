@@ -25,7 +25,7 @@ noise at the next.**
 
 | Moment | What it owes | Ceiling |
 |---|---|---|
-| **Start** | What will be done and what is excluded, with the tier if it is not obvious | one line |
+| **Start** | What will be done and what is excluded, with the tier | one line |
 | **A question** | The one decision that is blocked, and the default taken if nobody answers | one question, one line |
 | **Mid-run** | A line when the reader must act now: a divergence from what was agreed, a path found blocked, work that would grow the scope, a discovered constraint that invalidates the plan being written | one line each |
 | **End** | The report below | the ceiling below |
@@ -39,19 +39,19 @@ comes.
 1. **The answer, one line.** The status and what was decided, with the tier. A
    reader who stops after this line has the result
 2. **The evidence, one line.** The sweep (`_planning/CONTRACT.md`), which
-   already carries the counts: `swept, 0 markers; 22 claims / 22 tagged`
+   already carries the counts: `swept, 0 markers / 0 in open; 22 claims / 22 tagged`
 3. **What is unresolved** — one line per residual that needs a human decision.
-   `BLOCKED` and `UNVERIFIED` always, and any `unknown` a decision waits on.
+   `BLOCKED` and `UNVERIFIED` always, and any `[unknown]` a decision waits on.
    `DEFERRED` and `OUT-OF-SCOPE` are in the handoff and named here only if the
    reader would act on them today
 4. **What is next** — one line, or nothing if the answer is nothing
 
-A run with nothing unresolved reports lines 1 and 2 and stops.
+A run with nothing unresolved reports lines 1 and 2, then line 4 if there is a next step.
 
 ## Ceiling
 
 An `S` report is the brief, and the brief is already short. An `M` or `L`
-report is the four lines above plus the artifacts by name: long enough to be
+report is the lines above plus the artifacts by name: long enough to be
 read to the end, and no longer. A reader who stops after the first line has
 the result.
 
@@ -84,8 +84,8 @@ options, at whatever length that takes. **Cut noise, never risk.**
 - A restatement of the request, or of what the run was about to plan
 - A closing summary of what was just said
 - Tasks the plan already lists, or options the options file already weighed
-- Confidence about a `verified` claim nobody doubted, or hedging on an
-  `assumed` one that changes no decision
+- Confidence about a `[verified]` claim nobody doubted, or hedging on an
+  `[assumed]` one that changes no decision
 
 ## Asked for more
 

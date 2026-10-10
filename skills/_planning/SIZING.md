@@ -16,7 +16,7 @@ Match depth to stakes. Declare the tier at the top of the deliverable.
 | `M` | Multi-day, single owner | `00-brief.md` + `30-plan.md` | `10-context.md`, `20-options.md`, `35-estimate.md` |
 | `L` | Multi-week or multi-owner, or hard to reverse | Full artifact set, ending in `40-risks.md` + `50-review.md` | — |
 
-These are minimum sets, not exact ones: a chain that runs `planning-estimate` produces `35-estimate.md` at any tier. `L` is the exception — `40-risks.md` and a `planning-review` verdict are mandatory, never optional.
+These are minimum sets, not exact ones: a chain that runs `planning-estimate` produces `35-estimate.md` at `M` or `L`. `L` is the exception — `40-risks.md` and a `planning-review` verdict are mandatory, never optional.
 
 ## The planning gate
 

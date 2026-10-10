@@ -6,7 +6,7 @@
 
 full-plan:
   pattern: linear
-  when: "multi-week or hard to reverse, nothing decided yet"
+  when: "multi-week, multi-owner, or hard to reverse, nothing decided yet"
   chain: [planning-frame, planning-discover, planning-options, planning-decompose, planning-estimate, planning-risk, planning-review]
   gate: "the goal fits in one sentence without 'and' before anything else runs"
 
@@ -60,6 +60,7 @@ review-to-ready:
   chain: [planning-review]
   repair:
     goal: planning-frame
+    constraint: planning-frame     # the agreed brief changes, so it is re-agreed there
     evidence: planning-discover
     decision: planning-options
     dependency: planning-decompose

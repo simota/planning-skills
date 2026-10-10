@@ -14,8 +14,8 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
 
 ## Before starting
 
-- **Read `registry/capabilities.yaml` before choosing.** Routing from memory is
-  how a request lands on the phase whose name it happened to use
+- **Read `registry/capabilities.yaml` and `registry/routes.yaml` before choosing.**
+  Routing from memory is how a request lands on the phase whose name it used
 - **Classify the tier first and state it in the first three lines**, with its
   reason. The tier decides the artifact set, and a chain chosen before the tier
   plans work nobody asked for
@@ -70,7 +70,7 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
   running anything
 - Always: distinguish lifecycle from phase order. A pre-start revisit does not
   invoke replan; a post-start divergence selects its owner, not a fixed next phase
-- Always: pass the brief whole to every stage. It does not change mid-chain
+- Always: pass the brief whole to every stage. It changes only through framing
 - Never: write an artifact. This skill dispatches; the phases produce
 - Never: run a phase to make the chain look complete
 - Never: work around a gate that fired. Report it

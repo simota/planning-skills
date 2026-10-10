@@ -26,7 +26,7 @@ hurry, is the failure this tag scheme exists to catch.
 ## Confidence and ranges
 
 - **Never emit a single-point estimate.** Use `[optimistic / likely /
-  pessimistic]` or an explicit range
+  pessimistic]` or an explicit range; the ends are p10 and p90 unless stated
 - Attach `High | Medium | Low` confidence to every estimate, option score, and
   risk likelihood, with a one-line reason
 - **`Low` confidence on a load-bearing item is a blocking finding**, not a footnote
@@ -35,9 +35,9 @@ hurry, is the failure this tag scheme exists to catch.
 
 | Status | Condition |
 |---|---|
-| `DONE` | Every claim tagged, every load-bearing assumption either verified or costed, zero `UNVERIFIED` |
+| `DONE` | Every claim tagged, every load-bearing assumption verified — or costed where no check was within reach — zero `UNVERIFIED` |
 | `PARTIAL` | Everything else that produced work — a single `UNVERIFIED` lands here |
-| `BLOCKED` | Could not proceed. Say what was tried and what stopped it. A planning gate that fired lands here |
+| `BLOCKED` | Could not proceed. Say what was tried and what stopped it. A planning gate that fired lands here, and outranks `PARTIAL` |
 
 Falling short is reported as falling short. **A plan that reaches `DONE` by
 dropping a question is the failure mode of this whole set**: the question does
@@ -56,14 +56,14 @@ are in its `checks` playbook.
 
 ## Residuals
 
-Anything left behind is classified and appears in the handoff's `open` list.
+Anything left behind is classified and appears in the handoff's `open` list — at `S`, which has no handoff, in the brief.
 
 | Class | Means | Lives as |
 |---|---|---|
 | `BLOCKED` | Wanted, attempted, prevented | a note in the deliverable |
-| `OUT-OF-SCOPE` | Found during the work, outside what was agreed. Named, not planned | `NG-n` if it is a non-goal, otherwise a note |
+| `OUT-OF-SCOPE` | Found during the work, outside what was agreed. Named, not planned | `NG-n` if framing makes it one, otherwise a note |
 | `DEFERRED` | In scope, deliberately postponed, with the condition to resume named | `Q-n` with the trigger |
-| `UNVERIFIED` | A load-bearing assumption nobody checked | `A-n` with its cost of being wrong |
+| `UNVERIFIED` | A load-bearing assumption nobody checked, though a check was within reach | `A-n` with its cost of being wrong |
 
 `UNVERIFIED` is the one that matters here. **Every other class is visible in the
 plan; an unverified assumption reads exactly like a fact.**
