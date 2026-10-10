@@ -15,9 +15,9 @@ skills_dir: skills
 platform_dirs: [.git, .github, .claude, .claude-plugin, skills, docs]
 
 limits:
-  skill_md_lines: 145         # derived, not chosen: 90 for the skill's own words plus
-                              # the 59 lines of delivered contract every file in this
-                              # set now carries, the last 17 of them the sixth axis:
+  skill_md_lines: 145         # derived, not chosen: 73 for the skill's own words plus
+                              # the 72 lines of delivered contract every file in this
+                              # set now carries (62 of content, 10 markers), 16 of them the sixth axis:
                               # what the run says at the end. The raises before it
                               # (120 -> 128 -> 140) were the
                               # same move for a smaller block; the blocks have
@@ -41,7 +41,7 @@ limits:
                               # is the only one that owes a record of how those turned out
   skills_max: 11              # 9 in use, 2 spare for demand found in use
   routes_max: 12
-  route_stages_max: 8         # the canonical order is seven phases plus a router
+  route_stages_max: 8         # the canonical order is eight phases (replan included) plus a router
   repo_md_lines_total: 4200
 
 # Nine skills is the closest this family comes to the point where selection
@@ -243,6 +243,6 @@ delivered:
   # The sixth axis. The other five bind what has to be true; this one binds what
   # reaches the reader, and it is delivered for the same reason as the rest — a
   # rule about the last step of a run is worth nothing if it is read on two
-  # launches in seven. 17 delivered lines that buy back the thirty a handoff
+  # launches in seven. 16 delivered lines that buy back the thirty a handoff
   # rendered field by field spends.
   surface: { section: "Done when" }
