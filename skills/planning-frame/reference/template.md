@@ -15,6 +15,9 @@ Verified: 2026-08-21 — no automated check.
 ## Problem
 <one sentence, no "and">
 
+## Why chain
+<the five-whys, request first, each step one line — the chain, not only its conclusion>
+
 ## Why now
 <what changed, or what it costs to wait>
 
@@ -27,7 +30,13 @@ Verified: 2026-08-21 — no automated check.
 ## Success criteria
 ### SC-1: <what becomes true>
 - Serves: G-1
-- Metric / Baseline / Target / Measured by
+- Metric: <the number>
+- Baseline: <today's value> [verified: <pointer>] | [assumed] | [unknown]
+- Target: <value> by <when>
+- Measured by: <query, dashboard, test, or manual check>
+
+## Definition of done
+<what someone other than the author would check to call this finished>
 
 ## Constraints
 | ID | Constraint | Hard/Soft | Source |
@@ -36,6 +45,11 @@ Verified: 2026-08-21 — no automated check.
 ## Assumptions
 | ID | Assumption | Cost if wrong | Verify? |
 |---|---|---|---|
+
+## Terms
+| Term | Means | Not to be called |
+|---|---|---|
+<!-- spelled as .agents/glossary.md spells them; a coined term is proposed, not invented -->
 
 ## Open questions
 | ID | Question | Blocking? | Who answers |

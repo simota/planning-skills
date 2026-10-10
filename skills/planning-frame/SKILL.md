@@ -49,10 +49,10 @@ Phases: `INTERROGATE → STATE → BOUND → CRITERIA → CONSTRAIN`.
 | Interrogating a vague request | [shape](playbooks/shape.md) — the probes, and the shape a criterion has to take |
 | Writing the deliverable | [template](reference/template.md) — downstream phases parse these headings |
 | About to write the brief | [traps](playbooks/traps.md) |
-| A goal has no measurable criterion | Delete it or downgrade it to a non-goal. **A goal nobody can test is a goal nobody can finish** |
+| A goal has no measurable criterion | Rewrite it with one, or drop it and say why. If no `SC-n` is measurable, gate 2 fires. **A goal nobody can test is a goal nobody can finish** |
 | Fewer non-goals than goals | Keep going. Under-specified non-goals are the single most common cause of scope creep |
-| A technology name appears in the brief | Take it out. Framing that leaks a solution has pre-decided the options phase |
-| The request is already a well-formed problem | Say so and stop. Re-framing a stated problem is ceremony |
+| A technology name appears in the brief | Take it out, unless it is a sourced hard `C-n`. Framing that leaks a solution has pre-decided the options phase |
+| The request is already a well-formed problem | Say so and write the brief from it as given. Re-framing a stated problem is ceremony |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
   completeness · mechanism over intent · **deciding over deferring** ·
@@ -71,7 +71,7 @@ Phases: `INTERROGATE → STATE → BOUND → CRITERIA → CONSTRAIN`.
   each `[assumed]` with what it costs to be wrong
 - Always: state the definition of done in terms someone other than the author
   could check
-- Never: propose a solution, name a technology, or estimate
+- Never: propose a solution, name a technology outside a sourced `C-n`, or estimate
 - Never: accept "improve", "modernise", or "clean up" as a goal. Those are
   words with no achievement condition, and the brief exists to replace them
 - Never: write a criterion whose measurement method is "we will know"
@@ -79,8 +79,8 @@ Phases: `INTERROGATE → STATE → BOUND → CRITERIA → CONSTRAIN`.
 ## Verify with
 
 A criterion is `[verified]` only where its metric already exists and can be read
-today — with the pointer. Where the measurement does not exist yet, that is an
-`A-n` about measurability, not a criterion.
+today — with the pointer. An unknown baseline value is still a criterion; a
+metric nobody could measure yet is an `A-n` about measurability, not a criterion.
 
 - **Test each `SC-n` by asking who would run what, and what number would settle
   it.** A criterion that cannot survive that question is prose
