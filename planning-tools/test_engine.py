@@ -47,6 +47,10 @@ REFUSED = [
     ({"properties": {"a": {}}, "additionalProperties": {"type": "string"}}, {"b": 5}),
     ({"type": "int"}, 1),
     ({"type": "string", "pattern": "("}, "x"),
+    ({"type": "string", "pattern": 5}, "x"),
+    ({"type": ""}, 5),
+    ({"type": []}, 5),
+    ({"type": [["x"]]}, "a"),
 ]
 
 

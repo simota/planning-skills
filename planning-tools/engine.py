@@ -121,9 +121,15 @@ def conforms(schema: dict, value, at: str = "$") -> str | None:
     if not isinstance(schema.get("additionalProperties", False), bool):
         unknown.add("additionalProperties (schema form)")
     want = schema.get("type")
-    for t in (want if isinstance(want, list) else [want] if want else []):
-        if t not in _TYPES:
-            unknown.add(f"type {t!r}")
+    if "type" in schema:
+        named = want if isinstance(want, list) else [want]
+        if not named:
+            unknown.add("type []")
+        for t in named:
+            if not isinstance(t, str) or t not in _TYPES:
+                unknown.add(f"type {t!r}")
+    if "pattern" in schema and not isinstance(schema["pattern"], str):
+        unknown.add("pattern (not a string)")
     if unknown:
         raise EngineError(f"schema at {at} uses {sorted(unknown)}, which this "
                           "check does not implement; extend conforms() first")
