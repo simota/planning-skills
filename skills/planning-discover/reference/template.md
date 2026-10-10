@@ -10,7 +10,14 @@ Verified: 2026-08-21 — no automated check.
 # <initiative> — Context
 > Status: draft
 > Updated: YYYY-MM-DD
+> Tier: S | M | L
 > Timebox: <budget> — <spent>
+
+## Assumption queue
+| ID | Assumption | Status | Evidence | Cost if wrong |
+|---|---|---|---|---|
+<!-- every A-n from 00-brief.md, plus any added here. Status: verified / falsified / open (Q-n) / unverified.
+     The status lives here: 00-brief.md is not edited downstream. Count: received n · verified n · falsified n · open n · unverified n · added n -->
 
 ## Verified facts
 | Fact | Evidence | Informs |
@@ -34,6 +41,6 @@ Verified: 2026-08-21 — no automated check.
 |---|---|---|---|
 
 ## Not verified
-| Item | Why not |
-|---|---|
+| ID | Item | Why not | Cost if wrong |
+|---|---|---|---|
 ```
