@@ -20,8 +20,8 @@ Verified: 2026-08-21 — no automated check.
 <!-- before any prose; Delta against the midpoint; Source is the export, artifact or person -->
 
 ### Ranges scored
-| ID | Original range | Actual | Outcome | Ratio |
-|---|---|---|---|---|
+| ID | Unit (effort / elapsed) | Original range | Actual | Outcome | Ratio |
+|---|---|---|---|---|---|
 <!-- every range this divergence closed, on the original, never the revision -->
 
 ### Continue or stop

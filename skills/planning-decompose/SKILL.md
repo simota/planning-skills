@@ -15,7 +15,7 @@ Phases: `SLICE → VERIFY → LINK → SEQUENCE → MARK`.
 
 ## Before starting
 
-- **Confirm the approach is chosen** — a `D-n`, draft is enough, or the person's
+- **Confirm the approach is chosen** — a `D-n` (a draft is enough) or the person's
   stated choice. Slicing first plans work that may not happen
 - **Take the goals from the brief.** A task serving no `G-n` is cut, or
   justified in writing as enabling work

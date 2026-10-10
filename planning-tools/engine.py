@@ -88,9 +88,13 @@ _ANNOTATIONS = {"$schema", "$id", "title", "description", "default", "examples",
 
 
 def _same(a, b) -> bool:
-    """JSON equality: true is not 1, and 1 is 1.0."""
+    """JSON equality: true is not 1, and 1 is 1.0 — at every depth."""
     if isinstance(a, bool) or isinstance(b, bool):
         return isinstance(a, bool) and isinstance(b, bool) and a == b
+    if isinstance(a, list) and isinstance(b, list):
+        return len(a) == len(b) and all(_same(x, y) for x, y in zip(a, b))
+    if isinstance(a, dict) and isinstance(b, dict):
+        return a.keys() == b.keys() and all(_same(a[k], b[k]) for k in a)
     return a == b
 
 
@@ -99,12 +103,27 @@ def conforms(schema: dict, value, at: str = "$") -> str | None:
 
     The engines claim to enforce the schema themselves; this is not trusting
     that, because a wrong-shaped answer read as a verdict is a verdict nobody gave.
-    A schema keyword outside `_CHECKED` raises: a partial validator that passed
-    what it could not check would be the green run that verified nothing.
+    A keyword, or a form of one, outside what this implements raises when the
+    walk reaches it: a partial validator that passed what it could not check
+    would be the green run that verified nothing. A subschema the value never
+    reaches — an absent optional property — is not inspected.
     """
-    if not isinstance(schema, dict):
+    if schema is True:
         return None
+    if schema is False:
+        return f"{at} is present where the schema allows nothing"
+    if not isinstance(schema, dict):
+        raise EngineError(f"schema at {at} is {type(schema).__name__}, not a schema")
     unknown = set(schema) - _CHECKED - _ANNOTATIONS
+    # Forms of a checked keyword that this check does not implement either.
+    if not isinstance(schema.get("items", {}), (dict, bool)):
+        unknown.add("items (list form)")
+    if not isinstance(schema.get("additionalProperties", False), bool):
+        unknown.add("additionalProperties (schema form)")
+    want = schema.get("type")
+    for t in (want if isinstance(want, list) else [want] if want else []):
+        if t not in _TYPES:
+            unknown.add(f"type {t!r}")
     if unknown:
         raise EngineError(f"schema at {at} uses {sorted(unknown)}, which this "
                           "check does not implement; extend conforms() first")
@@ -112,7 +131,7 @@ def conforms(schema: dict, value, at: str = "$") -> str | None:
     if want:
         types = want if isinstance(want, list) else [want]
         # bool is an int in Python; a JSON true is not a number.
-        if not any(isinstance(value, _TYPES.get(t, object))
+        if not any(isinstance(value, _TYPES[t])
                    and not (t in ("number", "integer") and isinstance(value, bool))
                    for t in types):
             return f"{at} is {type(value).__name__}, schema wants {want}"
@@ -125,8 +144,13 @@ def conforms(schema: dict, value, at: str = "$") -> str | None:
             return f"{at} is shorter than {schema['minLength']}"
         if "maxLength" in schema and len(value) > schema["maxLength"]:
             return f"{at} is longer than {schema['maxLength']}"
-        if "pattern" in schema and not re.search(schema["pattern"], value):
-            return f"{at} does not match {schema['pattern']!r}"
+        if "pattern" in schema:
+            try:
+                hit = re.search(schema["pattern"], value)
+            except re.error as e:
+                raise EngineError(f"schema at {at} has an invalid pattern: {e}") from None
+            if not hit:
+                return f"{at} does not match {schema['pattern']!r}"
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         if "minimum" in schema and value < schema["minimum"]:
             return f"{at} is below {schema['minimum']}"
@@ -149,7 +173,7 @@ def conforms(schema: dict, value, at: str = "$") -> str | None:
             return f"{at} has fewer than {schema['minItems']} items"
         if "maxItems" in schema and len(value) > schema["maxItems"]:
             return f"{at} has more than {schema['maxItems']} items"
-        if isinstance(schema.get("items"), dict):
+        if "items" in schema:
             for i, v in enumerate(value):
                 why = conforms(schema["items"], v, f"{at}[{i}]")
                 if why:

@@ -55,7 +55,7 @@ that used the changed input. `review-to-ready` repairs at that owner and reviews
 
 Where a stage repeats until a condition holds — `review-to-ready` is the one
 that does — the entry carries the stopping condition (`oracle`), the `checker`,
-and a hard cycle limit. **The checker is never the engine that produced the plan**; none reachable, the review says so and raises its bar.
+and a hard cycle limit. **The checker is never the engine that produced the plan**; if no other engine is reachable, the review says so and raises its bar.
 
 ## Rules for running a chain
 

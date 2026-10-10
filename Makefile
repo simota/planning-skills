@@ -41,6 +41,7 @@ validate:
 test:
 	@python3 planning-tools/test_validate.py
 	@python3 planning-tools/test_planning_regressions.py
+	@python3 planning-tools/test_engine.py
 
 engines:
 	@python3 planning-tools/engine.py --selftest

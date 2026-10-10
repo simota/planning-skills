@@ -3,7 +3,7 @@
 
 ## Artifact layout
 
-All planning output lives under `plans/<slug>/`, where `<slug>` is a kebab-case name for the initiative. The one write outside it is the host's `.agents/glossary.md` (`_planning/SIZING.md` § Terms), never at `S`.
+All planning output lives under `plans/<slug>/`, where `<slug>` is a kebab-case name for the initiative. The writes outside it are the host's `.agents/glossary.md` (`_planning/SIZING.md` § Terms), never at `S`, and `planning-discover`'s refute scratch file, which is not an artifact.
 
 | File | Owner skill | Content |
 |------|-------------|---------|
@@ -19,7 +19,7 @@ All planning output lives under `plans/<slug>/`, where `<slug>` is a kebab-case 
 Rules:
 - Planning skills produce documents only. Never write code, never modify application files.
 - Create only the files the work actually produced. A padded section is worse than an absent file.
-- Every file opens with `> Status: draft | agreed | superseded` and `> Updated: YYYY-MM-DD`. `agreed` is set only once the person has agreed. Re-entered after execution starts, the owner keeps the original beside it with the date in its name, `superseded` with a pointer, and writes anew.
+- Every file opens with `> Status: draft | agreed | superseded` and `> Updated: YYYY-MM-DD`. `agreed` is set only once the person has agreed. When a file is re-entered after execution starts, its owner renames the original with the date in its name, marks it `superseded` with a pointer, and writes the new file under the original name, keeping every ID.
 
 ## ID scheme
 

@@ -2,14 +2,14 @@
 #
 # These are route templates, not a universal workflow. Enter the phase whose
 # input is missing; repeat only phases whose decisions a new finding invalidates.
-# A pre-execution repair is not post-start replanning.
+# A pre-execution repair is not post-start replanning. In any chain, task
+# proposals from planning-risk re-enter decompose (and estimate) before review.
 
 full-plan:
   pattern: linear
   when: "multi-week, multi-owner, or hard to reverse, nothing decided yet"
   chain: [planning-frame, planning-discover, planning-options, planning-decompose, planning-estimate, planning-risk, planning-review]
   gate: "the goal fits in one sentence without 'and' before anything else runs"
-  # risk task proposals re-enter decompose (and estimate) before review
 
 approach:
   pattern: linear
