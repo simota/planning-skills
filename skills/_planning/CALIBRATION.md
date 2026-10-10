@@ -4,7 +4,7 @@
 Binding on every `planning-*` skill that produces, revises, or reviews an
 estimate. A range is a claim about the future, and a claim nobody ever settles
 is not a forecast — it is a mood. **Every range is scored once the work it
-covered is done; `planning-replan` records the score in the plan's `changelog.md`.**
+covered is done; `planning-replan` records it in `changelog.md`, at a divergence or at close-out.**
 
 ## The failure this prevents
 

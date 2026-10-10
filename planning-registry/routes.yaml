@@ -55,6 +55,12 @@ course-correct:
     record-only: none
     stop: none
 
+close-out:
+  pattern: report-only
+  when: "the work finished, within its forecast or not"
+  chain: [planning-replan]
+  stops_at: "every range scored on its original in changelog.md; nothing re-enters"
+
 review-to-ready:
   pattern: loop
   when: "close every blocking finding before work starts"

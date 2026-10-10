@@ -40,7 +40,6 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
-import re
 import subprocess
 import sys
 import tempfile
@@ -82,7 +81,9 @@ _TYPES = {"object": dict, "array": list, "string": str, "boolean": bool,
 # rather than skipped: a constraint nobody checks reads as one that held.
 _CHECKED = {"type", "enum", "const", "required", "properties", "additionalProperties",
             "items", "allOf", "anyOf", "oneOf", "not", "minLength", "maxLength",
-            "pattern", "minimum", "maximum", "minItems", "maxItems"}
+            "minimum", "maximum", "minItems", "maxItems"}
+# `pattern` is deliberately absent: JSON Schema patterns are ECMA-262, and
+# Python's `re` both rejects valid ones (`\p{L}`) and accepts what they reject.
 _ANNOTATIONS = {"$schema", "$id", "title", "description", "default", "examples",
                 "$comment"}
 
@@ -128,8 +129,6 @@ def conforms(schema: dict, value, at: str = "$") -> str | None:
         for t in named:
             if not isinstance(t, str) or t not in _TYPES:
                 unknown.add(f"type {t!r}")
-    if "pattern" in schema and not isinstance(schema["pattern"], str):
-        unknown.add("pattern (not a string)")
     if unknown:
         raise EngineError(f"schema at {at} uses {sorted(unknown)}, which this "
                           "check does not implement; extend conforms() first")
@@ -150,13 +149,6 @@ def conforms(schema: dict, value, at: str = "$") -> str | None:
             return f"{at} is shorter than {schema['minLength']}"
         if "maxLength" in schema and len(value) > schema["maxLength"]:
             return f"{at} is longer than {schema['maxLength']}"
-        if "pattern" in schema:
-            try:
-                hit = re.search(schema["pattern"], value)
-            except re.error as e:
-                raise EngineError(f"schema at {at} has an invalid pattern: {e}") from None
-            if not hit:
-                return f"{at} does not match {schema['pattern']!r}"
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         if "minimum" in schema and value < schema["minimum"]:
             return f"{at} is below {schema['minimum']}"
