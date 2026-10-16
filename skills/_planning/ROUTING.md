@@ -60,7 +60,7 @@ and a hard cycle limit. **The checker is never the engine that produced the plan
 ## Rules for running a chain
 
 - **Settle the brief before the first stage**, including the tier. Every stage
-  receives it whole, changed only by framing with human re-agreement (`_planning/SIZING.md`)
+  receives it whole, changed only by framing with human re-agreement — a gate-5 `terms` entry aside (`_planning/SIZING.md`)
 - **A stage's output is a handoff** (`_planning/HANDOFF.md`), and the next stage
   runs the seven receiver checks before starting
 - **IDs continue across stages.** A receiver that renumbers has broken every

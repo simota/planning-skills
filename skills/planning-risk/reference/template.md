@@ -4,7 +4,7 @@
 Purpose: the required sections of `40-risks.md`, in order, with what each must carry.
 Read when: writing or completing the deliverable.
 Source: none — nothing outside this page can move what it states.
-Verified: 2026-08-21 — no automated check.
+Verified: 2026-10-16 — no automated check.
 
 ```markdown
 # <initiative> — Risks
@@ -17,7 +17,7 @@ Verified: 2026-08-21 — no automated check.
 
 ## Register
 ### R-1: <failure>
-- Category / Likelihood / Impact / Score (L×I = n) / Detection / Threshold / Mitigation / Residual
+- Category / Likelihood (basis; confidence — reason) / Impact / Score (L×I = n) / Detection / Threshold / Mitigation / Residual
 
 ## Category coverage
 | Category | Status |

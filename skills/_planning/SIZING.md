@@ -13,10 +13,10 @@ Match depth to stakes. Declare the tier at the top of the deliverable.
 | Tier | Trigger | Minimum deliverable | Added when the request calls for it |
 |------|---------|---------------------|-------------------------------------|
 | `S` | < 1 day of work, reversible | One brief in the response. No files. | — |
-| `M` | Multi-day, single owner | `00-brief.md` + `30-plan.md` | `10-context.md`, `20-options.md`, `35-estimate.md` |
-| `L` | Multi-week or multi-owner, or hard to reverse | Full artifact set, ending in `40-risks.md` + `50-review.md` | — |
+| `M` | Multi-day, single owner | `00-brief.md` + `30-plan.md` | `10-context.md`, `20-options.md`, `35-estimate.md`, `40-risks.md`, `50-review.md` |
+| `L` | Multi-week or multi-owner, or hard to reverse | `00-brief.md` + `30-plan.md` + `35-estimate.md` + `40-risks.md` + `50-review.md` | `10-context.md`, `20-options.md` by default; skipped only with a stated reason |
 
-These are minimum sets, not exact ones: a chain that runs `planning-estimate` produces `35-estimate.md` at `M` or `L`. `L` is the exception — `40-risks.md` and a `planning-review` verdict are mandatory, never optional.
+These are minimum sets, not exact ones: a chain that runs `planning-estimate` produces `35-estimate.md` at `M`. `L` is the exception — `35-estimate.md`, `40-risks.md` and a `planning-review` verdict are mandatory, never optional.
 
 ## The planning gate
 

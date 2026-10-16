@@ -30,7 +30,7 @@ def render(path: Path) -> bool:
     original = text
     for key, spec in H["delivered"].items():
         block = (ROOT / "planning-registry" / "delivered" / f"{key}.md").read_text(
-            encoding="utf-8").rstrip("\n")
+            encoding="utf-8").strip("\n")      # as V17 reads it: blank edges are not content
         open_m, close_m = f"<!-- deliver:{key} -->", f"<!-- /deliver:{key} -->"
         payload = f"{open_m}\n{block}\n{close_m}"
         opens, closes = text.count(open_m), text.count(close_m)

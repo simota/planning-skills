@@ -136,7 +136,7 @@ planning-skills/
 ├── Makefile
 ├── .claude-plugin/plugin.json    # named by the plugin format
 ├── planning-registry/            # budgets, boundaries, routes, delivered blocks
-├── planning-tools/               # validate · tests · render · figures · refute · pre-commit
+├── planning-tools/               # validate · tests · render · figures · engine · refute · pre-commit
 └── skills/                       # named by the plugin format: skills live here
     ├── _planning/                # contracts in force on every run
     └── planning-<phase>/

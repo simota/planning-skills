@@ -28,9 +28,9 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
 - **Declare the tier before anything else**, read off the work and stated at the
   top of the deliverable. `S` — under a day, reversible: one brief in the
   response, **no files, no handoff**. `M` — multi-day, single owner: the brief
-  and the plan. `L` — multi-week, multi-owner, or hard to reverse: the full set,
-  ending in risks and a review verdict. **Over-planning an `S` is a failure of
-  the same weight as under-planning an `L`**
+  and the plan. `L` — multi-week, multi-owner, or hard to reverse: brief, plan,
+  estimate, risks and a review verdict; context and options unless a stated skip.
+  **Over-planning an `S` is a failure of the same weight as under-planning an `L`**
 - **The planning gate stops the run at the phase that owns the condition** — the
   goal cannot be stated in one sentence without "and", no success criterion is
   measurable, a load-bearing assumption is cheap to verify and unverified, or the
@@ -71,7 +71,8 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
   running anything
 - Always: distinguish lifecycle from phase order. A pre-start revisit does not
   invoke replan; a post-start divergence selects its owner, not a fixed next phase
-- Always: pass the brief whole to every stage. It changes only through framing
+- Always: pass the brief whole to every stage. It changes only through framing,
+  a gate-5 `terms` entry aside
 - Never: write an artifact. This skill dispatches; the phases produce
 - Never: run a phase to make the chain look complete
 - Never: work around a gate that fired. Report it
@@ -84,7 +85,7 @@ that ran and produced nothing is indistinguishable from one that never ran**,
 which is why the skip list is part of the deliverable rather than a footnote.
 
 - Claims this skill makes about the request are `[verified]` from the request
-  text itself, or they are `[assumed]` and the receiving phase checks them
+  text itself, or `[assumed]` and named in the dispatch for the receiving phase to open as `A-n`
 <!-- deliver:report -->
 - **Tag every factual claim in a decision-bearing section**, exactly one:
   `[verified: <pointer>]` — read, run, or cited, with the pointer ·

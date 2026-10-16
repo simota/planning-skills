@@ -18,7 +18,9 @@ slow tier is the only thing that catches a tampered or stale fixture, so CI runs
 it weekly and on demand rather than never. Both tiers compare against the same
 generated fixture; the arithmetic has one home.
 """
+import hashlib
 import json
+import math
 import pathlib
 import random
 import re
@@ -41,14 +43,25 @@ def beta_pert(o, l, p, rng):
     return o + (p - o) * rng.betavariate(a, b)
 
 
+# Every float total goes through fsum: 3.12 made the builtin sum() compensated,
+# so plain sum() gives a different last digit per Python and `--full` would
+# compare unequal on any version but the one that wrote the fixture.
 def pert(tasks):
-    mean = sum((o + 4 * l + p) / 6 for o, l, p in tasks)
-    sigma = sum(((p - o) / 6) ** 2 for o, l, p in tasks) ** 0.5
+    mean = math.fsum((o + 4 * l + p) / 6 for o, l, p in tasks)
+    sigma = math.fsum(((p - o) / 6) ** 2 for o, l, p in tasks) ** 0.5
     return mean, sigma
 
 
 def draw(tasks, rng, n=N):
-    return sorted(sum(beta_pert(*t, rng) for t in tasks) for _ in range(n))
+    return sorted(math.fsum(beta_pert(*t, rng) for t in tasks) for _ in range(n))
+
+
+def probe() -> str:
+    """A short seeded draw, bit for bit. The fast tier re-runs it, so an
+    interpreter whose float totals differ from the one that wrote the fixture
+    is caught in a second rather than by the weekly `--full`."""
+    d = draw([(2, 3, 8)] * 12, random.Random(SEED), 2000)
+    return hashlib.sha256(",".join(map(float.hex, d)).encode()).hexdigest()[:16]
 
 
 def q(d, p):
@@ -77,6 +90,14 @@ def rows_after(header_substr: str) -> list[list[str]]:
 
 
 NUM = re.compile(r"-?−?\d+\.\d+")
+PCT = re.compile(r"\(([+-]?\d+)%\)")
+
+
+def header_of(header_substr: str) -> str:
+    for l in PAGE.read_text(encoding="utf-8").splitlines():
+        if l.strip().startswith("|") and header_substr in l:
+            return l
+    return ""
 
 
 def num(cell: str) -> float | None:
@@ -184,16 +205,55 @@ def check_merge(fx) -> int:
     missing("merge", [k for k in fx["merge"] if k != "chain_mean"], seen, "k=")
     if n == 0:
         fail("merge", "no rows compared — the checker has stopped checking")
+    # The reference mean is printed in the header, and a slip may carry its
+    # percentage; both are figures a reader takes at face value.
+    hdr = header_of("p50 of the merge")
+    n += 1
+    if not near(num(hdr), mean, 2):
+        fail("merge", f"header states one chain's mean as {num(hdr)}, model gives {mean:.2f}")
+    # The headline slip is published with its percentage; that one may not
+    # vanish unnoticed. Other rows may carry one or not.
+    pct_required = {"8"}
+    for r in rows:
+        m = PCT.search(r[2])
+        if not m:
+            if r[0] in pct_required:
+                n += 1
+                fail("merge", f"k={r[0]} slip: the page no longer states its percentage, "
+                              f"model gives {fx['merge_slip_pct'][r[0]]:+.0f}%")
+            continue
+        n += 1
+        want = fx.get("merge_slip_pct", {}).get(r[0])
+        if want is None:
+            fail("merge", f"k={r[0]} slip: page says {m.group(1)}%, the fixture has "
+                          "no figure for it — run `make figures-full`")
+        elif not near(float(m.group(1)), want, 0):
+            fail("merge", f"k={r[0]} slip: page says {m.group(1)}%, model gives {want:+.0f}%")
     return n
 
 
 def check_near_critical(fx) -> int:
     rows = rows_after("Gap ÷ its σ")
     model = fx["near_critical"]["rows"]
+    n = 0
+    # The gap column is measured against this, so it is checked with them.
+    text = " ".join(PAGE.read_text(encoding="utf-8").split())
+    m = re.search(r"critical path of mean (\d+\.\d+), σ (\d+\.\d+)", text)
+    if not m:
+        fail("near-critical", "the page no longer states the critical path's mean and σ "
+                              "in a form this reads")
+    else:
+        for got, key in zip(m.groups(), ("crit_mean", "crit_sigma")):
+            n += 1
+            want = fx["near_critical"].get(key)
+            if want is None:
+                fail("near-critical", f"the fixture has no {key} — run `make figures-full`")
+            elif not near(float(got), want, len(got.split(".")[1])):
+                fail("near-critical", f"critical path {key[5:]}: page says {got}, "
+                                      f"model gives {want:.2f}")
     if len(rows) != len(model):
         fail("near-critical", f"page has {len(rows)} rows, the model has {len(model)}")
-        return 0
-    n = 0
+        return n
     for r, want in zip(rows, model):
         for col, dp in enumerate((1, 2, 2, 1, 1)):
             n += 1
@@ -232,7 +292,7 @@ def compute() -> dict:
     """Every figure the page prints, from the seeded model. The only place the
     arithmetic lives."""
     rng = random.Random(SEED)
-    out: dict = {"seed": SEED, "runs": N}
+    out: dict = {"seed": SEED, "runs": N, "probe": probe()}
 
     tasks = [(2, 3, 8)] * 12
     d = draw(tasks, rng)
@@ -253,21 +313,23 @@ def compute() -> dict:
     cmean, _ = pert(chain)
     out["merge"] = {"chain_mean": cmean}
     for k in (1, 2, 3, 5, 8):
-        merged = sorted(max(sum(beta_pert(*t, rng) for t in chain) for _ in range(k))
+        merged = sorted(max(math.fsum(beta_pert(*t, rng) for t in chain) for _ in range(k))
                         for _ in range(N))
         out["merge"][str(k)] = q(merged, .50)
+    out["merge_slip_pct"] = {k: (v / cmean - 1) * 100 for k, v in out["merge"].items()
+                             if k != "chain_mean"}
 
     crit = [(9, 10, 11)] * 3
     mc, sc = pert(crit)
     base = mc + 1.28 * sc
-    out["near_critical"] = {"base_p90": base, "rows": []}
+    out["near_critical"] = {"base_p90": base, "crit_mean": mc, "crit_sigma": sc, "rows": []}
     for spec in [(3, 7, 22), (4, 9, 26), (6, 12, 30), (8, 15, 34)]:
         side = [spec] * 2
         ms, ss = pert(side)
         last, fin = 0, []
         for _ in range(N // 2):
-            c = sum(beta_pert(*t, rng) for t in crit)
-            s = sum(beta_pert(*t, rng) for t in side)
+            c = math.fsum(beta_pert(*t, rng) for t in crit)
+            s = math.fsum(beta_pert(*t, rng) for t in side)
             last += s > c
             fin.append(max(c, s))
         fin.sort()
@@ -276,7 +338,7 @@ def compute() -> dict:
             [ms, ss, (mc - ms) / ss, last / (N // 2) * 100, (p90 / base - 1) * 100])
 
     _, sig_ind = pert(tasks)
-    sig_lin = sum((p - o) / 6 for o, l, p in tasks)
+    sig_lin = math.fsum((p - o) / 6 for o, l, p in tasks)
     ind = draw(tasks, rng)
     o, l, p = tasks[0]
     cor = sorted(beta_pert(o, l, p, rng) * len(tasks) for _ in range(N))
@@ -323,6 +385,10 @@ def main() -> int:
         if fx is None:
             print("\n".join(failures))
             return 1
+        if fx.get("probe") != probe():
+            fail("fixture", "this Python does not reproduce the model's arithmetic bit for "
+                            "bit, so `--full` would disagree here; a float total is not "
+                            "going through math.fsum")
 
     cells = (check_endpoints(fx) + check_percentiles(fx) + check_merge(fx)
              + check_near_critical(fx) + check_correlation(fx))

@@ -8,7 +8,7 @@ allowed-tools: Read, Grep, Glob, Write, Edit
 ## Owns
 
 Post-start divergence, classified and corrected at its owning phase, and the close-out
-that scores every range once the work finishes (`close-out` in `registry/routes.yaml`) —
+that, once the work finishes, scores every range not scored at a divergence (`close-out` in `registry/routes.yaml`) —
 a plan that met its forecast is scored too. A pre-start edit is not a replan: it goes straight to the phase that owns it. **Stopping stays on the table
 and is priced like any other option.**
 
@@ -29,9 +29,9 @@ Close-out: `MEASURE → SCORE → RECORD` — finished work carries no class and
 - **Declare the tier before anything else**, read off the work and stated at the
   top of the deliverable. `S` — under a day, reversible: one brief in the
   response, **no files, no handoff**. `M` — multi-day, single owner: the brief
-  and the plan. `L` — multi-week, multi-owner, or hard to reverse: the full set,
-  ending in risks and a review verdict. **Over-planning an `S` is a failure of
-  the same weight as under-planning an `L`**
+  and the plan. `L` — multi-week, multi-owner, or hard to reverse: brief, plan,
+  estimate, risks and a review verdict; context and options unless a stated skip.
+  **Over-planning an `S` is a failure of the same weight as under-planning an `L`**
 - **The planning gate stops the run at the phase that owns the condition** — the
   goal cannot be stated in one sentence without "and", no success criterion is
   measurable, a load-bearing assumption is cheap to verify and unverified, or the

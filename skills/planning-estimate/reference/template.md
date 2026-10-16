@@ -4,7 +4,7 @@
 Purpose: the required sections of `35-estimate.md`, in order, with what each must carry.
 Read when: writing or completing the deliverable.
 Source: none — nothing outside this page can move what it states.
-Verified: 2026-08-21 — no automated check.
+Verified: 2026-10-16 — no automated check.
 
 ```markdown
 # <initiative> — Estimate
@@ -12,6 +12,7 @@ Verified: 2026-08-21 — no automated check.
 > Updated: YYYY-MM-DD
 > Tier: M | L   <!-- S writes no files (_planning/SIZING.md) -->
 > Capacity assumption: <productive fraction, basis>
+> Calibration applied: <n comparable ranges scored in plans/*/changelog.md; the adjustment, or none and why>
 
 ## Per task
 <!-- O / L / P are effort in person-days. Effort mean = (O + 4L + P) / 6.
@@ -32,6 +33,7 @@ Confidence: High | Medium | Low (<reason>)
 ## Schedule
 | Milestone | Earliest | Likely | Latest | Confidence |
 |---|---|---|---|---|
+<!-- Earliest / Likely / Latest in elapsed working days from the start, so each row is a scorable range -->
 
 ## Range drivers
 1. <largest source of width>
@@ -49,8 +51,9 @@ Confidence: High | Medium | Low (<reason>)
 Actual recorded by: <owner>
 | ID | Unit (effort / elapsed) | Range | Midpoint | Actual | Outcome | Ratio |
 |---|---|---|---|---|---|---|
-<!-- one row per task range (O … P) and one for the critical-path total (p10 … p90);
-     only the total counts toward the 80% rate. Midpoint = (low + high) / 2. Actual,
+<!-- one row per task range (O … P), one for the critical-path total (p10 … p90), and
+     one per Schedule milestone (Earliest … Latest, elapsed); only the total counts toward
+     the 80% rate. Midpoint = (low + high) / 2. Actual,
      Outcome and Ratio stay `—` here: once the work closes, planning-replan scores
      each row in changelog.md (_planning/CALIBRATION.md) -->
 ```

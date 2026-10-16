@@ -4,7 +4,7 @@
 Purpose: the required sections of `20-options.md`, in order, with what each must carry.
 Read when: writing or completing the deliverable.
 Source: none — nothing outside this page can move what it states.
-Verified: 2026-08-21 — no automated check.
+Verified: 2026-10-16 — no automated check.
 
 ```markdown
 # <initiative> — Options
@@ -28,8 +28,8 @@ Verified: 2026-08-21 — no automated check.
 |---|---|
 
 ## Comparison
-| Criterion | Weight | O-1 | O-2 | O-3 |
-|---|---|---|---|---|
+| Criterion | Weight | O-1 | O-2 | O-3 | Confidence (High / Medium / Low — reason) |
+|---|---|---|---|---|---|
 <!-- each score tagged; a judgement is [assumed] -->
 
 ## Pressure test

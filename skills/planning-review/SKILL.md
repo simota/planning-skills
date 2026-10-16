@@ -18,18 +18,18 @@ Phases: `TRACE → AUDIT → ATTACK → VERDICT`.
 - **Read the whole artifact set, not the plan document alone.** Most readiness
   failures are between artifacts: a task serving a goal nobody stated, an
   estimate resting on a falsified assumption
-- **If you authored this plan in the same session, say so, and raise the bar on
-  the silence audit.** Reviewing your own work is not forbidden here; pretending
-  it is somebody else's is
+- **If you authored this plan, or run on the engine that did, say so and
+  raise the bar on the silence audit.** Reviewing your own work is not
+  forbidden here; pretending it is somebody else's is
 - **Fix the verdict vocabulary before starting** so the finding list cannot
   quietly become the verdict
 <!-- deliver:sizing -->
 - **Declare the tier before anything else**, read off the work and stated at the
   top of the deliverable. `S` — under a day, reversible: one brief in the
   response, **no files, no handoff**. `M` — multi-day, single owner: the brief
-  and the plan. `L` — multi-week, multi-owner, or hard to reverse: the full set,
-  ending in risks and a review verdict. **Over-planning an `S` is a failure of
-  the same weight as under-planning an `L`**
+  and the plan. `L` — multi-week, multi-owner, or hard to reverse: brief, plan,
+  estimate, risks and a review verdict; context and options unless a stated skip.
+  **Over-planning an `S` is a failure of the same weight as under-planning an `L`**
 - **The planning gate stops the run at the phase that owns the condition** — the
   goal cannot be stated in one sentence without "and", no success criterion is
   measurable, a load-bearing assumption is cheap to verify and unverified, or the

@@ -22,7 +22,7 @@ help:
 	@echo "make check     validate + test + figures (what CI runs)"
 	@echo "make validate  static rules over the corpus"
 	@echo "make test      prove every rule still fires"
-	@echo "make refute CLAIMS=f.json RUNNING=claude   put each claim to the engines that did not make it"
+	@echo "make refute CLAIMS=f.json RUNNING=<engine>   put each claim to the engines that did not make it"
 	@echo "make engines  ask each checker engine for one object; reports what is unreachable"
 	@echo "make render    write the delivered blocks back into every SKILL.md"
 	@echo "make figures   check the published figures against the model fixture"
@@ -47,8 +47,9 @@ engines:
 	@python3 planning-tools/engine.py --selftest
 
 refute:
-	@test -n "$(CLAIMS)" || { echo "usage: make refute CLAIMS=claims.json RUNNING=claude"; exit 2; }
-	@python3 planning-tools/refute.py --running "$(or $(RUNNING),claude)" "$(CLAIMS)"
+	@test -n "$(CLAIMS)" && test -n "$(RUNNING)" || { \
+		echo "usage: make refute CLAIMS=claims.json RUNNING=<the engine running this>"; exit 2; }
+	@python3 planning-tools/refute.py --running "$(RUNNING)" "$(CLAIMS)"
 
 render:
 	@python3 planning-tools/render.py
@@ -63,12 +64,15 @@ figures-rewrite:
 	@python3 planning-tools/figures_check.py --rewrite
 
 # Where git looks, not where it usually is: a worktree's hooks live in the main
-# repository, and `core.hooksPath` moves them anywhere.
+# repository, and `core.hooksPath` moves them anywhere — possibly a directory
+# every repository shares, so a hook already there is never silently replaced.
 hooks:
-	@dir=$$(git rev-parse --git-path hooks) && mkdir -p "$$dir" && \
-		{ [ "$$dir/pre-commit" -ef planning-tools/githooks/pre-commit ] || \
-		  cp planning-tools/githooks/pre-commit "$$dir/pre-commit"; } && \
-		chmod +x "$$dir/pre-commit" && echo "pre-commit installed in $$dir"
+	@dir=$$(git rev-parse --git-path hooks) && mkdir -p "$$dir" && hook="$$dir/pre-commit" && \
+		if [ "$$hook" -ef planning-tools/githooks/pre-commit ] || cmp -s planning-tools/githooks/pre-commit "$$hook"; then :; \
+		elif [ -e "$$hook" ] && [ -z "$(FORCE)" ]; then \
+			echo "$$hook already exists and differs; not replacing it (FORCE=1 to overwrite)"; exit 1; \
+		else cp planning-tools/githooks/pre-commit "$$hook"; fi && \
+		chmod +x "$$hook" && echo "pre-commit installed in $$dir"
 
 # A skill is a directory holding a SKILL.md, under skills/ where the plugin
 # format expects it. The prefix alone is not the test: planning-registry/ and
@@ -84,6 +88,8 @@ link:
 			name=$$(basename "$$path"); target="$$dir/$$name"; \
 			if [ -e "$$target" ] && [ ! -L "$$target" ]; then \
 				echo "  skip $$name (a real path is already there)"; \
+			elif [ -L "$$target" ] && [ -e "$$target" ] && [ "$$(readlink "$$target")" != "$(REPO)/$$path" ]; then \
+				echo "  skip $$name (links to $$(readlink "$$target"), not this repo)"; \
 			else \
 				ln -sfn "$(REPO)/$$path" "$$target"; echo "  link $$name"; \
 			fi; \
@@ -96,7 +102,8 @@ unlink:
 		echo "$$dir"; \
 		for path in $(SKILL_DIRS); do \
 			name=$$(basename "$$path"); target="$$dir/$$name"; \
-			if [ -L "$$target" ]; then rm "$$target"; echo "  unlink $$name"; fi; \
+			if [ -L "$$target" ] && [ "$$(readlink "$$target")" = "$(REPO)/$$path" ]; then \
+				rm "$$target"; echo "  unlink $$name"; fi; \
 		done; \
 	done
 
@@ -105,7 +112,8 @@ status:
 		echo "$$dir"; \
 		for path in $(SKILL_DIRS); do \
 			name=$$(basename "$$path"); target="$$dir/$$name"; \
-			if [ -L "$$target" ]; then echo "  linked   $$name"; \
+			if [ -L "$$target" ] && [ "$$(readlink "$$target")" = "$(REPO)/$$path" ]; then echo "  linked   $$name"; \
+			elif [ -L "$$target" ]; then echo "  other    $$name -> $$(readlink "$$target")"; \
 			else echo "  unlinked $$name"; fi; \
 		done; \
 	done

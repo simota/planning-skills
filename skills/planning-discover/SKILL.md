@@ -27,9 +27,9 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
 - **Declare the tier before anything else**, read off the work and stated at the
   top of the deliverable. `S` — under a day, reversible: one brief in the
   response, **no files, no handoff**. `M` — multi-day, single owner: the brief
-  and the plan. `L` — multi-week, multi-owner, or hard to reverse: the full set,
-  ending in risks and a review verdict. **Over-planning an `S` is a failure of
-  the same weight as under-planning an `L`**
+  and the plan. `L` — multi-week, multi-owner, or hard to reverse: brief, plan,
+  estimate, risks and a review verdict; context and options unless a stated skip.
+  **Over-planning an `S` is a failure of the same weight as under-planning an `L`**
 - **The planning gate stops the run at the phase that owns the condition** — the
   goal cannot be stated in one sentence without "and", no success criterion is
   measurable, a load-bearing assumption is cheap to verify and unverified, or the
@@ -56,7 +56,7 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
 | An assumption turns out false | Say so loudly and name what it invalidates upstream. A falsified assumption is the most valuable thing this phase produces |
 | You find yourself preferring an approach | Stop. Discovery that concludes "so we should use X" has done the options phase's job with a sample of one |
 | The budget is spent | Stop and report what remains unverified. Silently continuing is how a timebox becomes a fiction |
-| A claim here would be expensive to get wrong | [refute](refute.py) — `python3 <this skill's directory>/refute.py --running <this engine> <scratch>/claims.json` — a working file, never under `plans/`, puts it to the engines that did not make it, asked to break it. `REFUTED` or `CONTESTED` stays `[assumed]`; unrefuted is n engines finding nothing, never proof |
+| A claim here would be expensive to get wrong | [refute](refute.py) — `python3 <this skill's directory>/refute.py --running <this engine> <scratch>/claims.json` — a working file, never under `plans/`, puts it to the engines that did not make it, asked to break it. `REFUTED`, `CONTESTED` or `UNCHECKED` stays `[assumed]`; unrefuted is n engines finding nothing, never proof |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
   completeness · mechanism over intent · **deciding over deferring** ·
@@ -73,8 +73,8 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
 - Always: rank unknowns by **decision impact**, not by how interesting they are
 - Always: state what was not verified, as its own section. A context document
   silent about its gaps reads as complete
-- Never: write anything but `10-context.md`, above `S` `.agents/glossary.md`, and
-  refute's scratch file outside `plans/`, or run a command with side effects
+- Never: write anything but `plans/<slug>/10-context.md` and, outside `plans/`, the
+  glossary (above `S`) and refute's scratch file; never run a command with side effects
 - Never: recommend an approach, or score one
 - Never: report a finding whose command you did not run. Reconstructed output is
   `[assumed]` at best

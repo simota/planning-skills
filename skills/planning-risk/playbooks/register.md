@@ -18,7 +18,7 @@
 ```
 ### R-3: <failure in one sentence>
 - Category: data
-- Likelihood: Medium (<basis>)
+- Likelihood: Medium (<basis>; confidence: High | Medium | Low — <reason>)
 - Impact: High (<what it costs: users, money, time, trust>)
 - Detection: <the observable signal>
 - Threshold: <the value at which we act>

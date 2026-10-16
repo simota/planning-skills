@@ -4,13 +4,13 @@
 Purpose: the required sections of `00-brief.md`, in order, with what each must carry.
 Read when: writing or completing the deliverable.
 Source: none — nothing outside this page can move what it states.
-Verified: 2026-08-21 — no automated check.
+Verified: 2026-10-16 — no automated check.
 
 ```markdown
 # <initiative> — Brief
 > Status: draft
 > Updated: YYYY-MM-DD
-> Tier: S | M | L
+> Tier: M | L   <!-- S writes no file: its inline shape is in SKILL.md -->
 > Delivers: <the artifact set for the declared tier>
 
 ## Problem
