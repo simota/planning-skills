@@ -709,7 +709,7 @@ def v35_signature():
     Each set declares one signature mechanism in `signature:` — the contract
     that carries it, the vocabulary it introduces, and the skills that owe it.
     The rule is identical in every set; only the declaration differs, which is
-    what keeps six copies of this file from becoming six dialects.
+    what keeps this file's copies across the sets from becoming dialects.
 
     The delivered block states the rule inside every skill. A skill that owes
     the mechanism also names its own half of it, because a rule stated
