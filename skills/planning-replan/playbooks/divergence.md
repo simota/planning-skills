@@ -37,7 +37,7 @@ Then project: at the observed rate, the remaining critical path finishes in `[ra
 
 ## The Stop Test
 
-Run it when the projected finish — critical-path actuals to date plus the remaining critical path at the observed rate — exceeds the original critical-path total by more than 30%, both taken at their midpoints. One task's delta alone never triggers it: with the path unmoved, that is `record-only`. Answer all four:
+Run it when the projected finish — critical-path actuals to date plus the remaining critical path at the observed rate — exceeds the original critical-path total by more than 30%, both taken at their midpoints — or whenever continuation is otherwise in question: remaining value fell, or the person asks whether to continue. One task's delta alone never triggers it: with the path unmoved, that is `record-only`. Answer all four:
 
 1. What is the remaining cost, as a range?
 2. What is the remaining value, given what is now known? (Not the value assumed at planning time.)

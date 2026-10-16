@@ -30,7 +30,7 @@ swept: "1 marker / 1 in open; 22 claims / 22 tagged"
 next: "<the skill that should receive this, or none>"
 ```
 
-- **`brief` travels whole; downstream phases may not edit it.** A finding that
+- **`brief` travels whole; downstream phases may not edit it** — `terms` aside, which takes a gate-5 answer. A finding that
   changes the goal or constraints returns to framing for explicit human re-agreement.
   The new brief supersedes the old one; affected decisions are rechecked, not silently reused
 - **`ids_added` is what makes the ID scheme work across phases.** A receiver

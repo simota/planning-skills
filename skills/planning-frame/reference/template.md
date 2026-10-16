@@ -10,7 +10,7 @@ Verified: 2026-08-21 — no automated check.
 # <initiative> — Brief
 > Status: draft
 > Updated: YYYY-MM-DD
-> Tier: S | M | L
+> Tier: M | L   <!-- S writes no file: its inline shape is in SKILL.md -->
 > Delivers: <the artifact set for the declared tier>
 
 ## Problem

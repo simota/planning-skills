@@ -59,7 +59,7 @@ close-out:
   pattern: report-only
   when: "the work finished, within its forecast or not"
   chain: [planning-replan]
-  stops_at: "every range scored on its original in changelog.md; nothing re-enters"
+  stops_at: "every range not scored at a divergence is scored on its original in changelog.md; nothing re-enters"
 
 review-to-ready:
   pattern: loop

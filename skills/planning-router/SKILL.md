@@ -84,7 +84,7 @@ that ran and produced nothing is indistinguishable from one that never ran**,
 which is why the skip list is part of the deliverable rather than a footnote.
 
 - Claims this skill makes about the request are `[verified]` from the request
-  text itself, or they are `[assumed]` and the receiving phase checks them
+  text itself, or `[assumed]` and named in the dispatch for the receiving phase to open as `A-n`
 <!-- deliver:report -->
 - **Tag every factual claim in a decision-bearing section**, exactly one:
   `[verified: <pointer>]` — read, run, or cited, with the pointer ·

@@ -56,7 +56,7 @@ Phases: `INVENTORY → VERIFY → PROBE → RANK`.
 | An assumption turns out false | Say so loudly and name what it invalidates upstream. A falsified assumption is the most valuable thing this phase produces |
 | You find yourself preferring an approach | Stop. Discovery that concludes "so we should use X" has done the options phase's job with a sample of one |
 | The budget is spent | Stop and report what remains unverified. Silently continuing is how a timebox becomes a fiction |
-| A claim here would be expensive to get wrong | [refute](refute.py) — `python3 <this skill's directory>/refute.py --running <this engine> <scratch>/claims.json` — a working file, never under `plans/`, puts it to the engines that did not make it, asked to break it. `REFUTED` or `CONTESTED` stays `[assumed]`; unrefuted is n engines finding nothing, never proof |
+| A claim here would be expensive to get wrong | [refute](refute.py) — `python3 <this skill's directory>/refute.py --running <this engine> <scratch>/claims.json` — a working file, never under `plans/`, puts it to the engines that did not make it, asked to break it. `REFUTED`, `CONTESTED` or `UNCHECKED` stays `[assumed]`; unrefuted is n engines finding nothing, never proof |
 <!-- deliver:values -->
 - Ties break by `_planning/VALUES.md`, read top to bottom: honesty over
   completeness · mechanism over intent · **deciding over deferring** ·

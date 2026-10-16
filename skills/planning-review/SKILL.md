@@ -18,9 +18,9 @@ Phases: `TRACE → AUDIT → ATTACK → VERDICT`.
 - **Read the whole artifact set, not the plan document alone.** Most readiness
   failures are between artifacts: a task serving a goal nobody stated, an
   estimate resting on a falsified assumption
-- **If you authored this plan in the same session, say so, and raise the bar on
-  the silence audit.** Reviewing your own work is not forbidden here; pretending
-  it is somebody else's is
+- **If you authored this plan in this session, or no other engine ran this review,
+  say so and raise the bar on the silence audit.** Reviewing your own work is not
+  forbidden here; pretending it is somebody else's is
 - **Fix the verdict vocabulary before starting** so the finding list cannot
   quietly become the verdict
 <!-- deliver:sizing -->

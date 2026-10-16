@@ -28,8 +28,8 @@ Verified: 2026-08-21 — no automated check.
 |---|---|
 
 ## Comparison
-| Criterion | Weight | O-1 | O-2 | O-3 |
-|---|---|---|---|---|
+| Criterion | Weight | O-1 | O-2 | O-3 | Confidence (High / Medium / Low — reason) |
+|---|---|---|---|---|---|
 <!-- each score tagged; a judgement is [assumed] -->
 
 ## Pressure test

@@ -8,7 +8,7 @@ allowed-tools: Read, Grep, Glob, Write, Edit
 ## Owns
 
 Post-start divergence, classified and corrected at its owning phase, and the close-out
-that scores every range once the work finishes (`close-out` in `registry/routes.yaml`) —
+that scores every range not already scored once the work finishes (`close-out` in `registry/routes.yaml`) —
 a plan that met its forecast is scored too. A pre-start edit is not a replan: it goes straight to the phase that owns it. **Stopping stays on the table
 and is priced like any other option.**
 

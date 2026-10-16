@@ -17,7 +17,7 @@ Verified: 2026-08-21 — no automated check.
 
 ## Register
 ### R-1: <failure>
-- Category / Likelihood / Impact / Score (L×I = n) / Detection / Threshold / Mitigation / Residual
+- Category / Likelihood (basis; confidence — reason) / Impact / Score (L×I = n) / Detection / Threshold / Mitigation / Residual
 
 ## Category coverage
 | Category | Status |
