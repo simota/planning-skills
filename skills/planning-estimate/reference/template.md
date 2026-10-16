@@ -33,6 +33,7 @@ Confidence: High | Medium | Low (<reason>)
 ## Schedule
 | Milestone | Earliest | Likely | Latest | Confidence |
 |---|---|---|---|---|
+<!-- Earliest / Likely / Latest in elapsed working days from the start, so each row is a scorable range -->
 
 ## Range drivers
 1. <largest source of width>

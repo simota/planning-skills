@@ -23,13 +23,13 @@ import validate                                    # noqa: E402  — for RULES o
 
 
 def _untracked(src: str, names: list[str]) -> set[str]:
-    """What the copy leaves behind. The copy has no git, so V28 there counts
-    every dot-directory as shipped: a local `.venv` carried across would make
-    every case report V28 and let a broken V28 pass on that noise."""
+    """What the copy leaves behind: everything git does not ship. The copy has
+    no git, so there every path counts as shipped — a local `.venv`,
+    `node_modules` or `scratch/` carried across would make every case report V28
+    and let a broken rule pass on that noise."""
     skip = {".git", "__pycache__"}
-    if Path(src) == ROOT:
-        skip |= {n for n in names if n.startswith(".") and (ROOT / n).is_dir()
-                 and not validate._tracked(ROOT / n)}
+    if validate.SHIPPED is not None:
+        skip |= {n for n in names if not validate._tracked(Path(src) / n)}
     return skip
 
 
@@ -371,6 +371,32 @@ def _(r):
 
 @case("V34-whole-dir")
 def _(r): (r / "skills/planning-risk/tools").symlink_to("../../planning-tools")
+
+
+@case("V34-ancestor")
+def _(r):
+    """A link to the repository root reaches the tools as surely as one to them."""
+    (r / "skills/planning-risk/repo").symlink_to("../..")
+
+
+def _nested_export(r: Path) -> None:
+    """This tree unpacked inside someone else's repository: git answers, for the
+    wrong tree, and an index that ships nothing here must not exempt everything."""
+    subprocess.run(["git", "init", "-q", str(r.parent)], check=True)
+
+
+@case("V8-nested-export")
+def _(r):
+    _nested_export(r)
+    p = r / "skills/planning-risk/playbooks/traps.md"
+    p.write_text(p.read_text(encoding="utf-8") + "\nSee [x](gone.md).\n", encoding="utf-8")
+
+
+@case("V28-nested-export")
+def _(r):
+    _nested_export(r)
+    (r / "stray").mkdir()
+    (r / "stray/f").write_text("x", encoding="utf-8")
 
 
 @case("V34-nested")

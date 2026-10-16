@@ -88,7 +88,7 @@ link:
 			name=$$(basename "$$path"); target="$$dir/$$name"; \
 			if [ -e "$$target" ] && [ ! -L "$$target" ]; then \
 				echo "  skip $$name (a real path is already there)"; \
-			elif [ -L "$$target" ] && [ "$$(readlink "$$target")" != "$(REPO)/$$path" ]; then \
+			elif [ -L "$$target" ] && [ -e "$$target" ] && [ "$$(readlink "$$target")" != "$(REPO)/$$path" ]; then \
 				echo "  skip $$name (links to $$(readlink "$$target"), not this repo)"; \
 			else \
 				ln -sfn "$(REPO)/$$path" "$$target"; echo "  link $$name"; \

@@ -75,19 +75,38 @@ TICK_PATH_RE = re.compile(r"`([^`\s]*(?:/[^`\s]*|\.(?:md|yaml|py)))`")
 MARKER_RE = re.compile(r"#" + r"TODO\(agent\):")
 
 
-def _markdown() -> list[Path]:
-    """Every markdown file this repo ships: what git tracks, so a local `.venv`
-    or `node_modules` full of other people's pages is not held to these rules.
-    With no git to ask — the pre-commit hook's copy of the index, a bare export —
-    everything on disk is, which is exactly the files being committed."""
+def _git(*args: str) -> str | None:
     try:
-        r = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z", "--", "*.md"],
+        r = subprocess.run(["git", "-C", str(ROOT), *args],
                            capture_output=True, text=True, encoding="utf-8")
     except OSError:
-        r = None
-    if r is None or r.returncode != 0:
+        return None
+    return r.stdout if r.returncode == 0 else None
+
+
+def _shipped() -> set[str] | None:
+    """The paths git ships, relative to ROOT — or None when git cannot say for
+    this tree: no git, or a tree that is not its own repository (an export
+    unpacked inside another one, whose index would report nothing as shipped
+    and so exempt everything). None means everything on disk counts."""
+    top = _git("rev-parse", "--show-toplevel")
+    if top is None or Path(top.strip()).resolve() != ROOT.resolve():
+        return None
+    out = _git("ls-files", "-z")
+    return None if out is None else {n for n in out.split("\0") if n}
+
+
+SHIPPED = _shipped()
+
+
+def _markdown() -> list[Path]:
+    """Every markdown file this repo ships, so a local `.venv` or `node_modules`
+    full of other people's pages is not held to these rules. With no git to ask
+    — the pre-commit hook's copy of the index, a bare export — everything on
+    disk is, which is exactly the files being committed."""
+    if SHIPPED is None:
         return sorted(f for f in ROOT.rglob("*.md") if ".git" not in f.parts)
-    return sorted(ROOT / n for n in r.stdout.split("\0") if n and (ROOT / n).is_file())
+    return sorted(ROOT / n for n in SHIPPED if n.endswith(".md") and (ROOT / n).is_file())
 
 
 MARKDOWN = _markdown()
@@ -557,14 +576,13 @@ def v28_namespace_agrees():
 
 
 def _tracked(d: Path) -> bool:
-    """Whether git ships `d`. With no git to ask — the pre-commit hook's copy of
-    the index, a bare export — it is assumed shipped, so the rule stays whole."""
-    try:
-        r = subprocess.run(["git", "-C", str(ROOT), "ls-files", "--", str(d.relative_to(ROOT))],
-                           capture_output=True, text=True)
-    except OSError:
+    """Whether git ships `d`, or anything under it. With no git to ask — the
+    pre-commit hook's copy of the index, a bare export — it is assumed shipped,
+    so the rule stays whole."""
+    if SHIPPED is None:
         return True
-    return r.returncode != 0 or bool(r.stdout.strip())
+    rel = d.relative_to(ROOT).as_posix()
+    return rel in SHIPPED or any(n.startswith(rel + "/") for n in SHIPPED)
 
 
 def v29_reference_headers():
@@ -729,10 +747,12 @@ def v34_tools_reachable():
         for top, dirs, files in os.walk(d, followlinks=False):
             for n in sorted(dirs + files):
                 entry = Path(top) / n
-                if not entry.is_symlink() or (entry.parent == d and entry.suffix == ".py"):
-                    continue                  # a top-level .py is judged above
+                if not entry.is_symlink() or (entry.parent == d and entry.name in declared_tools):
+                    continue                  # a declared tool at the top is judged above
                 target = entry.resolve()
-                if target == tools_dir or tools_dir in target.parents:
+                # The tools themselves, anything under them, or anything above
+                # them — a link to the repository root reaches them all.
+                if target == tools_dir or tools_dir in target.parents or target in tools_dir.parents:
                     fail("V34", f"{entry.relative_to(d.parent)} reaches into {SET}-tools/; "
                                 "only a declared tool, linked at a skill's top level, may")
 

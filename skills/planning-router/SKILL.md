@@ -71,7 +71,8 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
   running anything
 - Always: distinguish lifecycle from phase order. A pre-start revisit does not
   invoke replan; a post-start divergence selects its owner, not a fixed next phase
-- Always: pass the brief whole to every stage. It changes only through framing
+- Always: pass the brief whole to every stage. It changes only through framing,
+  a gate-5 `terms` entry aside
 - Never: write an artifact. This skill dispatches; the phases produce
 - Never: run a phase to make the chain look complete
 - Never: work around a gate that fired. Report it
