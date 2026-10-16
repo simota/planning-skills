@@ -223,11 +223,14 @@ def _ask(engine: str, prompt: str, schema: dict):
                 raise EngineError(f"codex wrote no answer.\n{_tail(r)}")
             return _parse(engine, body)
         if engine == "claude":
-            # No prompt argument: `-p` reads it from stdin. Without a shell or a
-            # file tool, a claim that says "run this" has nothing to run it with.
+            # No prompt argument: `-p` reads it from stdin. No tools at all and
+            # no MCP servers: a denylist misses whatever it did not name (Read,
+            # WebSearch, a user's MCP tools), so a claim that says "run this" or
+            # "read that" has nothing to do it with. `--json-schema` still
+            # answers through its own StructuredOutput tool.
             argv = ["claude", "-p", "--output-format", "json",
                     "--json-schema", json.dumps(schema),
-                    "--disallowedTools", "Bash,Edit,Write,MultiEdit,NotebookEdit,WebFetch"]
+                    "--tools", "", "--strict-mcp-config"]
             r = _spawn(engine, argv, cwd, prompt)
             return _structured(engine, _parse(engine, r.stdout), r, "subtype")
         if engine == "agy":
@@ -254,7 +257,11 @@ def _structured(engine: str, envelope: dict, r: subprocess.CompletedProcess, sta
 def _spawn(engine: str, argv: list[str], cwd: pathlib.Path,
            stdin: str | None = None) -> subprocess.CompletedProcess:
     try:
-        r = subprocess.run(argv, capture_output=True, text=True, timeout=TIMEOUT,
+        # Decoded leniently and as UTF-8 whatever the locale: one stray byte in an
+        # engine's output must surface as that engine's error, not as a
+        # UnicodeDecodeError that takes the other engines' verdicts down with it.
+        r = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", timeout=TIMEOUT,
                            cwd=cwd, input=stdin if stdin is not None else "")
     except FileNotFoundError:
         raise EngineError(f"{engine} is not on PATH") from None

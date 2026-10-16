@@ -38,7 +38,10 @@ CAP_RAW = load("capabilities.yaml") or {}
 # A skill entry is a mapping. A scalar one is V9's to report; every other rule
 # reads only the mappings, so one bad line is one failure rather than a crash.
 CAP = {k: v for k, v in CAP_RAW.items() if isinstance(v, dict)}
-ROUTES = load("routes.yaml")
+ROUTES_RAW = load("routes.yaml") or {}
+# As with capabilities: a null or scalar route is V7's to report, and every
+# other rule reads only the mappings.
+ROUTES = {k: v for k, v in ROUTES_RAW.items() if isinstance(v, dict)}
 FIX = load("fixtures.yaml")
 
 LIM = H["limits"]
@@ -70,6 +73,24 @@ def link_path(target: str) -> str:
 # the directory the file writing it lives in.
 TICK_PATH_RE = re.compile(r"`([^`\s]*(?:/[^`\s]*|\.(?:md|yaml|py)))`")
 MARKER_RE = re.compile(r"#" + r"TODO\(agent\):")
+
+
+def _markdown() -> list[Path]:
+    """Every markdown file this repo ships: what git tracks, so a local `.venv`
+    or `node_modules` full of other people's pages is not held to these rules.
+    With no git to ask — the pre-commit hook's copy of the index, a bare export —
+    everything on disk is, which is exactly the files being committed."""
+    try:
+        r = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z", "--", "*.md"],
+                           capture_output=True, text=True, encoding="utf-8")
+    except OSError:
+        r = None
+    if r is None or r.returncode != 0:
+        return sorted(f for f in ROOT.rglob("*.md") if ".git" not in f.parts)
+    return sorted(ROOT / n for n in r.stdout.split("\0") if n and (ROOT / n).is_file())
+
+
+MARKDOWN = _markdown()
 
 
 def read(p: Path) -> str:
@@ -172,23 +193,23 @@ def v6_budgets():
             fail("V6", f"{SHARED}/{f.name} is {n} lines (max {LIM['shared_file_lines']})")
     if total > LIM["shared_lines_total"]:
         fail("V6", f"{SHARED} totals {total} lines (max {LIM['shared_lines_total']})")
-    repo = sum(len(read(f).splitlines()) for f in ROOT.rglob("*.md")
-               if ".git" not in f.parts)
+    repo = sum(len(read(f).splitlines()) for f in MARKDOWN)
     if repo > LIM["repo_md_lines_total"]:
         fail("V6", f"repo markdown totals {repo} lines (max {LIM['repo_md_lines_total']})")
 
 
 def v7_routes_real():
+    for name, r in ROUTES_RAW.items():
+        if not isinstance(r, dict):
+            fail("V7", f"routes.yaml {name} is {r!r}, not a mapping")
     for name, r in ROUTES.items():
-        for s in r.get("chain", []):
+        for s in r.get("chain") or []:
             if s not in SKILLS:
                 fail("V7", f"route {name} chains {s}, which does not exist")
 
 
 def v8_links():
-    for f in ROOT.rglob("*.md"):
-        if ".git" in f.parts:
-            continue
+    for f in MARKDOWN:
         for target in LINK_RE.findall(read(f)):
             if target.startswith(("http", "#", "mailto:")):
                 continue
@@ -250,8 +271,8 @@ def v12_prefix():
 
 
 def v13_route_budget():
-    if len(ROUTES) > LIM["routes_max"]:
-        fail("V13", f"{len(ROUTES)} routes (max {LIM['routes_max']})")
+    if len(ROUTES_RAW) > LIM["routes_max"]:
+        fail("V13", f"{len(ROUTES_RAW)} routes (max {LIM['routes_max']})")
     for name, r in ROUTES.items():
         n = len(r.get("chain") or [])
         if n > LIM["route_stages_max"]:
@@ -294,7 +315,9 @@ def v16_sections():
 
 def v17_delivery():
     for key, spec in H["delivered"].items():
-        want = read(ROOT / "planning-registry" / "delivered" / f"{key}.md").rstrip("\n")
+        # Normalised exactly as render.py writes it, or a leading blank line in
+        # the source is a difference no `make render` can ever close.
+        want = read(ROOT / "planning-registry" / "delivered" / f"{key}.md").strip("\n")
         open_m, close_m = f"<!-- deliver:{key} -->", f"<!-- /deliver:{key} -->"
         for d in SKILL_DIRS:
             text = read(d / "SKILL.md")
@@ -413,8 +436,8 @@ def v21_verify_names_a_grade():
 
 
 def v22_markers_classified():
-    for f in ROOT.rglob("*.md"):
-        if ".git" in f.parts or f.parts[-2:-1] == ("delivered",):
+    for f in MARKDOWN:
+        if f.parts[-2:-1] == ("delivered",):
             continue
         for i, line in enumerate(read(f).splitlines(), 1):
             # A marker quoted in a code span is the form being described, not a
@@ -431,9 +454,7 @@ def v23_labels():
         for pat, label in H["label_by_path"].items():
             if label not in allowed:
                 fail("V23", f"label_by_path[{pat!r}] is {label!r}, not one of {allowed}")
-    for f in sorted(ROOT.rglob("*.md")):
-        if ".git" in f.parts:
-            continue
+    for f in MARKDOWN:
         rel = str(f.relative_to(ROOT))
         want = None
         for pat, label in H["label_by_path"].items():
@@ -525,9 +546,9 @@ def v28_namespace_agrees():
     for d in sorted(list(ROOT.iterdir()) + list(SKILLS_ROOT.iterdir() if SKILLS_ROOT != ROOT else [])):
         if not d.is_dir() or d.name in PLATFORM_DIRS:
             continue
-        # `.venv`, `.pytest_cache`, `.idea` are the checkout's, not the set's;
-        # a dot-directory git tracks is shipped, and is held to the rule.
-        if d.name.startswith(".") and not _tracked(d):
+        # `.venv`, `.idea`, `node_modules` are the checkout's, not the set's;
+        # a directory git tracks is shipped, and is held to the rule.
+        if not _tracked(d):
             continue
         if not (d.name.startswith(PREFIX) or d.name == SHARED):
             fail("V28", f"{d.name}/ carries no set name; a directory this set owns "
@@ -701,6 +722,19 @@ def v34_tools_reachable():
             if entry.suffix == ".py" and entry.name not in declared_tools:
                 fail("V34", f"{d.name}/{entry.name} is a tool link nothing "
                             "declares; add it to linked_tools or remove it")
+    # Any other way in is the whole-directory grant the docstring rules out: a
+    # link to the tools directory itself, or one nested under playbooks/.
+    tools_dir = (ROOT / f"{SET}-tools").resolve()
+    for d in SKILL_DIRS:
+        for top, dirs, files in os.walk(d, followlinks=False):
+            for n in sorted(dirs + files):
+                entry = Path(top) / n
+                if not entry.is_symlink() or (entry.parent == d and entry.suffix == ".py"):
+                    continue                  # a top-level .py is judged above
+                target = entry.resolve()
+                if target == tools_dir or tools_dir in target.parents:
+                    fail("V34", f"{entry.relative_to(d.parent)} reaches into {SET}-tools/; "
+                                "only a declared tool, linked at a skill's top level, may")
 
 
 def v35_signature():
@@ -886,8 +920,8 @@ def v38_enumerations_declared():
     Declared words are what V20 and V22 reach; the rest is what drifts.
     """
     declared = {w for words in VOCAB.values() for w in words}
-    for f in sorted(SKILLS_ROOT.rglob("*.md")):
-        if ".git" in f.parts:
+    for f in MARKDOWN:
+        if SKILLS_ROOT != ROOT and SKILLS_ROOT not in f.parents:
             continue
         for i, line in enumerate(read(f).splitlines(), 1):
             m = ENUM_RE.search(line)

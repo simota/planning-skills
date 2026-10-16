@@ -87,6 +87,13 @@ def _(r): sub(r / "planning-registry/routes.yaml", "chain: [planning-risk, plann
               "chain: [planning-risk, planning-nonexistent]")
 
 
+@case("V7-null")
+def _(r):
+    """A route left as a bare key is a failure to report, not a traceback."""
+    p = r / "planning-registry/routes.yaml"
+    p.write_text(p.read_text(encoding="utf-8") + "\nhalf-written:\n", encoding="utf-8")
+
+
 @case("V8")
 def _(r): sub(r / "README.md", "](skills/_planning/CONTRACT.md)", "](skills/_planning/GONE.md)")
 
@@ -362,6 +369,16 @@ def _(r):
     (r / "skills/planning-risk/render.py").symlink_to("../../planning-tools/render.py")
 
 
+@case("V34-whole-dir")
+def _(r): (r / "skills/planning-risk/tools").symlink_to("../../planning-tools")
+
+
+@case("V34-nested")
+def _(r):
+    """A declared tool linked below the top level is a way in nothing checks."""
+    (r / "skills/planning-risk/playbooks/refute.py").symlink_to("../../../planning-tools/refute.py")
+
+
 @case("V34-missing-tool")
 def _(r): sub(r / "planning-registry/harness.yaml",
               "  refute.py: all", "  refute.py: all\n  nosuch.py: all")
@@ -421,6 +438,52 @@ def _(r):
 def _(r): sub(r / "planning-registry/harness.yaml", "source_authorities:", "unused_authorities:")
 
 
+# Each quiet case mutates a copy the same way, and the validator must stay green:
+# a rule that fires on what it exists to ignore gets switched off by hand.
+QUIET: dict[str, callable] = {}
+
+
+def quiet(name):
+    def deco(fn):
+        QUIET[name] = fn
+        return fn
+    return deco
+
+
+def _git_all(r: Path) -> None:
+    """The copy as a checkout: everything in it tracked, so what is added after is not."""
+    subprocess.run(["git", "init", "-q", str(r)], check=True)
+    subprocess.run(["git", "-C", str(r), "add", "-A"], check=True)
+
+
+@quiet("untracked-dotdir")
+def _(r):
+    """The case `_untracked` keeps out of every other copy: a local `.venv`."""
+    _git_all(r)
+    (r / ".venv/bin").mkdir(parents=True)
+    (r / ".venv/bin/python").write_text("x", encoding="utf-8")
+
+
+@quiet("untracked-node-modules")
+def _(r):
+    """Someone else's markdown, untracked, breaks every page rule; none is ours."""
+    _git_all(r)
+    d = r / "skills/node_modules/pkg/playbooks"
+    d.mkdir(parents=True)
+    (d / "README.md").write_text(
+        "[gone](gone.md)\n#" + "TODO(agent): x\nLEVEL: FOO | BAR\n" + "x\n" * 5000,
+        encoding="utf-8")
+
+
+@quiet("leading-blank-delivered")
+def _(r):
+    """A delivered source opening on a blank line, then `make render`."""
+    p = r / "planning-registry/delivered/score.md"
+    p.write_text("\n" + p.read_text(encoding="utf-8"), encoding="utf-8")
+    subprocess.run([sys.executable, str(r / "planning-tools/render.py")],
+                   check=True, capture_output=True)
+
+
 def main() -> int:
     baseline = run(ROOT)
     if baseline.returncode != 0:
@@ -442,6 +505,20 @@ def main() -> int:
                 print(f"  {rule} did not fire\n{out}")
 
     print(f"{len(CASES)} rules exercised, {len(bad)} silent")
+    loud: list[str] = []
+    for name, mutate in QUIET.items():
+        with tempfile.TemporaryDirectory() as tmp:
+            copy = Path(tmp) / "repo"
+            shutil.copytree(ROOT, copy, symlinks=True, ignore=_untracked)
+            mutate(copy)
+            r = run(copy)
+            if r.returncode != 0:
+                loud.append(name)
+                print(f"  {name} should have stayed green\n{r.stdout + r.stderr}")
+    print(f"{len(QUIET)} quiet cases, {len(loud)} loud")
+    if loud:
+        print("loud: " + ", ".join(loud))
+        return 1
     if bad:
         print("silent: " + ", ".join(bad))
         return 1
