@@ -211,9 +211,16 @@ def check_merge(fx) -> int:
     n += 1
     if not near(num(hdr), mean, 2):
         fail("merge", f"header states one chain's mean as {num(hdr)}, model gives {mean:.2f}")
+    # The headline slip is published with its percentage; that one may not
+    # vanish unnoticed. Other rows may carry one or not.
+    pct_required = {"8"}
     for r in rows:
         m = PCT.search(r[2])
         if not m:
+            if r[0] in pct_required:
+                n += 1
+                fail("merge", f"k={r[0]} slip: the page no longer states its percentage, "
+                              f"model gives {fx['merge_slip_pct'][r[0]]:+.0f}%")
             continue
         n += 1
         want = fx.get("merge_slip_pct", {}).get(r[0])
