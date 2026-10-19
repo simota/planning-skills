@@ -6,9 +6,11 @@ stands between an engine's answer and a verdict is exercised on every run.
 """
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -54,6 +56,24 @@ REFUSED = [
 ]
 
 
+def _alive(pidfile: Path) -> bool:
+    """Whether the pid recorded in `pidfile` is still a running process."""
+    if not pidfile.exists():
+        return False
+    pid = int(pidfile.read_text())
+    for _ in range(20):                              # killing is not instant
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        stat = Path(f"/proc/{pid}/stat")
+        if stat.exists() and stat.read_text().split(") ", 1)[-1].startswith("Z"):
+            return False                             # dead, waiting to be reaped
+        time.sleep(0.1)
+    os.kill(pid, 9)                                  # leave no stray behind
+    return True
+
+
 def spawn_cases() -> list[str]:
     """What reaches an engine and what comes back, with a stub for the engine."""
     bad = []
@@ -67,6 +87,31 @@ def spawn_cases() -> list[str]:
                 bad.append(f"spawn: undecodable byte came back as {r.stdout!r}")
         except Exception as e:                       # noqa: BLE001 — any escape is the bug
             bad.append(f"spawn: undecodable output raised {type(e).__name__}: {e}")
+        # A claim the OS cannot pass as an argument (a NUL byte, as agy's argv
+        # carries the prompt) is that engine's error, not a crash of the run.
+        try:
+            engine._spawn("stub", [sys.executable, "-c", "pass", "a\x00b"], Path(tmp), "")
+            bad.append("spawn: an argument with a NUL byte was accepted")
+        except engine.EngineError:
+            pass
+        except Exception as e:                       # noqa: BLE001
+            bad.append(f"spawn: a NUL byte raised {type(e).__name__}: {e}")
+        # A timed-out engine is stopped whole: a launcher's own child must not
+        # outlive the run, still spending tokens on a prompt nobody reads.
+        pidfile = Path(tmp) / "child.pid"
+        launcher = ("import subprocess, sys; "
+                    "p = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)']); "
+                    f"open({str(pidfile)!r}, 'w').write(str(p.pid)); p.wait()")
+        timeout, engine.TIMEOUT = engine.TIMEOUT, 2
+        try:
+            engine._spawn("stub", [sys.executable, "-c", launcher], Path(tmp), "")
+            bad.append("spawn: a hung engine was not timed out")
+        except engine.EngineError:
+            pass
+        finally:
+            engine.TIMEOUT = timeout
+        if _alive(pidfile):
+            bad.append("spawn: a timed-out engine's child process is still running")
     # claude gets no tools and no MCP servers; a denylist misses what it omits.
     seen: list[list[str]] = []
 
@@ -102,7 +147,7 @@ def main() -> int:
         print("FAIL:", b)
     if bad:
         return 1
-    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; spawn: 2 cases")
+    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; spawn: 4 cases")
     return 0
 
 

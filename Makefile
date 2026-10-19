@@ -13,7 +13,9 @@ AGY_DIR    ?= $(HOME)/.gemini/antigravity-cli/skills
 # written to when it is installed here, and its own home — the parent of the
 # skills directory — is what says so: judging by the skills directory itself
 # would skip a host that has one but has never been given a skill.
-HOST_DIRS  := $(CLAUDE_DIR) $(CODEX_DIR) $(AGY_DIR)
+# Quoted one by one where it is used: a home directory may contain a space,
+# and an unquoted list would split it into two paths and link into the first.
+HOST_DIRS  := "$(CLAUDE_DIR)" "$(CODEX_DIR)" "$(AGY_DIR)"
 
 .DEFAULT_GOAL := help
 .PHONY: help check validate test figures figures-full figures-rewrite engines refute render hooks link unlink status
