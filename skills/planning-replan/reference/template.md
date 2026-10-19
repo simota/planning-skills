@@ -31,7 +31,7 @@ Verified: 2026-10-16 — no automated check.
 | Stop | | | |
 <!-- when continuation is in question; a record-only entry writes "not priced: record-only", a close-out "not priced: close-out" -->
 
-- Class: <divergence class> (`course-correct` key: <key>) — a close-out writes `close-out` and omits Changed, Superseded and Revised commitment; a stop writes `stop (cause: <class>)` and `Revised commitment: none — stop recommended; the person decides`
+- Class: <divergence class> (`course-correct` key: <key>) — a close-out writes `close-out` and omits Changed, Superseded and Revised commitment; a stop writes `stop (cause: <class>)` and `Revised commitment: unchanged — stop recommended, pending the person's decision`; the commitment is cleared only at the close-out after they stop the work
 - Measured: <the gap, as a number>
 - Changed: <artifacts and IDs>
 - Superseded: <file> → <replacement>

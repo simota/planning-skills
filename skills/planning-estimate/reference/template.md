@@ -51,8 +51,8 @@ Confidence: High | Medium | Low (<reason>)
 Actual recorded by: <owner>
 | ID | Unit (effort / elapsed) | Range | Midpoint | Actual | Outcome | Ratio |
 |---|---|---|---|---|---|---|
-<!-- one row per task effort range (O … P), one per critical-path total (effort and
-     elapsed, p10 … p90), and one per Schedule milestone (Earliest … Latest, elapsed);
+<!-- per task, one row for its effort range and one for its elapsed range (O … P); one per
+     critical-path total (effort and elapsed, p10 … p90); one per Schedule milestone (elapsed);
      only the effort total counts toward the 80% rate. Midpoint = (low + high) / 2. Actual,
      Outcome and Ratio stay `—` here: once the work closes, planning-replan scores
      each row in changelog.md (_planning/CALIBRATION.md) -->
