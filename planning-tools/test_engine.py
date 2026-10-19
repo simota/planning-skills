@@ -7,6 +7,7 @@ stands between an engine's answer and a verdict is exercised on every run.
 from __future__ import annotations
 
 import os
+import signal
 import subprocess
 import sys
 import tempfile
@@ -110,8 +111,51 @@ def spawn_cases() -> list[str]:
             pass
         finally:
             engine.TIMEOUT = timeout
-        if _alive(pidfile):
+        if not pidfile.exists():
+            bad.append("spawn: the launcher never recorded its child; the timeout case tested nothing")
+        elif _alive(pidfile):
             bad.append("spawn: a timed-out engine's child process is still running")
+        # Interrupted while waiting (Ctrl-C, any exception): the engine is in its
+        # own session, so nothing but this harness will ever stop it.
+        selfpid = Path(tmp) / "self.pid"
+        sleeper = (f"import os, time; open({str(selfpid)!r}, 'w').write(str(os.getpid())); "
+                   "time.sleep(60)")
+
+        class Interrupted(Exception):
+            pass
+
+        def interrupt(*_):
+            raise Interrupted
+        old = signal.signal(signal.SIGALRM, interrupt)
+        signal.setitimer(signal.ITIMER_REAL, 1.0)
+        try:
+            engine._spawn("stub", [sys.executable, "-c", sleeper], Path(tmp), "")
+            bad.append("spawn: the interrupt never arrived")
+        except Interrupted:
+            pass
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+            signal.signal(signal.SIGALRM, old)
+        if not selfpid.exists():
+            bad.append("spawn: the interrupted engine never started; that case tested nothing")
+        elif _alive(selfpid):
+            bad.append("spawn: an interrupted engine is still running")
+        # A descendant that left the group still holds the output pipes; the
+        # timeout must still return on time rather than wait for it.
+        escapee = ("import subprocess, sys; "
+                   "subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(6)'], "
+                   "start_new_session=True); import time; time.sleep(60)")
+        timeout, engine.TIMEOUT = engine.TIMEOUT, 1
+        start = time.monotonic()
+        try:
+            engine._spawn("stub", [sys.executable, "-c", escapee], Path(tmp), "")
+        except engine.EngineError:
+            pass
+        finally:
+            engine.TIMEOUT = timeout
+        if time.monotonic() - start > 4:
+            bad.append(f"spawn: a timeout took {time.monotonic() - start:.1f}s, waiting on "
+                       "a descendant that left the engine's group")
     # claude gets no tools and no MCP servers; a denylist misses what it omits.
     seen: list[list[str]] = []
 
@@ -147,7 +191,7 @@ def main() -> int:
         print("FAIL:", b)
     if bad:
         return 1
-    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; spawn: 4 cases")
+    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; spawn: 6 cases")
     return 0
 
 

@@ -22,7 +22,7 @@ Verified: 2026-10-16 — no automated check.
 ### Ranges scored
 | ID | Kind (original / revision) | Unit (effort / elapsed) | Range | Actual | Outcome | Ratio |
 |---|---|---|---|---|---|---|
-<!-- every range this divergence (or, at close-out, the finished or stopped work) closed; a revision is its own row, never in place of the original; at a stop, unfinished work is `abandoned` -->
+<!-- every range this divergence (or, at close-out, the finished or stopped work) closed; a revision is its own row, never in place of the original; once the person has stopped the work, close-out scores what never finished `abandoned` — a stop recommendation scores only what it closed -->
 
 ### Continue or stop
 | Option | Remaining cost (range) | Remaining value | Salvageable |

@@ -278,6 +278,11 @@ def _spawn(engine: str, argv: list[str], cwd: pathlib.Path,
     except subprocess.TimeoutExpired:
         _kill_group(p)
         raise EngineError(f"{engine} did not answer within {TIMEOUT}s") from None
+    except BaseException:
+        # Ctrl-C, or anything else: in its own session the engine hears no
+        # terminal signal, so it stops here or it does not stop.
+        _kill_group(p)
+        raise
     r = subprocess.CompletedProcess(argv, p.returncode, out, err)
     # A failed run that still printed an object is a failed run.
     if r.returncode != 0:
@@ -290,7 +295,12 @@ def _kill_group(p: subprocess.Popen) -> None:
         os.killpg(p.pid, signal.SIGKILL)
     except (ProcessLookupError, PermissionError):
         p.kill()
-    p.communicate()
+    # Reap the engine, then let go of its pipes: draining them would wait on any
+    # descendant that left the group and still holds them open.
+    p.wait()
+    for pipe in (p.stdin, p.stdout, p.stderr):
+        if pipe:
+            pipe.close()
 
 
 def _parse(engine: str, body: str) -> dict:
