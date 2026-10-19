@@ -258,35 +258,42 @@ def _structured(engine: str, envelope: dict, r: subprocess.CompletedProcess, sta
 
 def _spawn(engine: str, argv: list[str], cwd: pathlib.Path,
            stdin: str | None = None) -> subprocess.CompletedProcess:
+    # Armed before the engine exists, so no termination can slip between its
+    # start and the cleanup that stops it; until it exists, a signal is only
+    # noted, and acted on the moment there is an engine to stop.
+    termination = _Termination()
+    p = None
     try:
-        # Decoded leniently and as UTF-8 whatever the locale: one stray byte in an
-        # engine's output must surface as that engine's error, not as a
-        # UnicodeDecodeError that takes the other engines' verdicts down with it.
-        # Its own session, so a timeout stops the whole engine: a CLI that is a
-        # launcher for the real binary would otherwise leave that binary running.
-        p = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE, text=True, encoding="utf-8",
-                             errors="replace", cwd=cwd, start_new_session=True)
-    except FileNotFoundError:
-        raise EngineError(f"{engine} is not on PATH") from None
-    # E2BIG for an oversized argv; ValueError for one the OS cannot carry (a NUL
-    # byte, an unpaired surrogate) — either is this engine's, not the run's.
-    except (OSError, ValueError) as e:
-        raise EngineError(f"{engine} could not be started: {e}") from None
-    previous = _exit_on_termination()
-    try:
+        try:
+            # Decoded leniently and as UTF-8 whatever the locale: one stray byte
+            # in an engine's output must surface as that engine's error, not as a
+            # UnicodeDecodeError that takes the other engines' verdicts with it.
+            # Its own session, so a timeout stops the whole engine: a CLI that is
+            # a launcher for the real binary would otherwise leave it running.
+            p = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE, text=True, encoding="utf-8",
+                                 errors="replace", cwd=cwd, start_new_session=True)
+        except FileNotFoundError:
+            raise EngineError(f"{engine} is not on PATH") from None
+        # E2BIG for an oversized argv; ValueError for one the OS cannot carry (a
+        # NUL byte, an unpaired surrogate) — either is this engine's, not the run's.
+        except (OSError, ValueError) as e:
+            raise EngineError(f"{engine} could not be started: {e}") from None
+        termination.arm()
         out, err = p.communicate(input=stdin if stdin is not None else "", timeout=TIMEOUT)
     except subprocess.TimeoutExpired:
         _kill_group(p)
         raise EngineError(f"{engine} did not answer within {TIMEOUT}s") from None
+    except EngineError:
+        raise
     except BaseException:
         # Ctrl-C, a termination, anything else: in its own session the engine
         # hears no signal meant for this harness, so it stops here or not at all.
-        _kill_group(p)
+        if p is not None:
+            _kill_group(p)
         raise
     finally:
-        for sig, handler in previous.items():
-            signal.signal(sig, handler)
+        termination.restore()
     r = subprocess.CompletedProcess(argv, p.returncode, out, err)
     # A failed run that still printed an object is a failed run.
     if r.returncode != 0:
@@ -294,21 +301,39 @@ def _spawn(engine: str, argv: list[str], cwd: pathlib.Path,
     return r
 
 
-def _exit_on_termination() -> dict:
-    """Make SIGTERM and SIGHUP raise, for as long as an engine runs. By default
-    they end this process on the spot, skipping the cleanup that stops the
-    engine — which, in its own session, never received them. Only the main
-    thread may set handlers; elsewhere the defaults stay."""
-    previous = {}
+class _Termination:
+    """SIGTERM and SIGHUP end this process on the spot by default, skipping the
+    cleanup that stops the engine — which, in its own session, never received
+    them. While an engine runs they raise SystemExit instead; before it exists
+    they are noted and raised once it does. Only the main thread may set
+    handlers; elsewhere the defaults stay."""
 
-    def raise_exit(signum, _frame):
+    SIGNALS = (signal.SIGTERM, signal.SIGHUP)
+
+    def __init__(self):
+        self.armed, self.pending, self.previous = False, None, {}
+        for sig in self.SIGNALS:
+            try:
+                self.previous[sig] = signal.signal(sig, self._handle)
+            except ValueError:                  # not the main thread
+                break
+
+    def _handle(self, signum, _frame):
+        if not self.armed:
+            self.pending = signum               # no engine to stop yet
+            return
         raise SystemExit(128 + signum)
-    for sig in (signal.SIGTERM, signal.SIGHUP):
-        try:
-            previous[sig] = signal.signal(sig, raise_exit)
-        except ValueError:                      # not the main thread
-            break
-    return previous
+
+    def arm(self):
+        self.armed = True
+        if self.pending is not None:
+            raise SystemExit(128 + self.pending)
+
+    def restore(self):
+        for sig, handler in self.previous.items():
+            signal.signal(sig, handler)
+        if self.pending is not None and not self.armed:
+            raise SystemExit(128 + self.pending)  # the engine never started
 
 
 def _kill_group(p: subprocess.Popen) -> None:

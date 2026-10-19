@@ -158,6 +158,32 @@ def spawn_cases() -> list[str]:
                 bad.append(f"spawn: the {sig.name} case's engine never started; it tested nothing")
             elif _alive(selfpid):
                 bad.append(f"spawn: the engine outlived a {sig.name} to the harness")
+        # Terminated while the engine is being started: the signal must still
+        # take the engine down, not only the harness.
+        selfpid.unlink(missing_ok=True)
+        real_popen = engine.subprocess.Popen
+
+        def popen_then_term(*a, **k):
+            p = real_popen(*a, **k)
+            for _ in range(50):                      # until the engine has started
+                if selfpid.exists():
+                    break
+                time.sleep(0.05)
+            os.kill(os.getpid(), signal.SIGTERM)
+            time.sleep(0.2)                          # let the handler run in here
+            return p
+        engine.subprocess.Popen = popen_then_term
+        try:
+            engine._spawn("stub", [sys.executable, "-c", sleeper], Path(tmp), "")
+            bad.append("spawn: a SIGTERM during start-up never arrived")
+        except SystemExit:
+            pass
+        finally:
+            engine.subprocess.Popen = real_popen
+        if not selfpid.exists():
+            bad.append("spawn: the start-up case's engine never started; it tested nothing")
+        elif _alive(selfpid):
+            bad.append("spawn: the engine outlived a SIGTERM that arrived while it started")
         # A descendant that left the group still holds the output pipes; the
         # timeout must still return on time rather than wait for it.
         escapee = ("import subprocess, sys; "
@@ -209,7 +235,7 @@ def main() -> int:
         print("FAIL:", b)
     if bad:
         return 1
-    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; spawn: 8 cases")
+    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; spawn: 9 cases")
     return 0
 
 
