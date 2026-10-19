@@ -8,7 +8,7 @@ allowed-tools: Read, Grep, Glob, Write, Edit
 ## Owns
 
 Post-start divergence, classified and corrected at its owning phase, and the close-out
-that, once the work finishes, scores every range not scored at a divergence (`close-out` in `registry/routes.yaml`) —
+that, once the work finishes or is stopped, scores every range not scored at a divergence (`close-out` in `registry/routes.yaml`) —
 a plan that met its forecast is scored too. A pre-start edit is not a replan: it goes straight to the phase that owns it. **Stopping stays on the table
 and is priced like any other option.**
 
@@ -114,7 +114,7 @@ from memory is the one that gets classified wrong**: memory reconstructs the cau
 - **A range is scored, or it never meant anything.** Whatever was given one
   number-pair gets one outcome once the work closes — `within`, `under`,
   `over`, `open`, `abandoned` — and the ratio of actual to midpoint beside it.
-  Scored on the original range, never the revision. **A record of ten `within`
+  Scored on the original; a revision is scored as its own range. **Ten `within`
   in ten is a defect**: ranges that cannot be wrong carry no information
   (`_planning/CALIBRATION.md`)
 <!-- /deliver:score -->

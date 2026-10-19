@@ -15,14 +15,14 @@ Verified: 2026-10-16 — no automated check.
 ## YYYY-MM-DD — <trigger in one line>
 
 ### Planned vs actual
-| ID | Planned (range) | Midpoint | Actual | Delta | % | Status | Source |
-|---|---|---|---|---|---|---|---|
+| ID | Unit (effort / elapsed) | Planned (range) | Midpoint | Actual | Delta | % | Status | Source |
+|---|---|---|---|---|---|---|---|---|
 <!-- before any prose; Delta against the midpoint; Source is the export, artifact or person -->
 
 ### Ranges scored
-| ID | Unit (effort / elapsed) | Original range | Actual | Outcome | Ratio |
-|---|---|---|---|---|---|
-<!-- every range this divergence (or, at close-out, the finished work) closed, on the original, never the revision -->
+| ID | Kind (original / revision) | Unit (effort / elapsed) | Range | Actual | Outcome | Ratio |
+|---|---|---|---|---|---|---|
+<!-- every range this divergence (or, at close-out, the finished or stopped work) closed; a revision is its own row, never in place of the original; at a stop, unfinished work is `abandoned` -->
 
 ### Continue or stop
 | Option | Remaining cost (range) | Remaining value | Salvageable |
@@ -31,7 +31,7 @@ Verified: 2026-10-16 — no automated check.
 | Stop | | | |
 <!-- when continuation is in question; a record-only entry writes "not priced: record-only", a close-out "not priced: close-out" -->
 
-- Class: <divergence class> (`course-correct` key: <key>) — a close-out writes `close-out` and omits Changed, Superseded and Revised commitment
+- Class: <divergence class> (`course-correct` key: <key>) — a close-out writes `close-out` and omits Changed, Superseded and Revised commitment; a stop writes `stop (cause: <class>)` and `Revised commitment: none — stop recommended; the person decides`
 - Measured: <the gap, as a number>
 - Changed: <artifacts and IDs>
 - Superseded: <file> → <replacement>

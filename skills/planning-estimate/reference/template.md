@@ -22,7 +22,7 @@ Verified: 2026-10-16 — no automated check.
 
 ## Critical path total
 Effort p10 <mean − 1.28σ> … p90 <mean + 1.28σ> person-days, p50 <mean> · Elapsed p10 … p90 <calendar days>
-<!-- the p10 … p90 pair is the 80% range calibration scores -->
+<!-- both pairs are scored (Calibration); the effort p10 … p90 pair is the one that counts toward the 80% rate -->
 Confidence: High | Medium | Low (<reason>)
 
 ## Buffer
@@ -33,7 +33,7 @@ Confidence: High | Medium | Low (<reason>)
 ## Schedule
 | Milestone | Earliest | Likely | Latest | Confidence |
 |---|---|---|---|---|
-<!-- Earliest / Likely / Latest in elapsed working days from the start, so each row is a scorable range -->
+<!-- Earliest / Likely / Latest in elapsed calendar days from the start, so each row is a scorable range -->
 
 ## Range drivers
 1. <largest source of width>
@@ -51,9 +51,9 @@ Confidence: High | Medium | Low (<reason>)
 Actual recorded by: <owner>
 | ID | Unit (effort / elapsed) | Range | Midpoint | Actual | Outcome | Ratio |
 |---|---|---|---|---|---|---|
-<!-- one row per task range (O … P), one for the critical-path total (p10 … p90), and
-     one per Schedule milestone (Earliest … Latest, elapsed); only the total counts toward
-     the 80% rate. Midpoint = (low + high) / 2. Actual,
+<!-- one row per task effort range (O … P), one per critical-path total (effort and
+     elapsed, p10 … p90), and one per Schedule milestone (Earliest … Latest, elapsed);
+     only the effort total counts toward the 80% rate. Midpoint = (low + high) / 2. Actual,
      Outcome and Ratio stay `—` here: once the work closes, planning-replan scores
      each row in changelog.md (_planning/CALIBRATION.md) -->
 ```

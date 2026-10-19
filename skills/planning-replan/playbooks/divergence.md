@@ -21,7 +21,7 @@ Misclassification is the expensive failure here: treating missing work as estima
 
 ## Divergence Measurement
 
-Planned, Actual, and Delta use **one unit throughout** — the same effort or elapsed unit `35-estimate.md` used. Planned is the original range; **Delta and % are taken against its midpoint, `(low + high) / 2`** — the same midpoint the calibration ratio uses. Never mix a T-shirt size into a numeric delta: `+2` against `S → L` is unreadable as days, size steps, or percent, and the 30% stop-test threshold cannot be computed from it.
+Planned, Actual, and Delta share **one unit per row** — the effort or elapsed unit `35-estimate.md` used for that range. Planned is the original range; **Delta and % are taken against its midpoint, `(low + high) / 2`** — the same midpoint the calibration ratio uses. Never mix a T-shirt size into a numeric delta: `+2` against `S → L` is unreadable as days, size steps, or percent, and the 30% stop-test threshold cannot be computed from it.
 
 ```
 | ID  | Planned (d) | Midpoint | Actual (d) | Delta | %    | Status |
@@ -37,7 +37,7 @@ Then project: at the observed rate, the remaining critical path finishes in `[ra
 
 ## The Stop Test
 
-Run it when the projected finish — critical-path actuals to date plus the remaining critical path at the observed rate — exceeds the original critical-path total by more than 30%, both taken at their midpoints — or whenever continuation is otherwise in question: remaining value fell, or the person asks whether to continue. One task's delta alone never triggers it: with the path unmoved, that is `record-only`. Answer all four:
+Run it when the projected finish — critical-path actuals to date plus the remaining critical path at the observed rate — exceeds the original critical-path total by more than 30%, both in the same unit and taken at their midpoints — or whenever continuation is otherwise in question: remaining value fell, or the person asks whether to continue. One task's delta alone never triggers it: with the path unmoved, that is `record-only`. Answer all four:
 
 1. What is the remaining cost, as a range?
 2. What is the remaining value, given what is now known? (Not the value assumed at planning time.)

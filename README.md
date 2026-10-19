@@ -41,7 +41,7 @@ sounds rigorous, so the practice survives without being checked: ranges are
 produced, work takes what it takes, and the next range comes out of the same
 method with the same confidence. So every range is scored once its work closes
 — `within`, `under`, `over`, `open`, `abandoned` — with the ratio of actual to
-midpoint beside it, on the original range and never the revision.
+midpoint beside it, on the original range; a revision is scored as its own range.
 
 **A record of ten `within` in ten is a defect**, not a result: ranges that would
 have contained almost any outcome carry no information. The record attaches to

@@ -66,5 +66,5 @@ Two meanings for one word, or two names for one concept, is a question
 the codebase or the existing plans use most. The answer lands in `terms` and is
 appended to the glossary as `term · means · not to be called`, so the next run
 inherits the decision rather than the ambiguity. An `M` may create the glossary
-for its first settled term; an `S` never does — it marks what it found
-`OUT-OF-SCOPE` in the inline brief and moves on.
+for its first settled term; an `S` still asks and records the answer in
+`terms`, but marks the unwritten glossary entry `OUT-OF-SCOPE` in the inline brief.
