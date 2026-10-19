@@ -86,8 +86,8 @@ assumption fails. `make figures` holds every figure in it against a generated fi
 `make check` and the pre-commit hook, in hundredths of a second — and
 `make figures-full` re-derives that fixture from the seed in about a minute. The
 fast tier catches the realistic failure, a number edited in the page; the slow
-tier is the only thing that catches a stale fixture, so it runs when the model
-changes rather than never.
+tier is the only thing that catches a stale fixture, so CI runs it weekly and
+on demand rather than never.
 
 **Budgets are enforced, not intended.**
 [`planning-registry/harness.yaml`](planning-registry/harness.yaml) holds every
@@ -99,13 +99,13 @@ A skills directory is flat and shared with every other set on the machine, so a
 generic name placed there is a silent collision — `_common` in that directory
 already belongs to an unrelated set.
 
-**One declaration.** `set: planning` in the harness file is the only place the
-name is written; the prefix, the shared directory (`_planning/`), and the label
-every document carries all derive from it.
+**One declaration.** `set: planning` in the harness file is the name the prefix,
+the shared directory (`_planning/`), and the label every document carries are
+checked against (V28), so none of them can drift from it.
 
 **Every directory this set owns carries the set name.** The exceptions are named
 by the platform, not by the set: `.claude-plugin/` and `skills/` are where the
-plugin format expects them. Carrying the prefix is not what makes something
+plugin format expects them, and `.github/` and `docs/` where GitHub does. Carrying the prefix is not what makes something
 installable — a skill is a directory holding a `SKILL.md`, and only those are
 linked.
 
@@ -165,7 +165,7 @@ with the phases.
 
 ```sh
 make link                       # into each installed CLI: claude, codex, agy
-make link CLAUDE_DIR=.claude/skills
+make link CLAUDE_DIR=/path/to/project/.claude/skills   # that .claude/ must exist
 ```
 
 Each `planning-*` skill is linked individually and reaches its contracts through
