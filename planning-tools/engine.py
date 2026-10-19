@@ -273,21 +273,42 @@ def _spawn(engine: str, argv: list[str], cwd: pathlib.Path,
     # byte, an unpaired surrogate) — either is this engine's, not the run's.
     except (OSError, ValueError) as e:
         raise EngineError(f"{engine} could not be started: {e}") from None
+    previous = _exit_on_termination()
     try:
         out, err = p.communicate(input=stdin if stdin is not None else "", timeout=TIMEOUT)
     except subprocess.TimeoutExpired:
         _kill_group(p)
         raise EngineError(f"{engine} did not answer within {TIMEOUT}s") from None
     except BaseException:
-        # Ctrl-C, or anything else: in its own session the engine hears no
-        # terminal signal, so it stops here or it does not stop.
+        # Ctrl-C, a termination, anything else: in its own session the engine
+        # hears no signal meant for this harness, so it stops here or not at all.
         _kill_group(p)
         raise
+    finally:
+        for sig, handler in previous.items():
+            signal.signal(sig, handler)
     r = subprocess.CompletedProcess(argv, p.returncode, out, err)
     # A failed run that still printed an object is a failed run.
     if r.returncode != 0:
         raise EngineError(f"{engine} exited {r.returncode}.\n{_tail(r)}")
     return r
+
+
+def _exit_on_termination() -> dict:
+    """Make SIGTERM and SIGHUP raise, for as long as an engine runs. By default
+    they end this process on the spot, skipping the cleanup that stops the
+    engine — which, in its own session, never received them. Only the main
+    thread may set handlers; elsewhere the defaults stay."""
+    previous = {}
+
+    def raise_exit(signum, _frame):
+        raise SystemExit(128 + signum)
+    for sig in (signal.SIGTERM, signal.SIGHUP):
+        try:
+            previous[sig] = signal.signal(sig, raise_exit)
+        except ValueError:                      # not the main thread
+            break
+    return previous
 
 
 def _kill_group(p: subprocess.Popen) -> None:

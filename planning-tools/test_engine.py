@@ -11,6 +11,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from pathlib import Path
 
@@ -140,6 +141,23 @@ def spawn_cases() -> list[str]:
             bad.append("spawn: the interrupted engine never started; that case tested nothing")
         elif _alive(selfpid):
             bad.append("spawn: an interrupted engine is still running")
+        # Terminated (a cancelled job signals the harness's group, which no longer
+        # holds the engine): the engine goes down with the harness.
+        for sig in (signal.SIGTERM, signal.SIGHUP):
+            selfpid.unlink(missing_ok=True)
+            killer = threading.Timer(1.0, os.kill, (os.getpid(), sig))
+            killer.start()
+            try:
+                engine._spawn("stub", [sys.executable, "-c", sleeper], Path(tmp), "")
+                bad.append(f"spawn: {sig.name} never arrived")
+            except SystemExit:
+                pass
+            finally:
+                killer.cancel()
+            if not selfpid.exists():
+                bad.append(f"spawn: the {sig.name} case's engine never started; it tested nothing")
+            elif _alive(selfpid):
+                bad.append(f"spawn: the engine outlived a {sig.name} to the harness")
         # A descendant that left the group still holds the output pipes; the
         # timeout must still return on time rather than wait for it.
         escapee = ("import subprocess, sys; "
@@ -191,7 +209,7 @@ def main() -> int:
         print("FAIL:", b)
     if bad:
         return 1
-    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; spawn: 6 cases")
+    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; spawn: 8 cases")
     return 0
 
 
