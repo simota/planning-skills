@@ -11,8 +11,8 @@ it: given the engine that is running, it picks one that is not.
 **The running engine is stated, never sniffed.** codex launched from inside
 Claude Code inherits `CLAUDECODE` and `CLAUDE_CODE_*`, so a nested run reads as
 its parent and any env heuristic silently mis-identifies it — which would hand
-back a verdict from the very engine that was supposed to be excluded. `--running`
-is required, and absent it this stops.
+back a verdict from the very engine that was supposed to be excluded. A checker is
+named or `--running` is given; with neither, this stops.
 
 **A checker that did not run is not a checker that passed.** Every failure path
 here raises. Nothing returns a default verdict, nothing degrades to "assume
@@ -39,7 +39,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import pathlib
+import signal
 import subprocess
 import sys
 import tempfile
@@ -256,23 +258,95 @@ def _structured(engine: str, envelope: dict, r: subprocess.CompletedProcess, sta
 
 def _spawn(engine: str, argv: list[str], cwd: pathlib.Path,
            stdin: str | None = None) -> subprocess.CompletedProcess:
+    # Armed before the engine exists, so no termination can slip between its
+    # start and the cleanup that stops it; until it exists, a signal is only
+    # noted, and acted on the moment there is an engine to stop.
+    termination = _Termination()
+    p = None
     try:
-        # Decoded leniently and as UTF-8 whatever the locale: one stray byte in an
-        # engine's output must surface as that engine's error, not as a
-        # UnicodeDecodeError that takes the other engines' verdicts down with it.
-        r = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8",
-                           errors="replace", timeout=TIMEOUT,
-                           cwd=cwd, input=stdin if stdin is not None else "")
-    except FileNotFoundError:
-        raise EngineError(f"{engine} is not on PATH") from None
+        try:
+            # Decoded leniently and as UTF-8 whatever the locale: one stray byte
+            # in an engine's output must surface as that engine's error, not as a
+            # UnicodeDecodeError that takes the other engines' verdicts with it.
+            # Its own session, so a timeout stops the whole engine: a CLI that is
+            # a launcher for the real binary would otherwise leave it running.
+            p = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE, text=True, encoding="utf-8",
+                                 errors="replace", cwd=cwd, start_new_session=True)
+        except FileNotFoundError:
+            raise EngineError(f"{engine} is not on PATH") from None
+        # E2BIG for an oversized argv; ValueError for one the OS cannot carry (a
+        # NUL byte, an unpaired surrogate) — either is this engine's, not the run's.
+        except (OSError, ValueError) as e:
+            raise EngineError(f"{engine} could not be started: {e}") from None
+        termination.arm()
+        out, err = p.communicate(input=stdin if stdin is not None else "", timeout=TIMEOUT)
     except subprocess.TimeoutExpired:
+        _kill_group(p)
         raise EngineError(f"{engine} did not answer within {TIMEOUT}s") from None
-    except OSError as e:                 # E2BIG for an oversized argv, among others
-        raise EngineError(f"{engine} could not be started: {e}") from None
+    except EngineError:
+        raise
+    except BaseException:
+        # Ctrl-C, a termination, anything else: in its own session the engine
+        # hears no signal meant for this harness, so it stops here or not at all.
+        if p is not None:
+            _kill_group(p)
+        raise
+    finally:
+        termination.restore()
+    r = subprocess.CompletedProcess(argv, p.returncode, out, err)
     # A failed run that still printed an object is a failed run.
     if r.returncode != 0:
         raise EngineError(f"{engine} exited {r.returncode}.\n{_tail(r)}")
     return r
+
+
+class _Termination:
+    """SIGTERM and SIGHUP end this process on the spot by default, skipping the
+    cleanup that stops the engine — which, in its own session, never received
+    them. While an engine runs they raise SystemExit instead; before it exists
+    they are noted and raised once it does. Only the main thread may set
+    handlers; elsewhere the defaults stay."""
+
+    SIGNALS = (signal.SIGTERM, signal.SIGHUP)
+
+    def __init__(self):
+        self.armed, self.pending, self.previous = False, None, {}
+        for sig in self.SIGNALS:
+            try:
+                self.previous[sig] = signal.signal(sig, self._handle)
+            except ValueError:                  # not the main thread
+                break
+
+    def _handle(self, signum, _frame):
+        if not self.armed:
+            self.pending = signum               # no engine to stop yet
+            return
+        raise SystemExit(128 + signum)
+
+    def arm(self):
+        self.armed = True
+        if self.pending is not None:
+            raise SystemExit(128 + self.pending)
+
+    def restore(self):
+        for sig, handler in self.previous.items():
+            signal.signal(sig, handler)
+        if self.pending is not None and not self.armed:
+            raise SystemExit(128 + self.pending)  # the engine never started
+
+
+def _kill_group(p: subprocess.Popen) -> None:
+    try:
+        os.killpg(p.pid, signal.SIGKILL)
+    except (ProcessLookupError, PermissionError):
+        p.kill()
+    # Reap the engine, then let go of its pipes: draining them would wait on any
+    # descendant that left the group and still holds them open.
+    p.wait()
+    for pipe in (p.stdin, p.stdout, p.stderr):
+        if pipe:
+            pipe.close()
 
 
 def _parse(engine: str, body: str) -> dict:
@@ -335,7 +409,8 @@ def selftest() -> int:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("engine", nargs="?", help="the checker; omit to resolve from --running")
-    ap.add_argument("--running", help="the engine running this harness — required, never guessed")
+    ap.add_argument("--running", help="the engine running this harness — never guessed; "
+                    "required unless a checker is named")
     ap.add_argument("--prompt-file")
     ap.add_argument("--schema")
     ap.add_argument("--selftest", action="store_true")

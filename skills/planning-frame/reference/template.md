@@ -11,7 +11,7 @@ Verified: 2026-10-16 — no automated check.
 > Status: draft
 > Updated: YYYY-MM-DD
 > Tier: M | L   <!-- S writes no file: its inline shape is in SKILL.md -->
-> Delivers: <the artifact set for the declared tier>
+> Delivers: <the artifact set for the declared tier; at L, any skipped 10-context.md / 20-options.md with its reason>
 
 ## Problem
 <one sentence, no "and">

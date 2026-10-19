@@ -282,6 +282,18 @@ def check_correlation(fx) -> int:
     missing("correlation", fx["correlation"], seen, "")
     if n == 0:
         fail("correlation", "no rows compared — the checker has stopped checking")
+    # The prose under the table states the p90 shift as a percentage; it is the
+    # figure a reader quotes, so it is held like the cells it is read from.
+    text = " ".join(PAGE.read_text(encoding="utf-8").split())
+    m = re.search(r"p90 is (\d+)% later", text)
+    ind, cor = fx["correlation"]["Independent"][2], fx["correlation"]["Perfectly correlated"][2]
+    want = (cor / ind - 1) * 100
+    n += 1
+    if not m:
+        fail("correlation", f"the page no longer states how much later p90 is "
+                            f"(model gives {want:.0f}%)")
+    elif not near(float(m.group(1)), want, 0):
+        fail("correlation", f"page says p90 is {m.group(1)}% later, model gives {want:.0f}%")
     return n
 
 

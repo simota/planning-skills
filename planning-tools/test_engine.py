@@ -6,9 +6,13 @@ stands between an engine's answer and a verdict is exercised on every run.
 """
 from __future__ import annotations
 
+import os
+import signal
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -54,6 +58,24 @@ REFUSED = [
 ]
 
 
+def _alive(pidfile: Path) -> bool:
+    """Whether the pid recorded in `pidfile` is still a running process."""
+    if not pidfile.exists():
+        return False
+    pid = int(pidfile.read_text())
+    for _ in range(20):                              # killing is not instant
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        stat = Path(f"/proc/{pid}/stat")
+        if stat.exists() and stat.read_text().split(") ", 1)[-1].startswith("Z"):
+            return False                             # dead, waiting to be reaped
+        time.sleep(0.1)
+    os.kill(pid, 9)                                  # leave no stray behind
+    return True
+
+
 def spawn_cases() -> list[str]:
     """What reaches an engine and what comes back, with a stub for the engine."""
     bad = []
@@ -67,6 +89,117 @@ def spawn_cases() -> list[str]:
                 bad.append(f"spawn: undecodable byte came back as {r.stdout!r}")
         except Exception as e:                       # noqa: BLE001 — any escape is the bug
             bad.append(f"spawn: undecodable output raised {type(e).__name__}: {e}")
+        # A claim the OS cannot pass as an argument (a NUL byte, as agy's argv
+        # carries the prompt) is that engine's error, not a crash of the run.
+        try:
+            engine._spawn("stub", [sys.executable, "-c", "pass", "a\x00b"], Path(tmp), "")
+            bad.append("spawn: an argument with a NUL byte was accepted")
+        except engine.EngineError:
+            pass
+        except Exception as e:                       # noqa: BLE001
+            bad.append(f"spawn: a NUL byte raised {type(e).__name__}: {e}")
+        # A timed-out engine is stopped whole: a launcher's own child must not
+        # outlive the run, still spending tokens on a prompt nobody reads.
+        pidfile = Path(tmp) / "child.pid"
+        launcher = ("import subprocess, sys; "
+                    "p = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)']); "
+                    f"open({str(pidfile)!r}, 'w').write(str(p.pid)); p.wait()")
+        timeout, engine.TIMEOUT = engine.TIMEOUT, 2
+        try:
+            engine._spawn("stub", [sys.executable, "-c", launcher], Path(tmp), "")
+            bad.append("spawn: a hung engine was not timed out")
+        except engine.EngineError:
+            pass
+        finally:
+            engine.TIMEOUT = timeout
+        if not pidfile.exists():
+            bad.append("spawn: the launcher never recorded its child; the timeout case tested nothing")
+        elif _alive(pidfile):
+            bad.append("spawn: a timed-out engine's child process is still running")
+        # Interrupted while waiting (Ctrl-C, any exception): the engine is in its
+        # own session, so nothing but this harness will ever stop it.
+        selfpid = Path(tmp) / "self.pid"
+        sleeper = (f"import os, time; open({str(selfpid)!r}, 'w').write(str(os.getpid())); "
+                   "time.sleep(60)")
+
+        class Interrupted(Exception):
+            pass
+
+        def interrupt(*_):
+            raise Interrupted
+        old = signal.signal(signal.SIGALRM, interrupt)
+        signal.setitimer(signal.ITIMER_REAL, 1.0)
+        try:
+            engine._spawn("stub", [sys.executable, "-c", sleeper], Path(tmp), "")
+            bad.append("spawn: the interrupt never arrived")
+        except Interrupted:
+            pass
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+            signal.signal(signal.SIGALRM, old)
+        if not selfpid.exists():
+            bad.append("spawn: the interrupted engine never started; that case tested nothing")
+        elif _alive(selfpid):
+            bad.append("spawn: an interrupted engine is still running")
+        # Terminated (a cancelled job signals the harness's group, which no longer
+        # holds the engine): the engine goes down with the harness.
+        for sig in (signal.SIGTERM, signal.SIGHUP):
+            selfpid.unlink(missing_ok=True)
+            killer = threading.Timer(1.0, os.kill, (os.getpid(), sig))
+            killer.start()
+            try:
+                engine._spawn("stub", [sys.executable, "-c", sleeper], Path(tmp), "")
+                bad.append(f"spawn: {sig.name} never arrived")
+            except SystemExit:
+                pass
+            finally:
+                killer.cancel()
+            if not selfpid.exists():
+                bad.append(f"spawn: the {sig.name} case's engine never started; it tested nothing")
+            elif _alive(selfpid):
+                bad.append(f"spawn: the engine outlived a {sig.name} to the harness")
+        # Terminated while the engine is being started: the signal must still
+        # take the engine down, not only the harness.
+        selfpid.unlink(missing_ok=True)
+        real_popen = engine.subprocess.Popen
+
+        def popen_then_term(*a, **k):
+            p = real_popen(*a, **k)
+            for _ in range(50):                      # until the engine has started
+                if selfpid.exists():
+                    break
+                time.sleep(0.05)
+            os.kill(os.getpid(), signal.SIGTERM)
+            time.sleep(0.2)                          # let the handler run in here
+            return p
+        engine.subprocess.Popen = popen_then_term
+        try:
+            engine._spawn("stub", [sys.executable, "-c", sleeper], Path(tmp), "")
+            bad.append("spawn: a SIGTERM during start-up never arrived")
+        except SystemExit:
+            pass
+        finally:
+            engine.subprocess.Popen = real_popen
+        if not selfpid.exists():
+            bad.append("spawn: the start-up case's engine never started; it tested nothing")
+        elif _alive(selfpid):
+            bad.append("spawn: the engine outlived a SIGTERM that arrived while it started")
+        # A descendant that left the group still holds the output pipes; the
+        # timeout must still return on time rather than wait for it.
+        escapee = ("import subprocess, sys; "
+                   "subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(6)'], "
+                   "start_new_session=True); import time; time.sleep(60)")
+        timeout, engine.TIMEOUT = engine.TIMEOUT, 1
+        start = time.monotonic()
+        try:
+            engine._spawn("stub", [sys.executable, "-c", escapee], Path(tmp), "")
+        except engine.EngineError:
+            pass
+        finally:
+            engine.TIMEOUT = timeout
+        if time.monotonic() - start > 4:
+            bad.append(f"spawn: a timeout took {time.monotonic() - start:.1f}s, waiting on "
+                       "a descendant that left the engine's group")
     # claude gets no tools and no MCP servers; a denylist misses what it omits.
     seen: list[list[str]] = []
 
@@ -102,7 +235,7 @@ def main() -> int:
         print("FAIL:", b)
     if bad:
         return 1
-    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; spawn: 2 cases")
+    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; spawn: 9 cases")
     return 0
 
 

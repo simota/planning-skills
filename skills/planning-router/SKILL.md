@@ -21,7 +21,7 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
   plans work nobody asked for
 - **Apply gate conditions 1, 4 and 5 here, never 2 or 3** — the goal that needs
   "and", the already-decided request, and an ambiguous term — its answer goes to
-  the brief's `terms`, and `planning-frame` writes the glossary. Conditions 2 and 3
+  the brief's `terms`, and above `S` `planning-frame` writes the glossary. Conditions 2 and 3
   describe artifacts that do not exist until later phases have run, and halting
   on them would block the very work this skill exists to start
 <!-- deliver:sizing -->
@@ -108,7 +108,7 @@ which is why the skip list is part of the deliverable rather than a footnote.
 - **A range is scored, or it never meant anything.** Whatever was given one
   number-pair gets one outcome once the work closes — `within`, `under`,
   `over`, `open`, `abandoned` — and the ratio of actual to midpoint beside it.
-  Scored on the original range, never the revision. **A record of ten `within`
+  Scored on the original; a revision is scored as its own range. **Ten `within`
   in ten is a defect**: ranges that cannot be wrong carry no information
   (`_planning/CALIBRATION.md`)
 <!-- /deliver:score -->

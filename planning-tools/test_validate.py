@@ -530,7 +530,7 @@ def main() -> int:
                 bad.append(rule)
                 print(f"  {rule} did not fire\n{out}")
 
-    print(f"{len(CASES)} rules exercised, {len(bad)} silent")
+    print(f"{len(CASES)} cases exercised, {len(bad)} silent")
     loud: list[str] = []
     for name, mutate in QUIET.items():
         with tempfile.TemporaryDirectory() as tmp:

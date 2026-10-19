@@ -5,10 +5,10 @@ Purpose: How per-task ranges combine into the total the deliverable asks for, wh
 Read when: filling in "Critical path total", combining any set of task ranges, or setting the confidence label on a schedule.
 Source: none — nothing outside this page can move what it states.
 Verified: 2026-10-16 — the tables through "Where the method stops holding" came from a 200,000-run
-Monte Carlo over the Beta-PERT distribution `playbooks/sizing.md`'s formulas assume. `make figures` holds every one of them against a generated fixture on every commit; `make
-figures-full` re-derives that fixture from the seed. The fast tier catches a number edited
-here, and is the only one that runs automatically; the slow tier is the only thing that
-catches a stale fixture, so it runs when the model changes rather than never:
+Monte Carlo over the Beta-PERT distribution `playbooks/sizing.md`'s formulas assume. `make figures` holds every one of them against a generated fixture in CI and, once
+installed, the pre-commit hook; `make figures-full` re-derives that fixture from the seed.
+The fast tier catches a number edited here; the slow tier is the only thing that catches a
+stale fixture, so CI runs it weekly and on demand rather than never:
 those are `[verified]`. The confidence thresholds in the last section are `[assumed]` — a convention
 this set is adopting, not a measured boundary. Replace them the moment local actuals can set them.
 
