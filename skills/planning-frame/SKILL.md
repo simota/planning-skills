@@ -97,9 +97,9 @@ metric nobody could measure yet is an `A-n` about measurability, not a criterion
 - **Report `status`**: `DONE` (every claim tagged, every load-bearing assumption
   verified or costed past reach, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
 - **Every residual is `BLOCKED` / `OUT-OF-SCOPE` / `DEFERRED` / `UNVERIFIED`**
-  and appears in the handoff's `open` with its `A-n`, `Q-n` or note. `UNVERIFIED` is
-  the one that matters: every other class is visible in the plan, while **an
-  unverified assumption reads exactly like a fact**
+  and appears in the handoff's `open` (at `S`, the inline brief) with its `A-n`, `Q-n`
+  or note. `UNVERIFIED` is the one that matters: every other class is visible in
+  the plan, while **an unverified assumption reads exactly like a fact**
 - **Never omit the sweep** — markers against `open`, claims against claims
   tagged: `swept, 0 markers / 0 in open; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
 <!-- /deliver:report -->

@@ -82,7 +82,7 @@ is `39.6 … 48.6` and **no run in 200,000 landed at either end**.
 [`aggregation`](skills/planning-estimate/reference/aggregation.md) has the
 method that does work (means add, σ adds in quadrature), the parallel-merge cost
 that grows with the number of tracks, and the point where the independence
-assumption fails. `make figures` holds every figure in it against a generated fixture — in
+assumption fails. `make figures` holds every figure in its tables against a generated fixture — in
 `make check` and the pre-commit hook, in hundredths of a second — and
 `make figures-full` re-derives that fixture from the seed in about a minute. The
 fast tier catches the realistic failure, a number edited in the page; the slow
@@ -101,7 +101,7 @@ already belongs to an unrelated set.
 
 **One declaration.** `set: planning` in the harness file is the name the prefix,
 the shared directory (`_planning/`), and the label every document carries are
-checked against (V28), so none of them can drift from it.
+checked against (V28, and V23 for the label), so none of them can drift from it.
 
 **Every directory this set owns carries the set name.** The exceptions are named
 by the platform, not by the set: `.claude-plugin/` and `skills/` are where the

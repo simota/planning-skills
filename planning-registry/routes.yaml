@@ -15,7 +15,7 @@ approach:
   pattern: linear
   when: "the problem is clear, the way to solve it is not"
   chain: [planning-discover, planning-options]
-  gate: "a load-bearing assumption is verified before an approach is chosen"
+  gate: "a load-bearing assumption that is cheap to verify is verified before an approach is chosen"
 
 breakdown:
   pattern: linear

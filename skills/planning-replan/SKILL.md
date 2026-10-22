@@ -55,7 +55,7 @@ Close-out: `MEASURE → SCORE → RECORD` — finished work carries no class and
 | About to change the plan | [traps](playbooks/traps.md) |
 | The class is not yet decided | Do not correct anything. **The correction follows from the class**, and skipping classification reliably produces the wrong one |
 | An estimate slipped | That does not justify re-framing the problem. Correct the minimum surface |
-| A goal's assumption turned out false | That does justify it. Hand back to framing rather than patching downstream |
+| A goal's assumption turned out false | That does justify it: the problem itself moved, class `goal`. Hand back to framing rather than patching downstream |
 | Remaining value is below remaining cost | Recommend stopping, and say what is salvageable. This is a normal outcome, not a failure of the plan |
 | Artifacts need updating | Select the correction owner using `course-correct` in `registry/routes.yaml`, preserving IDs and rechecking only affected decisions |
 | One task took longer but no future decision changes | Score its original forecast and record the actual; do not re-decompose, re-estimate, or price a new continuation decision |
@@ -104,9 +104,9 @@ from memory is the one that gets classified wrong**: memory reconstructs the cau
 - **Report `status`**: `DONE` (every claim tagged, every load-bearing assumption
   verified or costed past reach, zero `UNVERIFIED`) / `PARTIAL` / `BLOCKED`
 - **Every residual is `BLOCKED` / `OUT-OF-SCOPE` / `DEFERRED` / `UNVERIFIED`**
-  and appears in the handoff's `open` with its `A-n`, `Q-n` or note. `UNVERIFIED` is
-  the one that matters: every other class is visible in the plan, while **an
-  unverified assumption reads exactly like a fact**
+  and appears in the handoff's `open` (at `S`, the inline brief) with its `A-n`, `Q-n`
+  or note. `UNVERIFIED` is the one that matters: every other class is visible in
+  the plan, while **an unverified assumption reads exactly like a fact**
 - **Never omit the sweep** — markers against `open`, claims against claims
   tagged: `swept, 0 markers / 0 in open; 22 claims / 22 tagged` (`_planning/CONTRACT.md`)
 <!-- /deliver:report -->
