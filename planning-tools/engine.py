@@ -58,11 +58,17 @@ class EngineError(RuntimeError):
     """The engine did not answer. Never a verdict."""
 
 
+# Keywords whose value is data, not a schema: closing an object found there
+# would change which answers the schema accepts.
+_VALUES = {"const", "default", "enum", "examples"}
+
+
 def strict(schema: dict) -> dict:
     """Every object closed, which is what codex requires and agy tolerates."""
     if not isinstance(schema, dict):
         return schema
-    out = {k: strict(v) if isinstance(v, dict) else v for k, v in schema.items()}
+    out = {k: strict(v) if isinstance(v, dict) and k not in _VALUES else v
+           for k, v in schema.items()}
     if out.get("type") == "object":
         out["additionalProperties"] = False
         out["properties"] = {k: strict(v) for k, v in (out.get("properties") or {}).items()}
@@ -88,6 +94,16 @@ _CHECKED = {"type", "enum", "const", "required", "properties", "additionalProper
 # Python's `re` both rejects valid ones (`\p{L}`) and accepts what they reject.
 _ANNOTATIONS = {"$schema", "$id", "title", "description", "default", "examples",
                 "$comment"}
+
+
+def _is(value, t: str) -> bool:
+    # bool is an int in Python; a JSON true is not a number.
+    if isinstance(value, bool):
+        return t == "boolean"
+    # JSON has one number type: 1.0 is an integer, and json.loads reads it as a float.
+    if t == "integer" and isinstance(value, float):
+        return value.is_integer()
+    return isinstance(value, _TYPES[t])
 
 
 def _same(a, b) -> bool:
@@ -137,10 +153,7 @@ def conforms(schema: dict, value, at: str = "$") -> str | None:
     want = schema.get("type")
     if want:
         types = want if isinstance(want, list) else [want]
-        # bool is an int in Python; a JSON true is not a number.
-        if not any(isinstance(value, _TYPES[t])
-                   and not (t in ("number", "integer") and isinstance(value, bool))
-                   for t in types):
+        if not any(_is(value, t) for t in types):
             return f"{at} is {type(value).__name__}, schema wants {want}"
     if "const" in schema and not _same(value, schema["const"]):
         return f"{at} is {value!r}, not {schema['const']!r}"

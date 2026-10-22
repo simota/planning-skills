@@ -36,6 +36,11 @@ CASES = [
     ({"enum": [[1]]}, [True], False),
     ({"const": {"a": 1}}, {"a": 1.0}, True),
     ({"type": "integer"}, True, False),
+    ({"type": "integer"}, 1.0, True),                # JSON's 1.0 is an integer
+    ({"type": "integer"}, 1.5, False),
+    # strict() closes schemas, not the values a const holds.
+    (engine.strict({**OBJ, "properties": {"m": {"const": {"type": "object"}}}}),
+     {"m": {"type": "object"}}, True),
     ({"not": {"const": 1}}, 1, False),
     ({"type": "array", "minItems": 1, "items": {"type": "string"}}, [], False),
     ({"type": "array", "items": False}, [1], False),
