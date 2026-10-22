@@ -5,10 +5,10 @@
 
 | # | Check | Fails when |
 |---|-------|-----------|
-| 1 | Goal traceability | A task serves no goal, or a goal has no task |
+| 1 | Goal traceability | A task serves no goal and is not justified in writing as enabling work, or a goal has no task |
 | 2 | Measurable success | An `SC-n` has no metric, no target, or no measurement method |
 | 3 | Evidence discipline | A decision-bearing claim is untagged, or a load-bearing claim is `[assumed]` and cheap to verify |
-| 4 | Decision integrity | A `D-n` has no deciding factor, no reversal cost, or no revisit trigger, or a load-bearing `D-n` is `Low` confidence |
+| 4 | Decision integrity | A `D-n` has no deciding factor, no `Reversible` value (`costly` without what undoing it takes), or neither a `Revisit when` trigger nor a deliberately stated permanence, or a load-bearing `D-n` is `Low` confidence |
 | 5 | Dependency soundness | The graph has a cycle, or a coupling from `planning-decompose`'s **Dependency Discovery** table (same file, shared/schema/deploy/reviewer/backfill/external) is unaddressed |
 | 6 | Verifiable done | A `T-n` done condition is not observable by a third party |
 | 7 | Estimate honesty | A point estimate appears, a confidence level or its reason is missing, buffer is hidden, elapsed time is conflated with effort, the critical-path total or a task on it is `Low` confidence, or the calibration loop cannot close — no scoring row, or nobody named to record the actual |

@@ -20,7 +20,7 @@
 - Category: data
 - Likelihood: Medium (<basis>; confidence: High | Medium | Low — <reason>)
 - Impact: High (<what it costs: users, money, time, trust>)
-- Detection: <the observable signal>
+- Detection: <the observable signal> (lead time: <how far ahead of the damage it fires>)
 - Threshold: <the value at which we act>
 - Mitigation: <avoid | reduce | transfer | accept> — <action> (owner: <name>) → unnumbered task proposal to `planning-decompose`
 - Residual: <what remains after mitigation>
