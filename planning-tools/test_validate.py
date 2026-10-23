@@ -99,6 +99,13 @@ def _(r): sub(r / "planning-registry/routes.yaml", "chain: [planning-discover, p
               "chain: 3")
 
 
+@case("V7-null-chain")
+def _(r):
+    """A falsy chain is present and malformed, not an empty route."""
+    sub(r / "planning-registry/routes.yaml", "chain: [planning-discover, planning-options]",
+        "chain: null")
+
+
 @case("V8")
 def _(r): sub(r / "README.md", "](skills/_planning/CONTRACT.md)", "](skills/_planning/GONE.md)")
 

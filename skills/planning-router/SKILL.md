@@ -51,7 +51,7 @@ An obvious phase is invoked directly; this router is a fallback, not a mandatory
 |---|---|
 | Picking the chain | [chains](playbooks/chains.md) — the canonical order, and the shortest path through it |
 | About to dispatch | [traps](playbooks/traps.md) |
-| A phase's output would not change any decision | Skip it, and **name the skipped phases and why**. A silent skip and a considered one read identically in the output. Never `planning-estimate`, `planning-risk` or `planning-review` at `L` (`_planning/SIZING.md`) |
+| A phase's output would not change any decision | Skip it, and **name the skipped phases and why**. A silent skip and a considered one read identically in the output. Never skip `planning-estimate`, `planning-risk` or `planning-review` at `L` (`_planning/SIZING.md`) |
 | The user has already chosen the approach | Skip the options phase and say so, or run it in decided mode when the choice needs a `D-n` on record. Manufacturing alternatives to look thorough costs a phase and buys nothing |
 | The goal needs "and" to state | Stop. Two goals are two briefs, and splitting them is the work rather than a preliminary to it |
 | The request is actually asking for execution | Stop and say so. A plan written for a decided question is pure cost |

@@ -458,7 +458,7 @@ def main() -> int:
     try:
         prompt = pathlib.Path(a.prompt_file).read_text(encoding="utf-8")
         schema = json.loads(pathlib.Path(a.schema).read_text(encoding="utf-8"))
-    except (OSError, ValueError) as e:
+    except (OSError, ValueError, RecursionError) as e:
         # The caller's input, not the checker's answer: 1 would read as the
         # engine having failed to answer a question that was never asked.
         print(f"cannot read the prompt or schema: {e}", file=sys.stderr)

@@ -293,8 +293,11 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as tmp:
         bad_json = Path(tmp) / "schema.json"
         bad_json.write_text("{", encoding="utf-8")
+        deep_json = Path(tmp) / "deep.json"
+        deep_json.write_text("[" * 100_000, encoding="utf-8")
         for args in (["--prompt-file", str(Path(tmp) / "none"), "--schema", str(bad_json)],
-                     ["--prompt-file", str(bad_json), "--schema", str(bad_json)]):
+                     ["--prompt-file", str(bad_json), "--schema", str(bad_json)],
+                     ["--prompt-file", str(bad_json), "--schema", str(deep_json)]):
             r = subprocess.run([sys.executable, engine.__file__, "codex", *args],
                                capture_output=True, text=True)
             if r.returncode != 2 or "Traceback" in r.stderr:

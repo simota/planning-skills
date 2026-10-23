@@ -222,7 +222,8 @@ def v7_routes_real():
         if not isinstance(r, dict):
             fail("V7", f"routes.yaml {name} is {r!r}, not a mapping")
     for name, r in ROUTES.items():
-        chain = r.get("chain") or []
+        # Absent is an empty route; a falsy value is present, and malformed.
+        chain = r.get("chain", [])
         if not isinstance(chain, list):
             fail("V7", f"route {name} chain is {chain!r}, not a list of skills")
             continue
@@ -312,7 +313,7 @@ def v13_route_budget():
     if len(ROUTES_RAW) > LIM["routes_max"]:
         fail("V13", f"{len(ROUTES_RAW)} routes (max {LIM['routes_max']})")
     for name, r in ROUTES.items():
-        chain = r.get("chain") or []
+        chain = r.get("chain", [])
         n = len(chain) if isinstance(chain, list) else 0     # V7 reports a scalar
         if n > LIM["route_stages_max"]:
             fail("V13", f"route {name} chains {n} stages (max {LIM['route_stages_max']})")
