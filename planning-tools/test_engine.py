@@ -48,6 +48,11 @@ CASES = [
     ({"properties": {"x": False}}, {"x": 1}, False),
     ({"type": "string", "maxLength": 2}, "abc", False),
     ({"type": "number", "minimum": 0}, -1, False),
+    # A nullable object is still an object: closed, so an extra key fails.
+    (engine.strict({"type": ["object", "null"], "properties": {"a": {"type": "string"}}}),
+     {"a": "x", "b": 1}, False),
+    (engine.strict({"type": ["object", "null"], "properties": {"a": {"type": "string"}}}),
+     None, True),
 ]
 
 # Schemas this check must refuse to judge rather than pass.
@@ -69,7 +74,12 @@ REFUSED = [
 RUN_REFUSED = [
     ({**OBJ, "additionalProperties": {"type": "string"}}, {}),
     ({**OBJ, "properties": {"m": {**OBJ, "additionalProperties": True}}}, {"m": {}}),
+    ({"type": ["object", "null"], "additionalProperties": True}, {}),
 ]
+
+# What an engine prints that is not JSON, though Python's json reads it: a NaN
+# passes every `minimum` and `maximum`, so it must not reach conforms() at all.
+NOT_JSON = ['{"n": NaN}', '{"n": Infinity}', '{"n": -Infinity}']
 
 
 def _alive(pidfile: Path) -> bool:
@@ -256,13 +266,20 @@ def main() -> int:
             pass
         finally:
             engine._spawn = real
+    for i, body in enumerate(NOT_JSON):
+        try:
+            got = engine._parse("stub", body)
+            bad.append(f"not json {i}: {body} was read as {got!r}")
+        except engine.EngineError:
+            pass
     bad += spawn_cases()
     for b in bad:
         print("FAIL:", b)
     if bad:
         return 1
     print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; "
-          f"run: {len(RUN_REFUSED)} refused; spawn: 9 cases")
+          f"run: {len(RUN_REFUSED)} refused; {len(NOT_JSON)} non-JSON answers refused; "
+          "spawn: 9 cases")
     return 0
 
 
