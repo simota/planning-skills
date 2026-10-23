@@ -24,7 +24,8 @@ that verified nothing.
 Engine quirks, re-checked by `make engines` rather than dated:
 
 * `codex exec` rejects a schema without `additionalProperties: false`, at every
-  level. Schemas are normalised here so callers write ordinary JSON Schema.
+  level. Schemas are normalised here so callers write ordinary JSON Schema; an
+  object the caller opened on purpose is refused rather than closed.
 * `agy --print` returns an envelope; the validated object is `structured_output`.
 * `claude -p --json-schema` returns the same kind of envelope as agy; the
   validated object is `structured_output`, and `result` is only its text form.
@@ -70,6 +71,12 @@ def strict(schema: dict) -> dict:
     out = {k: strict(v) if isinstance(v, dict) and k not in _VALUES else v
            for k, v in schema.items()}
     if out.get("type") == "object":
+        # Closing an object the caller opened on purpose — a map, an explicit
+        # `true` — asks a different question, and the answer `{}` then passes.
+        if out.get("additionalProperties", False) is not False:
+            raise EngineError("schema opens an object with additionalProperties "
+                              f"{out['additionalProperties']!r}; every object is closed "
+                              "for codex, so this cannot be asked as written")
         out["additionalProperties"] = False
         out["properties"] = {k: strict(v) for k, v in (out.get("properties") or {}).items()}
     if isinstance(out.get("items"), dict):

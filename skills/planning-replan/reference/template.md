@@ -4,7 +4,7 @@
 Purpose: the required sections of `changelog.md`, in order, with what each must carry.
 Read when: writing or completing the deliverable.
 Source: none — nothing outside this page can move what it states.
-Verified: 2026-10-16 — no automated check.
+Verified: 2026-10-22 — no automated check.
 
 ```markdown
 # <initiative> — Changelog
@@ -29,7 +29,7 @@ Verified: 2026-10-16 — no automated check.
 |---|---|---|---|
 | Continue | | | |
 | Stop | | | |
-<!-- when continuation is in question; a record-only entry writes "not priced: record-only", a close-out "not priced: close-out" -->
+<!-- when continuation is in question; a record-only entry writes "not priced: record-only", a close-out "not priced: close-out", any other entry "not priced: continuation not in question" -->
 
 - Class: <divergence class> (`course-correct` key: <key>) — a close-out writes `close-out` and omits Changed, Superseded and Revised commitment; a stop writes `stop (cause: <class>)` and `Revised commitment: unchanged — stop recommended, pending the person's decision`; the commitment is cleared only at the close-out after they stop the work
 - Measured: <the gap, as a number>

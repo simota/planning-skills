@@ -6,6 +6,7 @@ stands between an engine's answer and a verdict is exercised on every run.
 """
 from __future__ import annotations
 
+import json
 import os
 import signal
 import subprocess
@@ -60,6 +61,14 @@ REFUSED = [
     ({"type": ""}, 5),
     ({"type": []}, 5),
     ({"type": [["x"]]}, "a"),
+]
+
+# Schemas run() must refuse before asking: strict() closes every object for
+# codex, and closing one the caller left open on purpose asks a different
+# question — a map comes back `{}` and passes. (schema, what the engine says)
+RUN_REFUSED = [
+    ({**OBJ, "additionalProperties": {"type": "string"}}, {}),
+    ({**OBJ, "properties": {"m": {**OBJ, "additionalProperties": True}}}, {"m": {}}),
 ]
 
 
@@ -235,12 +244,25 @@ def main() -> int:
         except engine.EngineError:
             continue
         bad.append(f"refused {i}: judged instead of refusing ({why!r})")
+    real = engine._spawn
+    for i, (schema, answer) in enumerate(RUN_REFUSED):
+        out = json.dumps({"structured_output": answer})
+        engine._spawn = lambda eng, argv, cwd, stdin=None, out=out: \
+            subprocess.CompletedProcess(argv, 0, out, "")
+        try:
+            got = engine.run("claude", "p", schema)
+            bad.append(f"run refused {i}: answered {got!r} to a schema it rewrote")
+        except engine.EngineError:
+            pass
+        finally:
+            engine._spawn = real
     bad += spawn_cases()
     for b in bad:
         print("FAIL:", b)
     if bad:
         return 1
-    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; spawn: 9 cases")
+    print(f"conforms: {len(CASES)} judged, {len(REFUSED)} refused; "
+          f"run: {len(RUN_REFUSED)} refused; spawn: 9 cases")
     return 0
 
 
