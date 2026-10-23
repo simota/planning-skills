@@ -37,7 +37,7 @@ hurry, is the failure this tag scheme exists to catch.
 |---|---|
 | `DONE` | Every claim tagged, every load-bearing assumption verified — or costed where no check was within reach — zero `UNVERIFIED` |
 | `PARTIAL` | Everything else that produced work — a single `UNVERIFIED` lands here |
-| `BLOCKED` | Could not proceed. Say what was tried and what stopped it. A planning gate that fired lands here, and outranks `PARTIAL` |
+| `BLOCKED` | Could not proceed. Say what was tried and what stopped it. A planning gate that fired (conditions 1–4, `_planning/SIZING.md`) lands here, and outranks `PARTIAL` |
 
 Falling short is reported as falling short. **A plan that reaches `DONE` by
 dropping a question is the failure mode of this whole set**: the question does

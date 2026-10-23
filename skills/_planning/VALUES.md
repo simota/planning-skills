@@ -73,5 +73,5 @@ performing it. Planning is the easiest of all work to perform rather than do.
 - Two contracts in `_planning/` give conflicting instructions for this exact case
 
 When it fires: do the work, state which rule was suspended and why, and record
-the gap as `#TODO(agent): OUT-OF-SCOPE — <rule> suspended: <why>`. Suspending a rule silently is the
+the gap as `#TODO(agent): OUT-OF-SCOPE — <rule> suspended: <why>` — where no artifact is written (`S`, or a skill without `Write`), as that line in the inline brief or the dispatch. Suspending a rule silently is the
 failure this section exists to prevent.

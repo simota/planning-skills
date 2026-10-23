@@ -20,7 +20,7 @@ These are minimum sets, not exact ones: a chain that runs `planning-estimate` pr
 
 ## The planning gate
 
-No `planning-*` skill proceeds past its own phase while its own gate conditions hold. Stop and report instead.
+No `planning-*` skill proceeds past its own phase while its own gate conditions hold. Stop and report instead — conditions 1–4; condition 5 does not stop the run, it is one question with its default (§ Terms).
 
 | # | Condition | Evaluated by | Evaluated when |
 |---|-----------|--------------|----------------|

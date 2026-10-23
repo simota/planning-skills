@@ -378,17 +378,19 @@ def _not_json(name: str):
 def _parse(engine: str, body: str) -> dict:
     # Python's json reads NaN and Infinity, which JSON does not have; a NaN
     # passes every `minimum` and `maximum` conforms() would hold it to.
+    # Nesting deeper than the parser recurses raises RecursionError, which is
+    # not a ValueError: it is this engine's unreadable answer all the same.
     stripped = body.strip()
     try:
         got = json.loads(stripped, parse_constant=_not_json)
         if isinstance(got, dict):
             return got
-    except ValueError:
+    except (ValueError, RecursionError):
         pass
     for line in reversed(stripped.splitlines()):
         try:
             got = json.loads(line, parse_constant=_not_json)
-        except ValueError:
+        except (ValueError, RecursionError):
             continue
         if isinstance(got, dict):
             return got
@@ -454,13 +456,19 @@ def main() -> int:
         print("need --prompt-file and --schema", file=sys.stderr)
         return 2
     try:
+        prompt = pathlib.Path(a.prompt_file).read_text(encoding="utf-8")
+        schema = json.loads(pathlib.Path(a.schema).read_text(encoding="utf-8"))
+    except (OSError, ValueError, RecursionError) as e:
+        # The caller's input, not the checker's answer: 1 would read as the
+        # engine having failed to answer a question that was never asked.
+        print(f"cannot read the prompt or schema: {e}", file=sys.stderr)
+        return 2
+    try:
         engine = a.engine or other_than(a.running)
         if a.running and engine == a.running:
             raise EngineError(f"{engine} is the engine running this; "
                               "a verdict from it is not a check")
-        got = run(engine,
-                  pathlib.Path(a.prompt_file).read_text(encoding="utf-8"),
-                  json.loads(pathlib.Path(a.schema).read_text(encoding="utf-8")))
+        got = run(engine, prompt, schema)
     except EngineError as e:
         print(f"{a.engine or 'checker'}: {e}", file=sys.stderr)
         return 1
