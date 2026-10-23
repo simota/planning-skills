@@ -79,7 +79,9 @@ RUN_REFUSED = [
 
 # What an engine prints that is not JSON, though Python's json reads it: a NaN
 # passes every `minimum` and `maximum`, so it must not reach conforms() at all.
-NOT_JSON = ['{"n": NaN}', '{"n": Infinity}', '{"n": -Infinity}']
+# Nesting deeper than the parser recurses is that engine's answer failing, not a
+# RecursionError that takes the other engines' verdicts down with the run.
+NOT_JSON = ['{"n": NaN}', '{"n": Infinity}', '{"n": -Infinity}', '{"n": ' + "[" * 100_000]
 
 
 def _alive(pidfile: Path) -> bool:
@@ -277,6 +279,15 @@ def main() -> int:
             bad.append(f"not json {i}: {body} was read as {got!r}")
         except engine.EngineError:
             pass
+        except Exception as e:                       # noqa: BLE001 — any escape is the bug
+            bad.append(f"not json {i}: raised {type(e).__name__} instead of EngineError")
+    # The same nesting on a line of log before the answer is still the answer.
+    try:
+        got = engine._parse("stub", "[" * 100_000 + '\n{"ok": true}')
+        if got != {"ok": True}:
+            bad.append(f"deep log line: the answer after it was read as {got!r}")
+    except Exception as e:                           # noqa: BLE001
+        bad.append(f"deep log line: raised {type(e).__name__} before reaching the answer")
     bad += spawn_cases()
     for b in bad:
         print("FAIL:", b)
