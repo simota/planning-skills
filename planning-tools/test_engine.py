@@ -288,6 +288,17 @@ def main() -> int:
             bad.append(f"deep log line: the answer after it was read as {got!r}")
     except Exception as e:                           # noqa: BLE001
         bad.append(f"deep log line: raised {type(e).__name__} before reaching the answer")
+    # An input that cannot be read is the caller's mistake (2), not a checker
+    # that did not answer (1) — and never a traceback.
+    with tempfile.TemporaryDirectory() as tmp:
+        bad_json = Path(tmp) / "schema.json"
+        bad_json.write_text("{", encoding="utf-8")
+        for args in (["--prompt-file", str(Path(tmp) / "none"), "--schema", str(bad_json)],
+                     ["--prompt-file", str(bad_json), "--schema", str(bad_json)]):
+            r = subprocess.run([sys.executable, engine.__file__, "codex", *args],
+                               capture_output=True, text=True)
+            if r.returncode != 2 or "Traceback" in r.stderr:
+                bad.append(f"unreadable input {args[1]}: exit {r.returncode}\n{r.stderr[-300:]}")
     bad += spawn_cases()
     for b in bad:
         print("FAIL:", b)
