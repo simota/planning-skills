@@ -92,8 +92,13 @@ def _alive(pidfile: Path) -> bool:
             os.kill(pid, 0)
         except ProcessLookupError:
             return False
-        stat = Path(f"/proc/{pid}/stat")
-        if stat.exists() and stat.read_text().split(") ", 1)[-1].startswith("Z"):
+        try:
+            state = Path(f"/proc/{pid}/stat").read_text().split(") ", 1)[-1]
+        except FileNotFoundError:
+            return False                             # reaped between the two looks
+        except OSError:
+            state = ""                               # no /proc: kill(0) decides
+        if state.startswith("Z"):
             return False                             # dead, waiting to be reaped
         time.sleep(0.1)
     os.kill(pid, 9)                                  # leave no stray behind
