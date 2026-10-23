@@ -33,8 +33,8 @@ like a fact.
 **Over-planning is a failure of the same weight as under-planning.** The tier
 (`S` / `M` / `L`) is read off the work and declared at the top, and the planning
 gate stops a run at the phase that owns the condition — a goal that needs "and",
-no measurable criterion, a cheap unverified assumption, a person who has already
-decided and is asking for execution, or a term with two meanings.
+no measurable criterion, a cheap unverified assumption, or a person who has already
+decided and is asking for execution. A term with two meanings is one question with its default, not a stop.
 
 **A range nobody ever scores is not a forecast.** Estimating in ranges already
 sounds rigorous, so the practice survives without being checked: ranges are
