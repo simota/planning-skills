@@ -222,7 +222,11 @@ def v7_routes_real():
         if not isinstance(r, dict):
             fail("V7", f"routes.yaml {name} is {r!r}, not a mapping")
     for name, r in ROUTES.items():
-        for s in r.get("chain") or []:
+        chain = r.get("chain") or []
+        if not isinstance(chain, list):
+            fail("V7", f"route {name} chain is {chain!r}, not a list of skills")
+            continue
+        for s in chain:
             if s not in SKILLS:
                 fail("V7", f"route {name} chains {s}, which does not exist")
 
@@ -240,16 +244,30 @@ def _norm(s: str) -> str:
     return unicodedata.normalize("NFKC", s).lower()
 
 
+def _signals(c: dict) -> list[str]:
+    """The signals a rule can match on. A null, a scalar or a non-string entry
+    is V9's to report; every other rule reads the strings and does not crash."""
+    sigs = c.get("signals")
+    return [s for s in sigs if isinstance(s, str)] if isinstance(sigs, list) else []
+
+
 def v9_signals():
     seen: dict[str, str] = {}
     for name, c in CAP_RAW.items():
         if not isinstance(c, dict):
             fail("V9", f"capabilities.yaml {name} is {c!r}, not a mapping")
             continue
-        sigs = c.get("signals") or []
+        sigs = c.get("signals")
         if not sigs:
             fail("V9", f"{name} declares no signals")
+            continue
+        if not isinstance(sigs, list):
+            fail("V9", f"{name} signals is {sigs!r}, not a list")
+            continue
         for s in sigs:
+            if not isinstance(s, str):
+                fail("V9", f"{name} signal {s!r} is not a string")
+                continue
             k = _norm(s)
             if k in seen:
                 fail("V9", f"signal {s!r} claimed by both {seen[k]} and {name}")
@@ -257,13 +275,14 @@ def v9_signals():
 
 
 def v10_fixtures():
-    pairs = [(_norm(s), name) for name, c in CAP.items() for s in c.get("signals") or []]
+    pairs = [(_norm(s), name) for name, c in CAP.items() for s in _signals(c)]
     # An empty or mis-shaped fixture file checks nothing, and would say green.
     if not isinstance(FIX, list) or not FIX:
         fail("V10", "fixtures.yaml is not a non-empty list of {ask, expect}")
         return
     for entry in FIX:
-        if not (isinstance(entry, dict) and "ask" in entry and "expect" in entry):
+        if not (isinstance(entry, dict) and isinstance(entry.get("ask"), str)
+                and isinstance(entry.get("expect"), str)):
             fail("V10", f"fixture {entry!r} is not an {{ask, expect}} pair")
             continue
         ask, expect = _norm(entry["ask"]), entry["expect"]
@@ -293,7 +312,8 @@ def v13_route_budget():
     if len(ROUTES_RAW) > LIM["routes_max"]:
         fail("V13", f"{len(ROUTES_RAW)} routes (max {LIM['routes_max']})")
     for name, r in ROUTES.items():
-        n = len(r.get("chain") or [])
+        chain = r.get("chain") or []
+        n = len(chain) if isinstance(chain, list) else 0     # V7 reports a scalar
         if n > LIM["route_stages_max"]:
             fail("V13", f"route {name} chains {n} stages (max {LIM['route_stages_max']})")
 
@@ -315,7 +335,7 @@ def v15_permission_class():
     classes = H["permission_classes"]
     for d in SKILL_DIRS:
         declared = CAP.get(d.name, {}).get("class")
-        if declared not in classes:
+        if not isinstance(declared, str) or declared not in classes:
             fail("V15", f"{d.name} declares unknown class {declared!r}")
             continue
         want = classes[declared]["tools"]
@@ -360,7 +380,7 @@ def v17_delivery():
 def v18_signals_in_description():
     for d in SKILL_DIRS:
         desc = _norm(frontmatter(read(d / "SKILL.md")).get("description", ""))
-        for s in CAP.get(d.name, {}).get("signals", []):
+        for s in _signals(CAP.get(d.name, {})):
             if _norm(s) not in desc:
                 fail("V18", f"{d.name} signal {s!r} is not literal in its description; "
                             "the listing carries nothing else")
@@ -518,8 +538,15 @@ def v25_playbook_rot():
 
 def v26_boundaries_real():
     for name, c in CAP.items():
-        for entry in c.get("not", []):
-            go = entry.get("go", "")
+        entries = c.get("not", [])
+        if not isinstance(entries, list):
+            fail("V26", f"{name} `not:` is {entries!r}, not a list of {{what, go}}")
+            continue
+        for entry in entries:
+            go = entry.get("go", "") if isinstance(entry, dict) else None
+            if not isinstance(go, str):
+                fail("V26", f"{name} `not:` entry {entry!r} is not a {{what, go}} mapping")
+                continue
             if go.startswith(PREFIX) and go not in SKILLS:
                 fail("V26", f"{name} `not:` sends work to {go}, which does not exist")
 
@@ -722,7 +749,9 @@ def v34_tools_reachable():
                         "which are not skills")
         for d in SKILL_DIRS:
             cls = CAP.get(d.name, {}).get("class")
-            has_shell = "Bash" in H["permission_classes"].get(cls, {}).get("tools", "")
+            # An unknown or unhashable class is V15's to report; it grants nothing.
+            grant = H["permission_classes"].get(cls, {}) if isinstance(cls, str) else {}
+            has_shell = "Bash" in grant.get("tools", "")
             link = d / tool
             should = d.name in wanted and has_shell
             if should and not link.is_symlink():

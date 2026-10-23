@@ -94,6 +94,11 @@ def _(r):
     p.write_text(p.read_text(encoding="utf-8") + "\nhalf-written:\n", encoding="utf-8")
 
 
+@case("V7-scalar-chain")
+def _(r): sub(r / "planning-registry/routes.yaml", "chain: [planning-discover, planning-options]",
+              "chain: 3")
+
+
 @case("V8")
 def _(r): sub(r / "README.md", "](skills/_planning/CONTRACT.md)", "](skills/_planning/GONE.md)")
 
@@ -107,6 +112,27 @@ def _(r): sub(r / "planning-registry/capabilities.yaml", "signals: [pre-mortem, 
 def _(r):
     p = r / "planning-registry/capabilities.yaml"
     p.write_text(p.read_text(encoding="utf-8") + "\nplanning-scalar: 3\n", encoding="utf-8")
+
+
+@case("V9-null-signals")
+def _(r):
+    """A half-written entry is V9's to report; every rule reading signals must survive it."""
+    sub(r / "planning-registry/capabilities.yaml",
+        "  signals: [pre-mortem, register with likelihood, impact, mitigations, abort conditions]",
+        "  signals:")
+
+
+@case("V9-scalar-signal")
+def _(r): sub(r / "planning-registry/capabilities.yaml",
+              "signals: [pre-mortem, register with likelihood",
+              "signals: [3, pre-mortem, register with likelihood")
+
+
+@case("V10-non-string-ask")
+def _(r):
+    p = r / "planning-registry/fixtures.yaml"
+    p.write_text(p.read_text(encoding="utf-8") + "\n- ask: 3\n  expect: planning-risk\n",
+                 encoding="utf-8")
 
 
 @case("V10-empty")
@@ -154,6 +180,17 @@ def _(r): sub(r / "planning-registry/routes.yaml", "  pattern: loop", "  pattern
 @case("V15")
 def _(r): sub(r / f"{S}planning-router/SKILL.md", "allowed-tools: Read, Grep, Glob, Skill",
               "allowed-tools: Read, Grep, Glob, Write, Edit")
+
+
+@case("V10-list-expect")
+def _(r):
+    p = r / "planning-registry/fixtures.yaml"
+    p.write_text(p.read_text(encoding="utf-8")
+                 + '\n- ask: "abort conditions"\n  expect: [planning-risk]\n', encoding="utf-8")
+
+
+@case("V15-unhashable")
+def _(r): sub(r / "planning-registry/capabilities.yaml", "  class: route", "  class: [route]")
 
 
 @case("V16")
@@ -250,6 +287,22 @@ def _(r): sub(r / f"{S}planning-risk/playbooks/traps.md", "# ", "# pinned at v2.
 @case("V26")
 def _(r): sub(r / "planning-registry/capabilities.yaml", "      go: planning-replan",
               "      go: planning-adjust")
+
+
+@case("V26-null")
+def _(r):
+    """`not:` left empty, as a half-written boundary list is."""
+    t = (r / "planning-registry/capabilities.yaml").read_text(encoding="utf-8")
+    i = t.index("planning-risk:")
+    j = t.index("  signals:", i)
+    (r / "planning-registry/capabilities.yaml").write_text(
+        t[:i] + "planning-risk:\n  class: doc-write\n  not:\n" + t[j:], encoding="utf-8")
+
+
+@case("V26-scalar")
+def _(r): sub(r / "planning-registry/capabilities.yaml",
+              '    - what: "reacting to something that already went wrong"\n      go: planning-replan',
+              "    - planning-replan")
 
 
 @case("V27")
