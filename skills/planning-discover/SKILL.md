@@ -110,7 +110,7 @@ an `A-n` or `[unknown]` with a `Q-n`.
   number-pair gets one outcome once the work closes — `within`, `under`,
   `over`, `open`, `abandoned` — and the ratio of actual to midpoint beside it.
   Scored on the original; a revision is scored as its own range. **Ten `within`
-  in ten is a defect**: ranges that cannot be wrong carry no information
+  in ten on 80% ranges is a defect**: ranges that cannot be wrong carry no information
   (`_planning/CALIBRATION.md`)
 <!-- /deliver:score -->
 

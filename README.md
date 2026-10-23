@@ -43,7 +43,7 @@ method with the same confidence. So every range is scored once its work closes
 — `within`, `under`, `over`, `open`, `abandoned` — with the ratio of actual to
 midpoint beside it, on the original range; a revision is scored as its own range.
 
-**A record of ten `within` in ten is a defect**, not a result: ranges that would
+**A record of ten `within` in ten on 80% ranges is a defect**, not a result: ranges that would
 have contained almost any outcome carry no information. The record attaches to
 the method and the kind of work, never to a person — a record used to grade
 someone stops being honest within one cycle
