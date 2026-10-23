@@ -70,7 +70,9 @@ def strict(schema: dict) -> dict:
         return schema
     out = {k: strict(v) if isinstance(v, dict) and k not in _VALUES else v
            for k, v in schema.items()}
-    if out.get("type") == "object":
+    # `["object", "null"]` is an object too, and codex rejects it just as open.
+    t = out.get("type")
+    if t == "object" or (isinstance(t, list) and "object" in t):
         # Closing an object the caller opened on purpose — a map, an explicit
         # `true` — asks a different question, and the answer `{}` then passes.
         if out.get("additionalProperties", False) is not False:
@@ -369,17 +371,23 @@ def _kill_group(p: subprocess.Popen) -> None:
             pipe.close()
 
 
+def _not_json(name: str):
+    raise ValueError(f"{name} is not JSON")
+
+
 def _parse(engine: str, body: str) -> dict:
+    # Python's json reads NaN and Infinity, which JSON does not have; a NaN
+    # passes every `minimum` and `maximum` conforms() would hold it to.
     stripped = body.strip()
     try:
-        got = json.loads(stripped)
+        got = json.loads(stripped, parse_constant=_not_json)
         if isinstance(got, dict):
             return got
     except ValueError:
         pass
     for line in reversed(stripped.splitlines()):
         try:
-            got = json.loads(line)
+            got = json.loads(line, parse_constant=_not_json)
         except ValueError:
             continue
         if isinstance(got, dict):

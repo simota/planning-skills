@@ -7,7 +7,7 @@ The `course-correct` key is what `registry/routes.yaml` re-enters on; the class 
 
 | Class | `course-correct` key | Signal | Correction surface | Skill |
 |-------|----------------------|--------|-------------------|-------|
-| Estimation error | `estimate` | Work is what was planned and takes longer, or only capacity (headcount, availability) moved | Re-estimate, widen buffer, recalibrate the reference class | `planning-estimate` |
+| Estimation error | `estimate` | Work is what was planned and takes longer, or only capacity (headcount, availability) moved | Re-estimate the remaining work at the observed rate, widen buffer; adjust the reference class only as `_planning/CALIBRATION.md` allows | `planning-estimate` |
 | Missing work | `dependency` | Tasks appearing that were never in the plan | Re-decompose; ask why the slicing missed them | `planning-decompose` |
 | Falsified assumption | `evidence` | An `A-n` behind a decision turned out false; one behind the goal itself is `goal` | Verify related assumptions, then reconsider the decision it fed | `planning-discover` → `planning-options` |
 | Materialized risk | `materialized-risk` | An `R-n` came true | The mitigation's owner executes it; risk re-prices the remaining register | `planning-risk` |

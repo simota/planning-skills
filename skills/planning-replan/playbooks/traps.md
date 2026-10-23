@@ -6,5 +6,5 @@
 - **Rewriting the plan in place**: destroys the record of what was believed when. Supersede, do not overwrite.
 - **Renumbering IDs after dropping tasks**: silently breaks every prior reference. The dropped item stays in place marked `(dropped: <reason>)`, and its ID is never reused.
 - **Sunk cost entering the price**: "we're 70% done" is not an argument for finishing; the remaining 30% has its own cost and its own value.
-- **Re-planning at the same optimism**: if the last estimate was 2× low, the next one built the same way is too. Recalibrate the reference class, not just the number.
+- **Re-planning at the same optimism**: if the last estimate was 2× low, the next one built the same way is too. Re-estimate the remaining work at the observed rate rather than the planned one, and score the miss: the reference class moves only once enough scored ranges show a direction (`_planning/CALIBRATION.md`).
 - **Skipping the lesson**: a replan that corrects the schedule but not the method produces the identical replan next month.
