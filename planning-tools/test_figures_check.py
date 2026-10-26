@@ -8,6 +8,7 @@ lost its figures is the false pass the fast tier exists to rule out.
 """
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import sys
@@ -39,6 +40,23 @@ def replace(old: str, new: str):
     return edit
 
 
+def drop_key(key: str):
+    """A fixture whose seed and runs still match, with one section gone."""
+    def edit(text: str) -> str:
+        d = json.loads(text)
+        del d[key]
+        return json.dumps(d)
+    return edit
+
+
+def set_key(key: str, value):
+    def edit(text: str) -> str:
+        d = json.loads(text)
+        d[key] = value
+        return json.dumps(d)
+    return edit
+
+
 # (name, file, edit, should the fast tier pass?)
 CASES = [
     ("untouched", PAGE, lambda t: t, True),
@@ -49,6 +67,9 @@ CASES = [
     ("the correlation table emptied", PAGE, drop_body("| σ | p50 | p90 |"), False),
     ("a truncated fixture", FIXTURE, lambda t: t[:len(t) // 2], False),
     ("a fixture that is not an object", FIXTURE, lambda t: "[]\n", False),
+    ("a fixture missing a table's figures", FIXTURE, drop_key("correlation"), False),
+    ("a fixture missing the endpoints", FIXTURE, drop_key("endpoints"), False),
+    ("a fixture row of the wrong shape", FIXTURE, set_key("percentiles", {"3": 1.0}), False),
 ]
 
 
