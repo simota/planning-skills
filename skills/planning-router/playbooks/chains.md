@@ -21,7 +21,7 @@ The recurring chains, with their control structure, are `registry/routes.yaml`; 
 | Feature with a contested approach, multi-owner or hard to reverse | `L` | `frame → discover → options → decompose → estimate → risk → review` |
 | Migration, rewrite, or irreversible change | `L` | Full chain; `risk` and `review` mandatory |
 | Unfamiliar or legacy codebase | Per the `SIZING` triggers, never from unfamiliarity alone | `frame → discover` first, then re-route on findings |
-| Deadline is fixed, scope is not | `M`/`L` | `frame → options` (options over *scope*, not approach) `→ decompose → estimate`; `L` continues to `risk → review` |
+| Deadline is fixed, scope is not | `M`/`L` | `frame → options` (options over *scope*, not approach) `→ decompose → estimate`; `L` runs `discover` after frame unless the skip is stated, and continues to `risk → review` |
 | Plan exists, reality diverged | The plan's declared tier | `planning-replan` alone; re-enter the chain only where it points |
 | Plan exists, needs sign-off | The plan's declared tier | `planning-review` alone |
 | Work finished or stopped | The plan's declared tier | `planning-replan` alone, to score every range (`close-out`) |

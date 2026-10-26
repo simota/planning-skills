@@ -47,7 +47,6 @@ Re-running a phase continues the existing sequence — it never restarts at 1. A
 ## Decision record shape
 
 Recorded inline in `20-options.md`:
-
 ```
 ### D-1: <decision in one sentence>
 - Date: YYYY-MM-DD
@@ -56,6 +55,7 @@ Recorded inline in `20-options.md`:
 - Because: <the deciding factor, not a list of pros>
 - Reversible: yes | no | costly (<what undoing it takes>)
 - Revisit when: <observable trigger>
+- Confidence: High | Medium | Low — <reason>
 ```
 
 A decision with no `Revisit when` is permanent by default — state that deliberately or supply the trigger.

@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import pathlib
 import signal
@@ -221,7 +222,10 @@ def run(engine: str, prompt: str, schema: dict) -> dict:
     if engine not in known:
         raise EngineError(f"{engine} is not one of {known}")
     got = _ask(engine, prompt, strict(schema))
-    why = conforms(strict(schema), got)
+    # Both, because neither contains the other: closing the objects under `not`
+    # or in a `oneOf` alternative loosens what they exclude, so an answer the
+    # caller's schema rejects can conform to the closed one.
+    why = conforms(strict(schema), got) or conforms(schema, got)
     if why:
         raise EngineError(f"{engine} answered off-schema: {why}\n{json.dumps(got)[:400]}")
     return got
@@ -375,21 +379,30 @@ def _not_json(name: str):
     raise ValueError(f"{name} is not JSON")
 
 
+def _finite(digits: str) -> float:
+    """A number too large for a float, read as infinity: JSON has no such value."""
+    value = float(digits)
+    if math.isinf(value):
+        raise ValueError(f"{digits} does not fit a float")
+    return value
+
+
 def _parse(engine: str, body: str) -> dict:
-    # Python's json reads NaN and Infinity, which JSON does not have; a NaN
-    # passes every `minimum` and `maximum` conforms() would hold it to.
+    # Python's json reads NaN and Infinity, which JSON does not have, and turns
+    # 1e400 into infinity; a NaN passes every `minimum` and `maximum` conforms()
+    # would hold it to, and an infinity is printed back as `Infinity`.
     # Nesting deeper than the parser recurses raises RecursionError, which is
     # not a ValueError: it is this engine's unreadable answer all the same.
     stripped = body.strip()
     try:
-        got = json.loads(stripped, parse_constant=_not_json)
+        got = json.loads(stripped, parse_constant=_not_json, parse_float=_finite)
         if isinstance(got, dict):
             return got
     except (ValueError, RecursionError):
         pass
     for line in reversed(stripped.splitlines()):
         try:
-            got = json.loads(line, parse_constant=_not_json)
+            got = json.loads(line, parse_constant=_not_json, parse_float=_finite)
         except (ValueError, RecursionError):
             continue
         if isinstance(got, dict):

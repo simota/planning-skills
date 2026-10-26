@@ -116,9 +116,9 @@ def missing(where: str, want, seen: set, what: str) -> None:
 
 
 def check_endpoints(fx) -> int:
+    # An emptied table falls through to `missing`, which names both rows: these
+    # are the headline figures, and a page that lost them is not a green page.
     rows = rows_after("Where those endpoints actually fall")
-    if not rows:
-        return 0
     e = fx["endpoints"]
     want = {"Sum O … sum P": (e["sum_o"], e["sum_p"], e["pct_o"], e["pct_p"]),
             "Simulated p10 … p90": (e["p10"], e["p90"], None, None)}
@@ -143,6 +143,8 @@ def check_endpoints(fx) -> int:
                 fail("endpoints", f"{label}: page says p{plo} … p{phi}, "
                                   f"model gives p{w[2]:.2f} … p{w[3]:.2f}")
     missing("endpoints", want, seen, "")
+    if n == 0:
+        fail("endpoints", "no rows compared — the checker has stopped checking")
     return n
 
 
@@ -359,11 +361,26 @@ def compute() -> dict:
     return out
 
 
-def load_fixture() -> dict | None:
+def read_fixture() -> tuple[dict | None, str]:
+    """The stored fixture, or why there is none. A half-written or conflicted
+    file is a finding to report, not a traceback."""
     if not FIXTURE.exists():
-        fail("fixture", f"{FIXTURE.name} is missing — run `make figures-full`")
+        return None, "is missing"
+    try:
+        f = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    except (OSError, ValueError, RecursionError) as e:
+        return None, f"cannot be read ({e})"
+    if not isinstance(f, dict):
+        return None, f"holds a {type(f).__name__}, not the model's figures"
+    return f, ""
+
+
+def load_fixture() -> dict | None:
+    f, why = read_fixture()
+    if f is None:
+        fix = "figures-full" if not FIXTURE.exists() else "figures-rewrite"
+        fail("fixture", f"{FIXTURE.name} {why} — run `make {fix}`")
         return None
-    f = json.loads(FIXTURE.read_text(encoding="utf-8"))
     if f.get("seed") != SEED or f.get("runs") != N:
         fail("fixture", f"built from seed {f.get('seed')} over {f.get('runs')} runs; "
                         f"this checker models seed {SEED} over {N} — run `make figures-full`")
@@ -380,7 +397,14 @@ def main() -> int:
     full = rewrite or "--full" in sys.argv
     if full:
         fresh = compute()
-        stored = json.loads(FIXTURE.read_text(encoding="utf-8")) if FIXTURE.exists() else None
+        stored, why = read_fixture()
+        if stored is None and FIXTURE.exists() and not rewrite:
+            # Unreadable is not absent: overwriting it would hide whatever
+            # half-finished edit or merge left it this way.
+            print(f"{FIXTURE.name} {why}.")
+            print("If it should hold this run's figures, run `make figures-rewrite` "
+                  "and commit it.")
+            return 1
         if stored is not None and stored != fresh and not rewrite:
             # Rewriting here would make the slow tier the one thing it exists to
             # rule out: a check that repairs its own oracle and reports green. A

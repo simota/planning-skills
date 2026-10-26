@@ -75,13 +75,21 @@ RUN_REFUSED = [
     ({**OBJ, "additionalProperties": {"type": "string"}}, {}),
     ({**OBJ, "properties": {"m": {**OBJ, "additionalProperties": True}}}, {"m": {}}),
     ({"type": ["object", "null"], "additionalProperties": True}, {}),
+    # strict() closes the objects under `not` and in each alternative too, which
+    # loosens what they exclude: the answer is held to the schema as written.
+    ({**OBJ, "properties": {"v": {"type": "string"}, "o": {"type": "boolean"}},
+      "not": {**OBJ, "required": ["o"]}}, {"v": "pass", "o": True}),
+    ({**OBJ, "properties": {"a": {"type": "integer"}},
+      "oneOf": [OBJ, {**OBJ, "properties": {"a": {"type": "integer"}}}]}, {"a": 1}),
 ]
 
 # What an engine prints that is not JSON, though Python's json reads it: a NaN
 # passes every `minimum` and `maximum`, so it must not reach conforms() at all.
 # Nesting deeper than the parser recurses is that engine's answer failing, not a
 # RecursionError that takes the other engines' verdicts down with the run.
-NOT_JSON = ['{"n": NaN}', '{"n": Infinity}', '{"n": -Infinity}', '{"n": ' + "[" * 100_000]
+# A number too large for a float is read as infinity, and printed back as one.
+NOT_JSON = ['{"n": NaN}', '{"n": Infinity}', '{"n": -Infinity}', '{"n": ' + "[" * 100_000,
+            '{"n": 1e400}', '{"n": -1e400}']
 
 
 def _alive(pidfile: Path) -> bool:

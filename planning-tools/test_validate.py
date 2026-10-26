@@ -524,6 +524,52 @@ def _(r):
 def _(r): sub(r / "planning-registry/harness.yaml", "source_authorities:", "unused_authorities:")
 
 
+@case("V24-hyphenated")
+def _(r):
+    """A stale name with a hyphen in it is still a name that does not exist."""
+    sub(r / f"{S}_planning/ROUTING.md", "`planning-risk`",
+        "`planning-risk` (formerly `planning-risk-log`)")
+
+
+@case("V24-readme-word")
+def _(r):
+    """A longer name that contains a skill's name does not list that skill."""
+    sub(r / "README.md", "[`planning-risk`](skills/planning-risk/SKILL.md)",
+        "[planning-risk-log](skills/planning-risk-log/SKILL.md)")
+
+
+@case("V4-elsewhere")
+def _(r):
+    """A link to another skill's file of the same name links nothing here."""
+    sub(r / f"{S}planning-estimate/SKILL.md", "(playbooks/traps.md)",
+        "(../planning-risk/playbooks/traps.md)")
+
+
+@case("V30-elsewhere")
+def _(r): sub(r / f"{S}planning-review/SKILL.md", "(reference/template.md)",
+              "(../planning-risk/reference/template.md)")
+
+
+@case("V34-copy")
+def _(r):
+    """A copy in place of a link is the same decoration, and it does not track the tool."""
+    import yaml as _y
+    caps = _y.safe_load((r / "planning-registry/capabilities.yaml").read_text(encoding="utf-8"))
+    cls = _y.safe_load((r / "planning-registry/harness.yaml").read_text(encoding="utf-8"))["permission_classes"]
+    name = next(n for n, e in caps.items() if "Bash" not in cls[e["class"]]["tools"])
+    shutil.copyfile(r / "planning-tools/refute.py", r / "skills" / name / "refute.py")
+
+
+@case("V37-version-prefix")
+def _(r):
+    """A pin is matched as a version, not as the start of a longer one."""
+    sub(r / "planning-registry/harness.yaml", "source_authorities: {}",
+        'source_authorities: {git: "2.4"}')
+    sub(r / f"{S}planning-frame/reference/template.md",
+        "Source: none — nothing outside this page can move what it states.",
+        "Source: git 2.45\n\nWritten against git 2.45.")
+
+
 # Each quiet case mutates a copy the same way, and the validator must stay green:
 # a rule that fires on what it exists to ignore gets switched off by hand.
 QUIET: dict[str, callable] = {}
