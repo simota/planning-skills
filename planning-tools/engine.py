@@ -127,6 +127,23 @@ def _same(a, b) -> bool:
     return a == b
 
 
+def _bound(v) -> bool:
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+
+
+def _count(v) -> bool:
+    return _bound(v) and v >= 0 and float(v).is_integer()
+
+
+_FORMS = {"minimum": _bound, "maximum": _bound,
+          "minLength": _count, "maxLength": _count, "minItems": _count, "maxItems": _count,
+          "required": lambda v: isinstance(v, list) and all(isinstance(k, str) for k in v),
+          "enum": lambda v: isinstance(v, list),
+          "properties": lambda v: isinstance(v, dict),
+          "allOf": lambda v: isinstance(v, list), "anyOf": lambda v: isinstance(v, list),
+          "oneOf": lambda v: isinstance(v, list)}
+
+
 def conforms(schema: dict, value, at: str = "$") -> str | None:
     """The first way `value` breaks `schema`, or None — no dependency.
 
@@ -160,6 +177,15 @@ def conforms(schema: dict, value, at: str = "$") -> str | None:
     if unknown:
         raise EngineError(f"schema at {at} uses {sorted(unknown)}, which this "
                           "check does not implement; extend conforms() first")
+    # A checked keyword holding a value of the wrong form compares against
+    # something else: a string bound raised TypeError after the engine had
+    # answered, a NaN bound passed every number, and a string `required` was
+    # read letter by letter. Refused like an unknown keyword, for the same reason.
+    malformed = [k for k, ok in _FORMS.items() if k in schema and not ok(schema[k])]
+    if malformed:
+        given = ", ".join(f"{k}={schema[k]!r}" for k in malformed)
+        raise EngineError(f"schema at {at} gives {given}, which is not the form "
+                          "that keyword takes")
     want = schema.get("type")
     if want:
         types = want if isinstance(want, list) else [want]
@@ -246,7 +272,9 @@ def _ask(engine: str, prompt: str, schema: dict):
             argv = ["codex", "exec", "--output-schema", str(s), "-o", str(out),
                     "--sandbox", "read-only", "--skip-git-repo-check", "-"]
             r = _spawn(engine, argv, cwd, prompt)
-            body = out.read_text(encoding="utf-8") if out.exists() else ""
+            # Leniently, as its stdout is: a stray byte in the file is codex's
+            # unreadable answer, not a UnicodeDecodeError out of the whole run.
+            body = out.read_text(encoding="utf-8", errors="replace") if out.exists() else ""
             if not body.strip():
                 raise EngineError(f"codex wrote no answer.\n{_tail(r)}")
             return _parse(engine, body)
@@ -387,26 +415,35 @@ def _finite(digits: str) -> float:
     return value
 
 
+def _utf8(value):
+    """`value`, once every string in it is known to encode as UTF-8."""
+    json.dumps(value, ensure_ascii=False).encode("utf-8")
+    return value
+
+
 def _parse(engine: str, body: str) -> dict:
     # Python's json reads NaN and Infinity, which JSON does not have, and turns
     # 1e400 into infinity; a NaN passes every `minimum` and `maximum` conforms()
     # would hold it to, and an infinity is printed back as `Infinity`.
     # Nesting deeper than the parser recurses raises RecursionError, which is
     # not a ValueError: it is this engine's unreadable answer all the same.
+    # A lone surrogate (`"\ud83d"`) is a valid escape and no UTF-8 at all, so
+    # the answer could not be printed; `_utf8` raises UnicodeEncodeError, which
+    # is a ValueError, and the answer is refused with the rest.
     stripped = body.strip()
     try:
         got = json.loads(stripped, parse_constant=_not_json, parse_float=_finite)
         if isinstance(got, dict):
-            return got
+            return _utf8(got)
     except (ValueError, RecursionError):
         pass
     for line in reversed(stripped.splitlines()):
         try:
             got = json.loads(line, parse_constant=_not_json, parse_float=_finite)
+            if isinstance(got, dict):
+                return _utf8(got)
         except (ValueError, RecursionError):
             continue
-        if isinstance(got, dict):
-            return got
     raise EngineError(f"{engine} printed nothing that parses as an object:\n{body[:400]}")
 
 
@@ -470,7 +507,9 @@ def main() -> int:
         return 2
     try:
         prompt = pathlib.Path(a.prompt_file).read_text(encoding="utf-8")
-        schema = json.loads(pathlib.Path(a.schema).read_text(encoding="utf-8"))
+        # Held to JSON as an answer is: a NaN bound is no bound at all.
+        schema = json.loads(pathlib.Path(a.schema).read_text(encoding="utf-8"),
+                            parse_constant=_not_json, parse_float=_finite)
     except (OSError, ValueError, RecursionError) as e:
         # The caller's input, not the checker's answer: 1 would read as the
         # engine having failed to answer a question that was never asked.

@@ -132,8 +132,10 @@ def main() -> int:
         return 1
 
     try:
-        claims = json.loads(pathlib.Path(a.claims).read_text(encoding="utf-8"))
-    except (OSError, ValueError) as e:
+        # Too deep to parse, or carrying a lone surrogate no output can print,
+        # is the caller's file as surely as one that is not JSON.
+        claims = engine._utf8(json.loads(pathlib.Path(a.claims).read_text(encoding="utf-8")))
+    except (OSError, ValueError, RecursionError) as e:
         print(f"cannot read claims from {a.claims}: {e}", file=sys.stderr)
         return 2
     if isinstance(claims, dict):
