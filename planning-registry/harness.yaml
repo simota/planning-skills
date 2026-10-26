@@ -56,7 +56,7 @@ listing:
 # `doc-write` here carries Edit and withholds Bash, which is the reverse of the
 # coding and design sets. Both are `doc-write` by the same definition — the
 # artifact is documents, stated in the Never list — and the tools differ because
-# the domains do: every file under plans/ opens with `> Status:` and `> Updated:`
+# the domains do: every file under plans/ carries, under its title, `> Status:` and `> Updated:`
 # that a later phase rewrites in place (ARTIFACTS.md), and a set whose rule is
 # "never write code" does not hand out a shell to keep it.
 #

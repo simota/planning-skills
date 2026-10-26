@@ -48,6 +48,10 @@ CASES = [
     ({"properties": {"x": False}}, {"x": 1}, False),
     ({"type": "string", "maxLength": 2}, "abc", False),
     ({"type": "number", "minimum": 0}, -1, False),
+    # An integer bound past the float range is still a bound, and an exact one.
+    ({"type": "number", "maximum": 10 ** 309}, 1, True),
+    ({"type": "number", "minimum": 10 ** 309}, 1e308, False),
+    ({"type": "string", "maxLength": 10 ** 309}, "x", True),
     # A nullable object is still an object: closed, so an extra key fails.
     (engine.strict({"type": ["object", "null"], "properties": {"a": {"type": "string"}}}),
      {"a": "x", "b": 1}, False),
@@ -66,6 +70,18 @@ REFUSED = [
     ({"type": ""}, 5),
     ({"type": []}, 5),
     ({"type": [["x"]]}, "a"),
+    # A keyword whose value is not the form it takes: compared as written, a
+    # string bound raised TypeError after the engine had answered, a NaN bound
+    # passed everything, and a string `required` was read letter by letter.
+    ({"type": "number", "minimum": "0"}, 5),
+    ({"type": "number", "maximum": float("nan")}, 1e300),
+    ({"type": "number", "minimum": True}, 5),
+    ({"type": "string", "minLength": "2"}, "abc"),
+    ({"type": "array", "maxItems": 1.5}, [1]),
+    ({"required": "a"}, {"a": 1}),
+    ({"enum": 1}, 1),
+    ({"properties": [{"a": {}}]}, {"a": 1}),
+    ({"allOf": {"type": "string"}}, "x"),
 ]
 
 # Schemas run() must refuse before asking: strict() closes every object for
@@ -89,7 +105,10 @@ RUN_REFUSED = [
 # RecursionError that takes the other engines' verdicts down with the run.
 # A number too large for a float is read as infinity, and printed back as one.
 NOT_JSON = ['{"n": NaN}', '{"n": Infinity}', '{"n": -Infinity}', '{"n": ' + "[" * 100_000,
-            '{"n": 1e400}', '{"n": -1e400}']
+            '{"n": 1e400}', '{"n": -1e400}',
+            # A lone surrogate is a valid JSON escape and no UTF-8 at all: read as
+            # an answer, it raised UnicodeEncodeError when the verdict was printed.
+            '{"n": "\\ud83d"}', '{"\\udc00": 1}']
 
 
 def _alive(pidfile: Path) -> bool:
@@ -296,6 +315,21 @@ def main() -> int:
             bad.append(f"deep log line: the answer after it was read as {got!r}")
     except Exception as e:                           # noqa: BLE001
         bad.append(f"deep log line: raised {type(e).__name__} before reaching the answer")
+    # codex answers through a file, read apart from the lenient stdout decoding:
+    # one stray byte there must be codex's error, not a UnicodeDecodeError that
+    # takes the other engines' verdicts with it.
+    def codex_writes_bytes(eng, argv, cwd, stdin=None):
+        Path(argv[argv.index("-o") + 1]).write_bytes(b'{"ok": true}\xff')
+        return subprocess.CompletedProcess(argv, 0, "", "")
+    engine._spawn = codex_writes_bytes
+    try:
+        engine.run("codex", "p", engine.SELFTEST)
+    except engine.EngineError:
+        pass
+    except Exception as e:                           # noqa: BLE001
+        bad.append(f"codex non-UTF-8 answer: raised {type(e).__name__} instead of EngineError")
+    finally:
+        engine._spawn = real
     # An input that cannot be read is the caller's mistake (2), not a checker
     # that did not answer (1) — and never a traceback.
     with tempfile.TemporaryDirectory() as tmp:
@@ -303,13 +337,27 @@ def main() -> int:
         bad_json.write_text("{", encoding="utf-8")
         deep_json = Path(tmp) / "deep.json"
         deep_json.write_text("[" * 100_000, encoding="utf-8")
+        # NaN is not JSON: a schema bound of NaN held no answer to anything.
+        nan_json = Path(tmp) / "nan.json"
+        nan_json.write_text('{"type": "number", "maximum": NaN}', encoding="utf-8")
         for args in (["--prompt-file", str(Path(tmp) / "none"), "--schema", str(bad_json)],
                      ["--prompt-file", str(bad_json), "--schema", str(bad_json)],
-                     ["--prompt-file", str(bad_json), "--schema", str(deep_json)]):
+                     ["--prompt-file", str(bad_json), "--schema", str(deep_json)],
+                     ["--prompt-file", str(bad_json), "--schema", str(nan_json)]):
             r = subprocess.run([sys.executable, engine.__file__, "codex", *args],
                                capture_output=True, text=True)
             if r.returncode != 2 or "Traceback" in r.stderr:
-                bad.append(f"unreadable input {args[1]}: exit {r.returncode}\n{r.stderr[-300:]}")
+                bad.append(f"unreadable input {args[-1]}: exit {r.returncode}\n{r.stderr[-300:]}")
+        # The same for refute.py's claims: too deep to parse, or carrying text no
+        # UTF-8 output can print, is the caller's file (2), never a traceback.
+        surrogate = Path(tmp) / "surrogate.json"
+        surrogate.write_text('[{"id": "c", "claim": "x \\ud83d"}]', encoding="utf-8")
+        for claims in (deep_json, surrogate):
+            r = subprocess.run([sys.executable, refute.__file__, "--running", "claude",
+                                str(claims)], capture_output=True, text=True)
+            if r.returncode != 2 or "Traceback" in r.stderr:
+                bad.append(f"unreadable claims {claims.name}: exit {r.returncode}\n"
+                           f"{r.stderr[-300:]}")
     bad += spawn_cases()
     for b in bad:
         print("FAIL:", b)

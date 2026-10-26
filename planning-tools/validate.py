@@ -551,9 +551,13 @@ def v26_boundaries_real():
             fail("V26", f"{name} `not:` is {entries!r}, not a list of {{what, go}}")
             continue
         for entry in entries:
-            go = entry.get("go", "") if isinstance(entry, dict) else None
-            if not isinstance(go, str):
-                fail("V26", f"{name} `not:` entry {entry!r} is not a {{what, go}} mapping")
+            # Both halves, non-empty: a boundary that names what is out and not
+            # where it goes — or the reverse — is a half-written entry, and
+            # reading a missing `go` as "" let it pass as a boundary.
+            what, go = (entry.get("what"), entry.get("go")) if isinstance(entry, dict) else (None, None)
+            if not (isinstance(what, str) and what.strip() and isinstance(go, str) and go.strip()):
+                fail("V26", f"{name} `not:` entry {entry!r} is not a {{what, go}} mapping "
+                            "with both halves written")
                 continue
             if go.startswith(PREFIX) and go not in SKILLS:
                 fail("V26", f"{name} `not:` sends work to {go}, which does not exist")
@@ -751,6 +755,11 @@ def v34_tools_reachable():
         source = ROOT / f"{SET}-tools" / tool
         if not source.exists():
             fail("V34", f"linked_tools names {tool}, which is not in {SET}-tools/")
+            continue
+        # `all`, or a list of skills. Any other scalar read as `set(who)` was a
+        # set of its letters, and the failure named those instead of the entry.
+        if who != "all" and not (isinstance(who, list) and all(isinstance(w, str) for w in who)):
+            fail("V34", f"linked_tools[{tool}] is {who!r}; it is `all` or a list of skills")
             continue
         wanted = set(SKILLS) if who == "all" else set(who)
         unknown = wanted - set(SKILLS)

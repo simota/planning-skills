@@ -312,6 +312,20 @@ def _(r): sub(r / "planning-registry/capabilities.yaml",
               "    - planning-replan")
 
 
+@case("V26-no-go")
+def _(r):
+    """A boundary that says what is out and not where it goes is half-written."""
+    sub(r / "planning-registry/capabilities.yaml",
+        '    - what: "reacting to something that already went wrong"\n      go: planning-replan',
+        '    - what: "reacting to something that already went wrong"')
+
+
+@case("V26-empty-what")
+def _(r): sub(r / "planning-registry/capabilities.yaml",
+              '    - what: "reacting to something that already went wrong"\n',
+              '    - what: ""\n')
+
+
 @case("V27")
 def _(r):
     (r / f"{S}planning-risk/_planning").unlink()
@@ -468,6 +482,12 @@ def _(r):
 @case("V34-missing-tool")
 def _(r): sub(r / "planning-registry/harness.yaml",
               "  refute.py: all", "  refute.py: all\n  nosuch.py: all")
+
+
+@case("V34-scalar")
+def _(r):
+    """One skill named bare, not in a list: read as a set of letters, it named none."""
+    sub(r / "planning-registry/harness.yaml", "  refute.py: all", "  refute.py: planning-discover")
 
 
 @case("V34-none-declared")

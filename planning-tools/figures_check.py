@@ -426,8 +426,19 @@ def main() -> int:
                             "bit, so `--full` would disagree here; a float total is not "
                             "going through math.fsum")
 
-    cells = (check_endpoints(fx) + check_percentiles(fx) + check_merge(fx)
-             + check_near_critical(fx) + check_correlation(fx))
+    try:
+        cells = (check_endpoints(fx) + check_percentiles(fx) + check_merge(fx)
+                 + check_near_critical(fx) + check_correlation(fx))
+    except (KeyError, TypeError, IndexError, AttributeError) as e:
+        # A fresh run cannot be missing a figure, so there this is a bug in the
+        # checker and should raise. A stored fixture can: one whose seed and
+        # runs still match but a section was dropped or reshaped by a hand edit
+        # or a merge is a finding to report, not a traceback.
+        if full:
+            raise
+        fail("fixture", f"{FIXTURE.name} lacks or misshapes a figure the page prints "
+                        f"({type(e).__name__}: {e}) — run `make figures-rewrite`")
+        cells = 0
     if failures:
         print(f"{len(failures)} mismatch(es) between the page and the model:")
         print("\n".join(failures[:20]))
