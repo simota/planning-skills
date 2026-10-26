@@ -67,6 +67,12 @@ def link_path(target: str) -> str:
     return t.split("#", 1)[0]
 
 
+def linked_files(base: Path, text: str) -> set[Path]:
+    """The files the links in `text` reach from `base`. Compared by path: a link
+    to another skill's `traps.md` does not link this one's."""
+    return {(base / link_path(m)).resolve() for m in LINK_RE.findall(text) if link_path(m)}
+
+
 # A backticked token is a path if it contains a slash or names a file. Matching
 # only on the slash misses the bare sibling reference (`SIZING.md`), which is
 # the form that breaks: it resolves against the skill directory, not against
@@ -186,9 +192,9 @@ def v4_playbook_orphans():
         if not pb_dir.exists():
             continue
         body = sections(read(d / "SKILL.md")).get("Decide first", "")
-        linked = {Path(link_path(m)).name for m in LINK_RE.findall(body)}
+        linked = linked_files(d, body)
         for pb in sorted(pb_dir.glob("*.md")):
-            if pb.name not in linked:
+            if pb.resolve() not in linked:
                 fail("V4", f"{d.name}/playbooks/{pb.name} is not linked from Decide first")
 
 
@@ -518,10 +524,11 @@ def v24_rendered_tables():
     for name in SKILLS:
         if f"`{name}`" not in routing:
             fail("V24", f"{ROUTING_FILE} does not list {name}")
-        if name not in readme:
+        # As a word: `planning-risk-log` does not list `planning-risk`.
+        if not re.search(rf"(?<![\w-]){re.escape(name)}(?![\w-])", readme):
             fail("V24", f"README.md does not list {name}")
     for doc, text in ((SKILLS_ROOT / ROUTING_FILE, routing), (ROOT / "README.md", readme)):
-        for found in set(re.findall(rf"`({PREFIX}[a-z]+)`", text)):
+        for found in set(re.findall(rf"`({PREFIX}[a-z][a-z-]*)`", text)):
             if found not in SKILLS:
                 fail("V24", f"{doc.relative_to(ROOT)} names {found}, which does not exist")
 
@@ -637,12 +644,14 @@ def v30_reference_orphans():
         if not ref_dir.exists():
             continue
         body = sections(read(d / "SKILL.md")).get("Decide first", "")
-        linked = {Path(link_path(m)).name for m in LINK_RE.findall(body)}
+        linked = linked_files(d, body)
         for pb in sorted((d / "playbooks").glob("*.md")) if (d / "playbooks").exists() else []:
-            linked |= {Path(link_path(m)).name for m in LINK_RE.findall(read(pb))}
-            linked |= {Path(m).name for m in TICK_PATH_RE.findall(read(pb))}
+            linked |= linked_files(pb.parent, read(pb))
+            # A path in backticks is written from the skill or from the playbook.
+            linked |= {(base / m).resolve() for m in TICK_PATH_RE.findall(read(pb))
+                       for base in (d, pb.parent)}
         for f in sorted(ref_dir.glob("*.md")):
-            if f.name not in linked:
+            if f.resolve() not in linked:
                 fail("V30", f"{f.relative_to(ROOT)} is reachable from nothing — "
                             "not the Decide first table, not a playbook")
 
@@ -758,10 +767,12 @@ def v34_tools_reachable():
             if should and not link.is_symlink():
                 fail("V34", f"{d.name} may run {SET}-tools/{tool} but cannot reach "
                             f"it; link it as {tool}")
-            if not should and link.is_symlink():
+            # A copy is judged as a link would be: it reads as the same capability.
+            if not should and (link.is_symlink() or link.exists()):
                 why = ("its class grants no Bash" if d.name in wanted
                        else f"linked_tools[{tool}] does not name it")
-                fail("V34", f"{d.name} links {tool} and {why}")
+                how = "links" if link.is_symlink() else "carries a copy of"
+                fail("V34", f"{d.name} {how} {tool} and {why}")
             if link.is_symlink() and link.resolve() != source.resolve():
                 fail("V34", f"{d.name}/{tool} points at {link.resolve()}, not "
                             "the set's own")
@@ -945,11 +956,11 @@ def v37_source_pins_the_rot():
                                 "uses it; a source the page does not depend on pins nothing")
                 if version and names(head, name):
                     pin = f"{name} {version}"
-                    if pin not in head:
+                    if not names(head, pin):
                         fail("V37", f"{f.relative_to(ROOT)} names {name} in `Source:` without "
                                     f"the pinned version; the registry pins {version}, and a "
                                     "source without one cannot be compared with anything later")
-                    elif pin not in body:
+                    elif not names(body, pin):
                         fail("V37", f"{f.relative_to(ROOT)} pins {pin} and the page never says "
                                     f"{pin}; one of the two moved without the other")
 
