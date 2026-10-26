@@ -127,12 +127,16 @@ def _same(a, b) -> bool:
     return a == b
 
 
+# An int is never converted to a float here: 10**309 is a finite bound, and
+# math.isfinite() or float() on it raises OverflowError.
 def _bound(v) -> bool:
-    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+    if isinstance(v, bool):
+        return False
+    return isinstance(v, int) or (isinstance(v, float) and math.isfinite(v))
 
 
 def _count(v) -> bool:
-    return _bound(v) and v >= 0 and float(v).is_integer()
+    return _bound(v) and v >= 0 and (isinstance(v, int) or v.is_integer())
 
 
 _FORMS = {"minimum": _bound, "maximum": _bound,

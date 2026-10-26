@@ -48,6 +48,10 @@ CASES = [
     ({"properties": {"x": False}}, {"x": 1}, False),
     ({"type": "string", "maxLength": 2}, "abc", False),
     ({"type": "number", "minimum": 0}, -1, False),
+    # An integer bound past the float range is still a bound, and an exact one.
+    ({"type": "number", "maximum": 10 ** 309}, 1, True),
+    ({"type": "number", "minimum": 10 ** 309}, 1e308, False),
+    ({"type": "string", "maxLength": 10 ** 309}, "x", True),
     # A nullable object is still an object: closed, so an extra key fails.
     (engine.strict({"type": ["object", "null"], "properties": {"a": {"type": "string"}}}),
      {"a": "x", "b": 1}, False),
